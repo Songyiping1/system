@@ -1,42 +1,47 @@
 import { Component, signal, computed } from '@angular/core';
 import { FormsModule } from '@angular/forms';
+import { NgTemplateOutlet } from '@angular/common';
 import { DialogComponent } from '../../shared/components/dialog/dialog.component';
-import { ButtonComponent } from '../../shared/components/button/button.component';
-import { PasswordDialogStep } from '../../shared/models';
+
+type Step = 'input' | 'input-countdown' | 'forgot' | 'confirm' | 'success';
 
 @Component({
   selector: 'app-change-password',
-  imports: [FormsModule, DialogComponent, ButtonComponent],
+  imports: [FormsModule, NgTemplateOutlet, DialogComponent],
   templateUrl: './change-password.html',
   styleUrl: './change-password.scss',
 })
 export class ChangePassword {
   readonly visible = signal(false);
-  readonly step = signal<PasswordDialogStep>('input');
-  readonly form = signal({
-    oldPassword: '',
-    newPassword: '',
-    confirmPassword: '',
-    captcha: '',
-    phone: '',
-    newPhone: '',
-  });
-  readonly errors = signal<Record<string, string>>({});
+  readonly step = signal<Step>('input');
+
+  readonly oldPassword = signal('');
+  readonly newPassword = signal('');
+  readonly confirmPassword = signal('');
+  readonly captcha = signal('');
+
+  readonly showOldPwd = signal(false);
+  readonly showNewPwd = signal(false);
+  readonly showConfirmPwd = signal(false);
+
   readonly countdown = signal(0);
-  readonly companyName = signal('中企云链（北京）信息科技有限公司');
-
-  readonly showOldPassword = signal(false);
-  readonly showNewPassword = signal(false);
-  readonly showConfirmPassword = signal(false);
-
   private countdownTimer: ReturnType<typeof setInterval> | null = null;
 
   readonly dialogTitle = computed(() => {
-    const s = this.step();
-    if (s === 'confirm' || s === 'success') return '提示';
-    if (s === 'forgot' || s === 'forgot-error') return '忘记密码';
-    if (s === 'modify-binding') return '修改绑定';
-    return '修改密码';
+    return this.step() === 'forgot' ? '忘记密码' : '修改密码';
+  });
+
+  readonly isBackStep = computed(() => this.step() === 'forgot');
+
+  readonly canSubmit = computed(() => {
+    const step = this.step();
+    if (step === 'input' || step === 'input-countdown') {
+      return !!(this.oldPassword() && this.newPassword() && this.confirmPassword() && this.captcha());
+    }
+    if (step === 'forgot') {
+      return !!(this.captcha() && this.newPassword() && this.confirmPassword());
+    }
+    return false;
   });
 
   open(): void {
@@ -50,50 +55,22 @@ export class ChangePassword {
     this.clearCountdown();
   }
 
-  updateField(field: string, value: string): void {
-    this.form.update(f => ({ ...f, [field]: value }));
-    this.errors.update(e => {
-      const copy = { ...e };
-      delete copy[field];
-      return copy;
-    });
-  }
-
-  submitPassword(): void {
-    const f = this.form();
-    const errs: Record<string, string> = {};
-    if (!f.oldPassword) errs['oldPassword'] = '请输入原密码';
-    if (!f.newPassword) errs['newPassword'] = '请输入新密码';
-    if (f.newPassword && f.newPassword.length < 8) errs['newPassword'] = '密码长度不能少于8位';
-    if (!f.confirmPassword) errs['confirmPassword'] = '请确认新密码';
-    if (f.newPassword && f.confirmPassword && f.newPassword !== f.confirmPassword) errs['confirmPassword'] = '两次密码输入不一致';
-
-    this.errors.set(errs);
-    if (Object.keys(errs).length === 0) {
-      this.step.set('confirm');
-    }
-  }
-
-  confirmChange(): void {
-    this.step.set('success');
+  onBack(): void {
+    this.step.set('input');
+    this.resetForm();
   }
 
   goToForgot(): void {
     this.step.set('forgot');
-  }
-
-  goToModifyBinding(): void {
-    this.step.set('modify-binding');
-  }
-
-  backToInput(): void {
-    this.step.set('input');
     this.resetForm();
   }
 
   sendCaptcha(): void {
     if (this.countdown() > 0) return;
     this.countdown.set(60);
+    if (this.step() === 'input') {
+      this.step.set('input-countdown');
+    }
     this.countdownTimer = setInterval(() => {
       this.countdown.update(v => {
         if (v <= 1) {
@@ -105,6 +82,19 @@ export class ChangePassword {
     }, 1000);
   }
 
+  submit(): void {
+    if (!this.canSubmit()) return;
+    this.step.set('confirm');
+  }
+
+  confirmChange(): void {
+    this.step.set('success');
+  }
+
+  cancelConfirm(): void {
+    this.step.set('input');
+  }
+
   private clearCountdown(): void {
     if (this.countdownTimer) {
       clearInterval(this.countdownTimer);
@@ -113,17 +103,13 @@ export class ChangePassword {
   }
 
   private resetForm(): void {
-    this.form.set({
-      oldPassword: '',
-      newPassword: '',
-      confirmPassword: '',
-      captcha: '',
-      phone: '',
-      newPhone: '',
-    });
-    this.errors.set({});
-    this.showOldPassword.set(false);
-    this.showNewPassword.set(false);
-    this.showConfirmPassword.set(false);
+    this.oldPassword.set('');
+    this.newPassword.set('');
+    this.confirmPassword.set('');
+    this.captcha.set('');
+    this.showOldPwd.set(false);
+    this.showNewPwd.set(false);
+    this.showConfirmPwd.set(false);
+    this.clearCountdown();
   }
 }

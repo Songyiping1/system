@@ -1,0 +1,73 @@
+<div class="role-manage">
+  <div class="role-manage__left">
+    <div class="left-header">
+      <app-search-input [placeholder]="'搜索角色'" [value]="searchValue()" (valueChange)="searchValue.set($event)" />
+      <app-button label="添加角色" variant="primary" />
+    </div>
+    <app-role-list
+      [groups]="roleGroups()"
+      [selectedKeys]="selectedRoleKeys()"
+      [multiSelect]="false"
+      (selectionChange)="onRoleSelectionChange($event)"
+    />
+  </div>
+
+  <div class="role-manage__right">
+    @if (selectedRole()) {
+      <div class="right-header">
+        <div class="right-header__info">
+          <h3 class="right-header__title">{{ selectedRole()!.label }}</h3>
+          <span class="right-header__desc">{{ roleDescription() }}</span>
+        </div>
+        <app-button label="编辑" variant="outline" />
+      </div>
+
+      <div class="tab-bar">
+        <div class="tab-bar__item" [class.tab-bar__item--active]="activeTab() === 'menu'" (click)="setActiveTab('menu')">菜单权限</div>
+        <div class="tab-bar__item" [class.tab-bar__item--active]="activeTab() === 'data'" (click)="setActiveTab('data')">数据权限</div>
+        <div class="tab-bar__item" [class.tab-bar__item--active]="activeTab() === 'members'" (click)="setActiveTab('members')">成员列表</div>
+      </div>
+
+      <div class="tab-content">
+        @if (activeTab() === 'menu') {
+          <app-tree-table
+            [columns]="menuPermissionColumns()"
+            [data]="menuPermissionData()"
+            [expandedKeys]="menuPermissionExpandedKeys()"
+            [selectable]="true"
+            (expandedKeysChange)="onMenuPermissionExpandedKeysChange($event)"
+          />
+        }
+
+        @if (activeTab() === 'data') {
+          <div class="data-permission-placeholder">
+            <span class="data-permission-placeholder__text">数据权限配置区域</span>
+          </div>
+        }
+
+        @if (activeTab() === 'members') {
+          <div class="members-actions">
+            <app-search-input [placeholder]="'搜索成员'" [value]="memberSearchValue()" (valueChange)="memberSearchValue.set($event)" />
+            <app-button label="+ 添加成员" variant="primary" />
+          </div>
+          <app-data-table [columns]="memberColumns()" [selectable]="true" [selectAll]="selectAllMembers()" (selectAllChange)="toggleSelectAllMembers()">
+            @for (member of roleMembers(); track member.key) {
+              <div class="table-row" [class.table-row--checked]="isMemberSelected(member.key)">
+                <div class="table-row__cell table-row__cell--checkbox">
+                  <app-checkbox [checked]="isMemberSelected(member.key)" (checkedChange)="toggleMemberRow(member.key)" />
+                </div>
+                <div class="table-row__cell table-row__cell--name">
+                  <app-avatar [name]="member.name" [size]="32" />
+                  <span>{{ member.name }}</span>
+                </div>
+                <div class="table-row__cell">{{ member.department }}</div>
+                <div class="table-row__cell">{{ member.employeeId }}</div>
+                <div class="table-row__cell">{{ member.joinTime }}</div>
+              </div>
+            }
+          </app-data-table>
+        }
+      </div>
+    }
+  </div>
+</div>

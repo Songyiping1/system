@@ -27,13 +27,14 @@
   width: 42px;
   height: 42px;
   border-radius: 8.4px;
-  background: #2a7a4f;
+  background: var(--color-logo-bg);
   display: flex;
   align-items: center;
   justify-content: center;
   color: white;
   font-weight: bold;
   font-size: 16px;
+  object-fit: cover;
 }
 
 .icon-sidebar__item {

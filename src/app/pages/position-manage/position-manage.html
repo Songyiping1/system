@@ -1,0 +1,48 @@
+<div class="position-manage">
+  <app-page-header title="岗位管理" description="管理公司岗位" />
+  <app-action-bar>
+    <div actionBarLeft>
+      <app-search-input [placeholder]="'搜索岗位'" [value]="searchValue()" (valueChange)="searchValue.set($event)" />
+    </div>
+    <div actionBarRight>
+      <app-button label="添加岗位" variant="primary" />
+    </div>
+  </app-action-bar>
+  <div class="table-wrapper">
+    <div class="table-header">
+      <div class="table-header__cell">
+        <span class="table-header__label">岗位名称</span>
+      </div>
+      <div class="table-header__cell">
+        <span class="table-header__separator"></span>
+        <span class="table-header__label">岗位编码</span>
+      </div>
+      <div class="table-header__cell">
+        <span class="table-header__separator"></span>
+        <span class="table-header__label">关联人数</span>
+      </div>
+      <div class="table-header__cell">
+        <span class="table-header__separator"></span>
+        <span class="table-header__label">创建时间</span>
+      </div>
+      <div class="table-header__cell">
+        <span class="table-header__separator"></span>
+        <span class="table-header__label">操作</span>
+      </div>
+    </div>
+    <div class="table-body">
+      @for (row of rows(); track row.key) {
+        <div class="table-row">
+          <div class="table-row__cell table-row__cell--name">{{ row.name }}</div>
+          <div class="table-row__cell">{{ row.code }}</div>
+          <div class="table-row__cell">{{ row.memberCount }}</div>
+          <div class="table-row__cell">{{ row.createdAt }}</div>
+          <div class="table-row__cell table-row__cell--actions">
+            <app-button label="编辑" variant="text" size="sm" />
+            <app-button label="删除" variant="text" size="sm" />
+          </div>
+        </div>
+      }
+    </div>
+  </div>
+</div>

@@ -20,10 +20,33 @@
         <span class="top-tab-bar__badge">{{ notificationCount() }}</span>
       }
     </div>
-    <div class="top-tab-bar__avatars">
-      <span class="top-tab-bar__avatar"></span>
-      <span class="top-tab-bar__avatar"></span>
-      <span class="top-tab-bar__avatar"></span>
+    <div class="top-tab-bar__avatar-wrap" (click)="toggleDropdown($event)">
+      <app-avatar [name]="'张竞元'" [size]="32" [online]="true" />
+
+      @if (showDropdown()) {
+        <div class="user-dropdown" (click)="$event.stopPropagation()">
+          <div class="user-dropdown__header">
+            <app-avatar [name]="'张竞元'" [size]="44" />
+            <div class="user-dropdown__info">
+              <span class="user-dropdown__name">张竞元</span>
+              <span class="user-dropdown__company">中企云链（北京）信息科技有限公司</span>
+            </div>
+          </div>
+          <div class="user-dropdown__section">
+            <div class="user-dropdown__item" (click)="onMenuClick('change-password')">修改密码</div>
+            <div class="user-dropdown__item" (click)="onMenuClick('change-binding')">修改绑定</div>
+          </div>
+          <div class="user-dropdown__section user-dropdown__section--bordered">
+            <div class="user-dropdown__item user-dropdown__item--arrow" (click)="onMenuClick('switch-account')">
+              <span>切换账号</span>
+              <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
+                <path d="M5 3l4 4-4 4" stroke="#999" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+              </svg>
+            </div>
+            <div class="user-dropdown__item" (click)="onMenuClick('logout')">退出登录</div>
+          </div>
+        </div>
+      }
     </div>
   </div>
 </div>

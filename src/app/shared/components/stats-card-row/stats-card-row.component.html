@@ -1,0 +1,19 @@
+<div class="stats-card-row">
+  @for (card of cards(); track card.label) {
+    <div
+      class="stats-card-row__card"
+      [class.stats-card-row__card--clickable]="card.clickable"
+      (click)="onCardClick(card)"
+    >
+      <div class="stats-card-row__label">{{ card.label }}</div>
+      <div class="stats-card-row__value">
+        <span>{{ card.value }}</span>
+        @if (card.clickable) {
+          <svg class="stats-card-row__arrow" width="16" height="16" viewBox="0 0 16 16" fill="none">
+            <path d="M6 4l4 4-4 4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+        }
+      </div>
+    </div>
+  }
+</div>

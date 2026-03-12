@@ -1,0 +1,132 @@
+<div class="member-manage">
+  <div class="member-manage__left">
+    <div class="tree-company">
+      <app-company-icon [fallbackText]="'中企云链'" [size]="24" [bgColor]="'#2e67f4'" />
+      <span class="tree-company__name">中企云链（北京）信息科技有限公司</span>
+    </div>
+
+    <div class="tree-header">
+      <app-search-input [placeholder]="'搜索部门'" [value]="searchValue()" (valueChange)="searchValue.set($event)" />
+      <button class="tree-header__add-btn" type="button">
+        <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
+          <path d="M7 1v12M1 7h12" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+        </svg>
+      </button>
+      <button class="tree-header__collapse-btn" type="button">
+        <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
+          <path d="M2 4h10M2 7h10M2 10h10" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+        </svg>
+      </button>
+    </div>
+
+    <div class="tree-body">
+      <ng-container *ngTemplateOutlet="deptNodeTpl; context: { $implicit: deptTree(), level: 0 }" />
+    </div>
+  </div>
+
+  <div class="member-manage__right">
+    <div class="right-header">
+      <div class="right-header__info">
+        <span class="right-header__dept-name">{{ selectedDept()?.name }}</span>
+        <span class="right-header__count">（{{ selectedDept()?.count }}人）</span>
+      </div>
+      <div class="right-header__actions">
+        <app-button label="导入人员" variant="outline" />
+        <app-button label="添加人员" variant="primary" />
+      </div>
+    </div>
+
+    <div class="right-filter">
+      <app-filter-bar [filters]="filters()" (filterChange)="onFilterChange($event)" />
+    </div>
+
+    <div class="right-table">
+      <div class="table-header">
+        <div class="table-header__cell table-header__cell--checkbox">
+          <app-checkbox [checked]="selectAllMembers()" [indeterminate]="indeterminate()" (checkedChange)="toggleSelectAllMembers()" />
+        </div>
+        <div class="table-header__cell table-header__cell--name">
+          <span class="table-header__label">姓名</span>
+        </div>
+        <div class="table-header__cell">
+          <span class="table-header__separator"></span>
+          <span class="table-header__label">人员状态</span>
+        </div>
+        <div class="table-header__cell">
+          <span class="table-header__separator"></span>
+          <span class="table-header__label">部门</span>
+        </div>
+        <div class="table-header__cell">
+          <span class="table-header__separator"></span>
+          <span class="table-header__label">岗位</span>
+        </div>
+      </div>
+      <div class="table-body">
+        @for (member of members(); track member.key) {
+          <div class="table-row" [class.table-row--checked]="isMemberSelected(member.key)">
+            <div class="table-row__cell table-row__cell--checkbox">
+              <app-checkbox [checked]="isMemberSelected(member.key)" (checkedChange)="toggleMemberRow(member.key)" />
+            </div>
+            <div class="table-row__cell table-row__cell--name">
+              <app-avatar [name]="member.name" [size]="32" />
+              <span>{{ member.name }}</span>
+            </div>
+            <div class="table-row__cell">
+              <app-type-badge [label]="member.status" [variant]="getStatusVariant(member.status)" />
+            </div>
+            <div class="table-row__cell">{{ member.department }}</div>
+            <div class="table-row__cell">{{ member.position }}</div>
+          </div>
+        }
+      </div>
+    </div>
+  </div>
+</div>
+
+<ng-template #deptNodeTpl let-nodes let-level="level">
+  @for (node of nodes; track node.key) {
+    <div class="tree-node-wrapper">
+      <div
+        class="tree-node"
+        [class.tree-node--selected]="selectedDeptKey() === node.key"
+        (click)="selectDept(node.key)"
+      >
+        <div class="tree-node__content" [style.padding-left.px]="12 + level * 20">
+          @if (node.children?.length) {
+            <span class="tree-node__chevron" [class.tree-node__chevron--expanded]="isExpanded(node.key)" (click)="toggleExpand(node.key, $event)">
+              <svg width="12" height="12" viewBox="0 0 12 12" fill="none">
+                <path d="M4.5 3l3 3-3 3" stroke="#999" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/>
+              </svg>
+            </span>
+          } @else {
+            <span class="tree-node__chevron-placeholder"></span>
+          }
+          <svg class="tree-node__icon" width="16" height="16" viewBox="0 0 16 16" fill="none">
+            <path d="M2 4a1 1 0 011-1h4l2 2h4a1 1 0 011 1v6a1 1 0 01-1 1H3a1 1 0 01-1-1V4z" stroke="#999" stroke-width="1.2"/>
+          </svg>
+          <span class="tree-node__label">{{ node.name }}</span>
+          <span class="tree-node__count">({{ node.count }})</span>
+          <span class="tree-node__more" (click)="toggleContextMenu(node.key, $event)">
+            <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
+              <circle cx="3" cy="7" r="1" fill="#999"/>
+              <circle cx="7" cy="7" r="1" fill="#999"/>
+              <circle cx="11" cy="7" r="1" fill="#999"/>
+            </svg>
+          </span>
+        </div>
+
+        @if (contextMenuKey() === node.key && selectedDeptKey() === node.key) {
+          <div class="tree-node__context-menu">
+            @for (item of getContextMenuItems(node); track item.label) {
+              <div class="tree-node__context-item" [class.tree-node__context-item--danger]="item.danger">{{ item.label }}</div>
+            }
+          </div>
+        }
+      </div>
+
+      @if (node.children?.length && isExpanded(node.key)) {
+        <ng-container *ngTemplateOutlet="deptNodeTpl; context: { $implicit: node.children, level: level + 1 }" />
+      }
+    </div>
+  }
+</ng-template>

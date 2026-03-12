@@ -1,0 +1,32 @@
+<div class="permission-query">
+  <div class="permission-query__body">
+    <div class="permission-query__left">
+      <div class="search-row">
+        <app-search-input [placeholder]="'搜索成员'" [value]="searchValue()" (valueChange)="searchValue.set($event)" />
+      </div>
+      <app-person-tree
+        [nodes]="personNodes()"
+        [selectedKeys]="selectedPersonKeys()"
+        [maxSelect]="1"
+        (selectionChange)="onPersonSelectionChange($event)"
+      />
+    </div>
+    <div class="permission-query__right">
+      <div class="permission-panel">
+        <div class="permission-panel__header">
+          <div class="permission-panel__info">
+            <h3>权限查询 - {{ selectedPersonLabel() }}</h3>
+            <span class="permission-panel__desc">查看成员的菜单权限配置</span>
+          </div>
+        </div>
+        <app-tree-table
+          [columns]="permissionColumns()"
+          [data]="permissionData()"
+          [expandedKeys]="permissionExpandedKeys()"
+          [selectable]="false"
+          (expandedKeysChange)="onPermissionExpandedKeysChange($event)"
+        />
+      </div>
+    </div>
+  </div>
+</div>

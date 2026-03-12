@@ -1,0 +1,10 @@
+<div class="avatar" [class.avatar--online]="online()" [style.width.px]="size()" [style.height.px]="size()">
+  @if (src()) {
+    <img class="avatar__img" [src]="src()" [alt]="name()" />
+  } @else {
+    <span class="avatar__fallback" [style.background]="bgColor()" [style.font-size.px]="size() * 0.4">{{ firstChar() }}</span>
+  }
+  @if (online()) {
+    <span class="avatar__status"></span>
+  }
+</div>

@@ -7,12 +7,17 @@ import { Component, input, output } from '@angular/core';
 })
 export class DialogComponent {
   readonly visible = input<boolean>(false);
-  readonly title = input<string>('');
+  readonly title = input.required<string>();
+  readonly description = input<string>('');
   readonly width = input<string>('480px');
   readonly showClose = input<boolean>(true);
+  readonly showBack = input<boolean>(false);
+  readonly headerBorder = input<boolean>(true);
+  readonly footerBorder = input<boolean>(false);
 
   readonly visibleChange = output<boolean>();
-  readonly close = output<void>();
+  readonly closed = output<void>();
+  readonly back = output<void>();
 
   onOverlayClick(event: MouseEvent): void {
     if (event.target === event.currentTarget) {
@@ -22,6 +27,10 @@ export class DialogComponent {
 
   onClose(): void {
     this.visibleChange.emit(false);
-    this.close.emit();
+    this.closed.emit();
+  }
+
+  onBack(): void {
+    this.back.emit();
   }
 }

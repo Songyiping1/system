@@ -75,3 +75,39 @@ export interface CompanyTreeNode {
   childCount?: number;
   children?: CompanyTreeNode[];
 }
+
+// Filter bar
+export interface FilterItem {
+  key: string;
+  label: string;
+  value: string;
+  options?: FilterOption[];
+  type?: 'select' | 'input' | 'date-range';
+}
+
+// Stats card
+export interface StatsCard {
+  label: string;
+  value: string | number;
+  clickable?: boolean;
+}
+
+// Person tree
+export interface PersonTreeNode extends CompanyTreeNode {
+  avatar?: string;
+  children?: PersonTreeNode[];
+}
+
+// Role list
+export interface RoleGroup {
+  title: string;
+  expanded?: boolean;
+  roles: RoleItem[];
+}
+
+export interface RoleItem {
+  key: string;
+  label: string;
+  selected?: boolean;
+  badge?: string;
+}

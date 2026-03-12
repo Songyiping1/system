@@ -1,0 +1,144 @@
+:host {
+  display: block;
+  height: 100%;
+}
+
+.member-admin-permission {
+  display: flex;
+  height: 100%;
+  overflow: hidden;
+  padding: 16px;
+  gap: 16px;
+
+  &__left {
+    width: 290px;
+    flex-shrink: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    overflow-y: auto;
+    background: white;
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-md);
+    padding: 16px;
+  }
+
+  &__right {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    overflow: hidden;
+    background: white;
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-md);
+    padding: 16px;
+  }
+}
+
+.search-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.right-header {
+  flex-shrink: 0;
+
+  &__title {
+    font-size: 18px;
+    font-weight: 600;
+    color: var(--color-text-1);
+    margin: 0;
+  }
+}
+
+.permission-list {
+  flex: 1;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+.permission-category {
+  &__title {
+    font-size: 15px;
+    font-weight: 600;
+    color: var(--color-text-1);
+    margin-bottom: 12px;
+    padding-bottom: 8px;
+    border-bottom: 1px solid var(--color-border);
+  }
+
+  &__items {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+  }
+}
+
+.permission-card {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12px 16px;
+  border-radius: var(--radius-md);
+  transition: background 0.2s;
+
+  &:hover {
+    background: #f9f9fb;
+  }
+
+  &__info {
+    flex: 1;
+    min-width: 0;
+  }
+
+  &__name {
+    font-size: 14px;
+    font-weight: 500;
+    color: var(--color-text-1);
+    margin-bottom: 2px;
+  }
+
+  &__desc {
+    font-size: 12px;
+    color: var(--color-text-3);
+  }
+}
+
+.toggle-switch {
+  cursor: pointer;
+  flex-shrink: 0;
+
+  &__track {
+    display: inline-flex;
+    align-items: center;
+    width: 40px;
+    height: 22px;
+    border-radius: 11px;
+    background: #dcdfe6;
+    padding: 2px;
+    transition: background 0.2s;
+    position: relative;
+
+    &--on {
+      background: var(--color-primary);
+
+      .toggle-switch__thumb {
+        transform: translateX(18px);
+      }
+    }
+  }
+
+  &__thumb {
+    display: block;
+    width: 18px;
+    height: 18px;
+    border-radius: 50%;
+    background: white;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.15);
+    transition: transform 0.2s;
+  }
+}

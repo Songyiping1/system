@@ -1,0 +1,82 @@
+.filter-bar {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+
+  &__item {
+    position: relative;
+    display: flex;
+    align-items: center;
+    border: 1px solid var(--color-border);
+    border-radius: 8px;
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+    padding: 6px 12px;
+    font-size: 14px;
+    color: var(--color-text-1);
+    background: #fff;
+  }
+
+  &__label {
+    color: var(--color-text-3);
+    margin-right: 4px;
+    white-space: nowrap;
+  }
+
+  &__value {
+    white-space: nowrap;
+  }
+
+  &__select {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    cursor: pointer;
+    user-select: none;
+  }
+
+  &__chevron {
+    flex-shrink: 0;
+    margin-left: 2px;
+  }
+
+  &__input {
+    border: none;
+    outline: none;
+    font-size: 14px;
+    color: var(--color-text-1);
+    background: transparent;
+    min-width: 0;
+    width: 120px;
+    font-family: var(--font-family);
+  }
+
+  &__dropdown {
+    position: absolute;
+    top: calc(100% + 4px);
+    left: 0;
+    min-width: 100%;
+    background: #fff;
+    border: 1px solid var(--color-border);
+    border-radius: 8px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    z-index: 10;
+    padding: 4px 0;
+  }
+
+  &__option {
+    padding: 6px 12px;
+    cursor: pointer;
+    white-space: nowrap;
+    font-size: 14px;
+
+    &:hover {
+      background: var(--color-nav-bg);
+    }
+
+    &--active {
+      color: var(--color-primary);
+      background: var(--color-selected);
+    }
+  }
+}

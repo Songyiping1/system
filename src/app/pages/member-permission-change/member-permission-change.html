@@ -1,0 +1,61 @@
+<div class="member-permission-change">
+  <app-page-header title="成员菜单权限变更" description="查看成员菜单权限变更记录" />
+  <app-action-bar>
+    <div actionBarLeft class="action-left">
+      <app-search-input [placeholder]="'搜索成员姓名'" [value]="searchValue()" (valueChange)="searchValue.set($event)" />
+      <div class="date-filter">
+        <label class="date-filter__label">变更时间</label>
+        <input class="date-filter__input" type="text" placeholder="选择日期范围" [value]="dateRange()" readonly />
+      </div>
+    </div>
+  </app-action-bar>
+  <div class="table-wrapper">
+    <div class="table-header">
+      <div class="table-header__cell table-header__cell--name">
+        <span class="table-header__label">成员姓名</span>
+      </div>
+      <div class="table-header__cell">
+        <span class="table-header__separator"></span>
+        <span class="table-header__label">变更类型</span>
+      </div>
+      <div class="table-header__cell">
+        <span class="table-header__separator"></span>
+        <span class="table-header__label">变更菜单</span>
+      </div>
+      <div class="table-header__cell">
+        <span class="table-header__separator"></span>
+        <span class="table-header__label">变更前</span>
+      </div>
+      <div class="table-header__cell">
+        <span class="table-header__separator"></span>
+        <span class="table-header__label">变更后</span>
+      </div>
+      <div class="table-header__cell">
+        <span class="table-header__separator"></span>
+        <span class="table-header__label">操作人</span>
+      </div>
+      <div class="table-header__cell">
+        <span class="table-header__separator"></span>
+        <span class="table-header__label">变更时间</span>
+      </div>
+    </div>
+    <div class="table-body">
+      @for (row of rows(); track row.key) {
+        <div class="table-row">
+          <div class="table-row__cell table-row__cell--name">
+            <app-avatar [name]="row.memberName" [size]="28" />
+            <span class="table-row__label">{{ row.memberName }}</span>
+          </div>
+          <div class="table-row__cell">
+            <app-type-badge [label]="row.changeType" [variant]="row.changeTypeVariant" />
+          </div>
+          <div class="table-row__cell">{{ row.changeMenu }}</div>
+          <div class="table-row__cell">{{ row.before }}</div>
+          <div class="table-row__cell">{{ row.after }}</div>
+          <div class="table-row__cell">{{ row.operator }}</div>
+          <div class="table-row__cell">{{ row.changeTime }}</div>
+        </div>
+      }
+    </div>
+  </div>
+</div>

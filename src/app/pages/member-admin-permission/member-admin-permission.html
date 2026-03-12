@@ -1,0 +1,40 @@
+<div class="member-admin-permission">
+  <div class="member-admin-permission__left">
+    <div class="search-row">
+      <app-search-input [placeholder]="'搜索成员'" [value]="searchValue()" (valueChange)="searchValue.set($event)" />
+    </div>
+    <app-person-tree
+      [nodes]="personNodes()"
+      [selectedKeys]="selectedPersonKeys()"
+      [maxSelect]="1"
+      (selectionChange)="onPersonSelectionChange($event)"
+    />
+  </div>
+  <div class="member-admin-permission__right">
+    <div class="right-header">
+      <h3 class="right-header__title">{{ selectedPersonLabel() }} 的管理权限</h3>
+    </div>
+    <div class="permission-list">
+      @for (category of permissionCategories(); track category.title; let ci = $index) {
+        <div class="permission-category">
+          <div class="permission-category__title">{{ category.title }}</div>
+          <div class="permission-category__items">
+            @for (item of category.items; track item.key; let ii = $index) {
+              <div class="permission-card">
+                <div class="permission-card__info">
+                  <div class="permission-card__name">{{ item.name }}</div>
+                  <div class="permission-card__desc">{{ item.description }}</div>
+                </div>
+                <label class="toggle-switch" (click)="togglePermission(ci, ii)">
+                  <span class="toggle-switch__track" [class.toggle-switch__track--on]="item.enabled">
+                    <span class="toggle-switch__thumb"></span>
+                  </span>
+                </label>
+              </div>
+            }
+          </div>
+        </div>
+      }
+    </div>
+  </div>
+</div>

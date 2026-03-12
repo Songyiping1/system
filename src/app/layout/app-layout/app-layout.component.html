@@ -1,7 +1,7 @@
 <div class="app-layout">
-  <app-icon-sidebar [items]="navItems()" [activeKey]="activeNavKey()" (activeKeyChange)="activeNavKey.set($event)" />
+  <app-icon-sidebar [items]="navItems()" [activeKey]="activeNavKey()" (activeKeyChange)="onNavChange($event)" />
   <div class="app-layout__main">
-    <app-top-tab-bar [tabs]="tabs()" [activeKey]="activeTabKey()" [notificationCount]="notificationCount()" (activeKeyChange)="activeTabKey.set($event)" (tabClose)="closeTab($event)" />
+    <app-top-tab-bar [tabs]="tabs()" [activeKey]="activeTabKey()" [notificationCount]="notificationCount()" (activeKeyChange)="activeTabKey.set($event)" (tabClose)="closeTab($event)" (menuAction)="onMenuAction($event)" />
     <div class="app-layout__content">
       <app-sub-sidebar [groups]="menuGroups()" [activeKey]="activeMenuKey()" (activeKeyChange)="onMenuChange($event)" />
       <div class="app-layout__page">
@@ -10,3 +10,5 @@
     </div>
   </div>
 </div>
+
+<app-change-password />

@@ -1,0 +1,47 @@
+<div class="menu-assign-new">
+  <div class="menu-assign-new__body">
+    <div class="menu-assign-new__left">
+      <h3 class="section-title">角色列表</h3>
+      <div class="search-row">
+        <app-search-input [placeholder]="'搜索角色'" [value]="searchValue()" (valueChange)="searchValue.set($event)" />
+        <button class="add-btn" type="button">
+          <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
+            <path d="M7 1v12M1 7h12" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+          </svg>
+        </button>
+      </div>
+      @if (selectedRoleLabels().length > 0) {
+        <div class="selected-info">
+          <span class="selected-info__label">角色: {{ selectedRoleLabels().join(', ') }}</span>
+          <a class="selected-info__clear" (click)="clearSelection()">取消选择</a>
+        </div>
+      }
+      <app-role-list
+        [groups]="roleGroups()"
+        [selectedKeys]="selectedRoleKeys()"
+        (selectionChange)="onRoleSelectionChange($event)"
+      />
+    </div>
+    <div class="menu-assign-new__right">
+      <div class="assign-header">
+        <div class="assign-header__info">
+          <h3>分配中 - {{ selectedRoleLabels().join(', ') || '未选择' }}</h3>
+          <span class="assign-header__time">上次更新时间: 2025-12-01 14:14</span>
+        </div>
+        <div class="assign-header__actions">
+          <app-button label="取消" variant="outline" />
+          <app-button label="保存" variant="primary" />
+        </div>
+      </div>
+      <app-tree-table
+        [columns]="treeColumns()"
+        [data]="treeData()"
+        [expandedKeys]="treeExpandedKeys()"
+        [selectedKeys]="treeSelectedKeys()"
+        [selectable]="true"
+        (expandedKeysChange)="onTreeExpandedKeysChange($event)"
+        (selectedKeysChange)="onTreeSelectedKeysChange($event)"
+      />
+    </div>
+  </div>
+</div>

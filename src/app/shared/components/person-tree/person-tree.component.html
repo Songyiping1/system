@@ -1,0 +1,55 @@
+<div class="person-tree">
+  <div class="person-tree__search">
+    <app-search-input [placeholder]="'搜索'" (search)="onSearch($event)" (valueChange)="onSearch($event)" />
+  </div>
+
+  <div class="person-tree__list">
+    <ng-container *ngTemplateOutlet="nodeList; context: { $implicit: nodes(), level: 0 }" />
+  </div>
+
+  @if (maxSelect() > 1) {
+    <div class="person-tree__footer">
+      添加对比 {{ selectedCount() }}/{{ maxSelect() }}
+    </div>
+  }
+</div>
+
+<ng-template #nodeList let-items let-level="level">
+  @for (node of items; track node.key) {
+    <div class="person-tree__node" [style.padding-left.px]="level * 20 + 12">
+      <div
+        class="person-tree__node-content"
+        [class.person-tree__node-content--selected]="isSelected(node.key)"
+        (click)="node.children ? toggleExpand(node.key) : toggleSelect(node.key)"
+      >
+        @if (node.children && node.children.length > 0) {
+          <svg
+            class="person-tree__chevron"
+            [class.person-tree__chevron--expanded]="isExpanded(node.key)"
+            width="12" height="12" viewBox="0 0 12 12" fill="none"
+          >
+            <path d="M4.5 3l3 3-3 3" stroke="#999" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+        } @else {
+          <span class="person-tree__chevron-placeholder"></span>
+        }
+
+        @if (node.icon || node.iconText) {
+          <app-company-icon [size]="20" [fallbackText]="node.iconText || node.label" [bgColor]="node.iconColor || '#2e67f4'" />
+        } @else if (node.avatar !== undefined) {
+          <app-avatar [size]="24" [name]="node.label" [src]="node.avatar" />
+        }
+
+        <span class="person-tree__label">{{ node.label }}</span>
+
+        @if (node.childCount !== undefined) {
+          <span class="person-tree__count">({{ node.childCount }})</span>
+        }
+      </div>
+
+      @if (node.children && isExpanded(node.key)) {
+        <ng-container *ngTemplateOutlet="nodeList; context: { $implicit: node.children, level: level + 1 }" />
+      }
+    </div>
+  }
+</ng-template>
