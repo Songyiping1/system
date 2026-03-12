@@ -1,0 +1,18 @@
+<div
+  class="checkbox"
+  [class.checkbox--checked]="checked()"
+  [class.checkbox--indeterminate]="indeterminate()"
+  [class.checkbox--disabled]="disabled()"
+  (click)="toggle()"
+>
+  @if (checked() && !indeterminate()) {
+    <svg width="12" height="12" viewBox="0 0 12 12" fill="none">
+      <path d="M2 6l3 3 5-5" stroke="#fff" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+    </svg>
+  }
+  @if (indeterminate()) {
+    <svg width="12" height="12" viewBox="0 0 12 12" fill="none">
+      <path d="M3 6h6" stroke="#fff" stroke-width="1.5" stroke-linecap="round"/>
+    </svg>
+  }
+</div>

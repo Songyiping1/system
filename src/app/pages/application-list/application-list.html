@@ -1,0 +1,66 @@
+<div class="application-list">
+  <app-page-header title="入驻申请列表" description="查看全部菜单，管理与编辑菜单配置" />
+  <app-action-bar>
+    <div actionBarLeft class="filter-bar">
+      <app-search-input [placeholder]="'搜索'" [value]="searchValue()" (valueChange)="searchValue.set($event)" />
+      <app-status-filter
+        label="审批状态"
+        [options]="filterOptions()"
+        [value]="statusFilter()"
+        (valueChange)="statusFilter.set($event)"
+      />
+    </div>
+    @if (showBatchActions()) {
+      <div actionBarRight class="action-buttons">
+        <app-button label="拒绝" variant="outline-danger" />
+        <app-button label="通过" variant="outline" />
+      </div>
+    }
+  </app-action-bar>
+  <div class="table-wrapper">
+    <div class="table-header">
+      <div class="table-header__cell table-header__cell--name">
+        <app-checkbox [checked]="selectAll()" [indeterminate]="indeterminate()" (checkedChange)="toggleSelectAll()" />
+        <span class="table-header__label">公司名称</span>
+      </div>
+      <div class="table-header__cell">
+        <span class="table-header__separator"></span>
+        <span class="table-header__label">审批状态</span>
+      </div>
+      <div class="table-header__cell">
+        <span class="table-header__separator"></span>
+        <span class="table-header__label">公司别名</span>
+      </div>
+      <div class="table-header__cell">
+        <span class="table-header__separator"></span>
+        <span class="table-header__label">申请时间</span>
+      </div>
+      <div class="table-header__cell">
+        <span class="table-header__separator"></span>
+        <span class="table-header__label">审批时间</span>
+      </div>
+      <div class="table-header__cell">
+        <span class="table-header__separator"></span>
+        <span class="table-header__label">管理员手机号</span>
+      </div>
+    </div>
+    <div class="table-body">
+      @for (row of rows(); track row.key) {
+        <div class="table-row" [class.table-row--checked]="isSelected(row.key)">
+          <div class="table-row__cell table-row__cell--name">
+            <app-checkbox [checked]="isSelected(row.key)" (checkedChange)="toggleRow(row.key)" />
+            <app-company-icon [fallbackText]="row.name" [size]="32" [bgColor]="row.iconColor" />
+            <span class="table-row__label">{{ row.name }}</span>
+          </div>
+          <div class="table-row__cell">
+            <app-type-badge [label]="row.status" [variant]="row.statusVariant" />
+          </div>
+          <div class="table-row__cell">{{ row.shortName }}</div>
+          <div class="table-row__cell">{{ row.applyTime }}</div>
+          <div class="table-row__cell">{{ row.approveTime }}</div>
+          <div class="table-row__cell">{{ row.phone }}</div>
+        </div>
+      }
+    </div>
+  </div>
+</div>

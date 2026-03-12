@@ -1,0 +1,15 @@
+.child-count-badge {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  color: var(--color-text-3);
+  font-size: 12px;
+
+  &__icon {
+    flex-shrink: 0;
+  }
+
+  &__text {
+    line-height: 1;
+  }
+}

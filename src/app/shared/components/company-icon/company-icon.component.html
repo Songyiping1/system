@@ -1,0 +1,7 @@
+<div class="company-icon" [style.width.px]="size()" [style.height.px]="size()">
+  @if (src()) {
+    <img class="company-icon__img" [src]="src()" [alt]="fallbackText()" />
+  } @else {
+    <span class="company-icon__fallback" [style.background]="bgColor()" [style.color]="'white'" [style.font-size.px]="size() * 0.375">{{ firstChar() }}</span>
+  }
+</div>

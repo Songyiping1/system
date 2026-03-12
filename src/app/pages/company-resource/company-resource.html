@@ -1,0 +1,54 @@
+<div class="company-resource">
+  <app-page-header title="公司资源管理" description="管理入驻CSES的公司" />
+  <app-action-bar>
+    <app-search-input actionBarLeft [placeholder]="'根据企业名称或完整企业标号搜索'" [value]="searchValue()" (valueChange)="searchValue.set($event)" />
+    <div actionBarRight class="action-buttons">
+      <app-button label="删除" variant="outline-danger" />
+      <app-button label="+ 新建公司" variant="primary" />
+    </div>
+  </app-action-bar>
+  <div class="table-wrapper">
+    <div class="table-header">
+      <div class="table-header__cell table-header__cell--first">
+        <app-checkbox [checked]="selectAll()" [indeterminate]="indeterminate()" (checkedChange)="toggleSelectAll()" />
+        <span class="table-header__label">公司名称</span>
+      </div>
+      <div class="table-header__cell">
+        <span class="table-header__separator"></span>
+        <span class="table-header__label">公司别名</span>
+      </div>
+      <div class="table-header__cell">
+        <span class="table-header__separator"></span>
+        <span class="table-header__label">人数</span>
+      </div>
+      <div class="table-header__cell">
+        <span class="table-header__separator"></span>
+        <span class="table-header__label">管理员手机号</span>
+      </div>
+    </div>
+    <div class="table-body">
+      @for (row of flattenedRows(); track row.node.key) {
+        <div class="table-row" [class.table-row--checked]="isSelected(row.node.key)">
+          <div class="table-row__cell table-row__cell--first">
+            <app-checkbox [checked]="isSelected(row.node.key)" (checkedChange)="toggleRow(row.node.key)" />
+            @for (_ of getIndent(row.level); track $index) {
+              <span class="table-row__indent"></span>
+            }
+            @if (row.node.children?.length) {
+              <span class="table-row__chevron" [class.table-row__chevron--expanded]="isExpanded(row.node.key)" (click)="toggleExpand(row.node.key); $event.stopPropagation()">
+                <svg width="16" height="16" viewBox="0 0 16 16"><path d="M6 4l4 4-4 4" stroke="#999" stroke-width="1.5" fill="none"/></svg>
+              </span>
+            } @else {
+              <span class="table-row__chevron-placeholder"></span>
+            }
+            <app-company-icon [fallbackText]="row.node.data['name']" [size]="32" [bgColor]="row.node.data['iconColor'] || '#2e67f4'" />
+            <span class="table-row__name">{{ row.node.data['name'] }}</span>
+          </div>
+          <div class="table-row__cell">{{ row.node.data['shortName'] }}</div>
+          <div class="table-row__cell">{{ row.node.data['count'] }}</div>
+          <div class="table-row__cell">{{ row.node.data['phone'] }}</div>
+        </div>
+      }
+    </div>
+  </div>
+</div>

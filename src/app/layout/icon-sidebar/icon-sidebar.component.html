@@ -1,0 +1,11 @@
+<nav class="icon-sidebar">
+  <div class="icon-sidebar__items">
+    <div class="icon-sidebar__logo">CS</div>
+    @for (item of items(); track item.key) {
+      <div class="icon-sidebar__item" [class.icon-sidebar__item--active]="item.key === activeKey()" (click)="activeKeyChange.emit(item.key)">
+        <span class="icon-sidebar__icon" [innerHTML]="getIcon(item.icon)"></span>
+        <span class="icon-sidebar__label">{{ item.label }}</span>
+      </div>
+    }
+  </div>
+</nav>

@@ -1,0 +1,17 @@
+<aside class="sub-sidebar">
+  @for (group of groups(); track group.title; let i = $index) {
+    @if (i > 0) {
+      <div class="sub-sidebar__divider"></div>
+    }
+    <div class="sub-sidebar__group">
+      <div class="sub-sidebar__group-title">{{ group.title }}</div>
+      <div class="sub-sidebar__items">
+        @for (item of group.items; track item.key) {
+          <div class="sub-sidebar__item" [class.sub-sidebar__item--active]="item.key === activeKey()" (click)="activeKeyChange.emit(item.key)">
+            {{ item.label }}
+          </div>
+        }
+      </div>
+    </div>
+  }
+</aside>

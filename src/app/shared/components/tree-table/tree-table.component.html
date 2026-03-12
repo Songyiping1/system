@@ -1,0 +1,52 @@
+<div class="tree-table">
+  <app-data-table [columns]="columns()" [selectable]="false">
+    @for (row of visibleRows(); track row.node.key) {
+      <div
+        class="tree-row"
+        [class.tree-row--selected]="isSelected(row.node.key)"
+        [class.tree-row--expanded]="isExpanded(row.node.key)"
+        (click)="onRowClick(row.node)"
+      >
+        <div class="tree-row__name-cell" [style.width]="columns()[0]?.width || '290px'">
+          @if (selectable()) {
+            <app-checkbox
+              [checked]="isSelected(row.node.key)"
+              (checkedChange)="toggleSelect(row.node.key)"
+            />
+          }
+          @for (i of getIndent(row.level); track i) {
+            <span class="tree-row__indent"></span>
+          }
+          @if (row.node.children?.length) {
+            <span
+              class="tree-row__expand"
+              [class.tree-row__expand--open]="isExpanded(row.node.key)"
+              (click)="toggleExpand(row.node.key); $event.stopPropagation()"
+            >
+              <svg width="16" height="16" viewBox="0 0 16 16"><path d="M6 4l4 4-4 4" stroke="#999" stroke-width="1.5" fill="none"/></svg>
+            </span>
+          }
+          <div class="tree-row__content">
+            <span class="tree-row__title">{{ row.node.data['name'] }}</span>
+            @if (row.node.data['description']) {
+              <span class="tree-row__desc">{{ row.node.data['description'] }}</span>
+            }
+          </div>
+          @if (isExpanded(row.node.key) && isSelected(row.node.key)) {
+            <span class="tree-row__add-btn" (click)="onAdd(row.node); $event.stopPropagation()">
+              <svg width="16" height="16" viewBox="0 0 16 16"><path d="M8 3v10M3 8h10" stroke="#999" stroke-width="1.5"/></svg>
+            </span>
+          }
+          @if (row.node.children?.length) {
+            <app-child-count-badge [count]="row.node.children!.length" />
+          }
+        </div>
+        @for (col of columns().slice(1); track col.key) {
+          <div class="tree-row__cell" [style.flex]="'1'">
+            {{ row.node.data[col.key] }}
+          </div>
+        }
+      </div>
+    }
+  </app-data-table>
+</div>

@@ -1,0 +1,21 @@
+<button
+  class="btn"
+  [class.btn--primary]="variant() === 'primary'"
+  [class.btn--danger]="variant() === 'danger'"
+  [class.btn--outline-danger]="variant() === 'outline-danger'"
+  [class.btn--outline]="variant() === 'outline'"
+  [class.btn--text]="variant() === 'text'"
+  [class.btn--sm]="size() === 'sm'"
+  [class.btn--full-width]="fullWidth()"
+  [class.btn--disabled]="disabled() || loading()"
+  [disabled]="disabled() || loading()"
+  (click)="onClick()"
+>
+  @if (loading()) {
+    <span class="btn__loading">...</span>
+  }
+  @if (icon()) {
+    <span class="btn__icon">{{ icon() }}</span>
+  }
+  <span class="btn__label">{{ label() }}</span>
+</button>

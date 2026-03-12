@@ -1,0 +1,90 @@
+<div class="menu-assign">
+  <app-page-header title="菜单分配" description="给公司配置菜单权限" />
+  <div class="menu-assign__body">
+    <div class="menu-assign__left">
+      <h3 class="section-title">公司列表</h3>
+      <div class="search-wrapper">
+        <svg width="12" height="12" viewBox="0 0 12 12" fill="none">
+          <circle cx="5.5" cy="5.5" r="4.5" stroke="#999" stroke-width="1"/>
+          <path d="M9 9L11 11" stroke="#999" stroke-width="1" stroke-linecap="round"/>
+        </svg>
+        <input type="text" class="search-wrapper__input" placeholder="搜索公司" [value]="companySearchValue()" (input)="companySearchValue.set($any($event.target).value)" />
+      </div>
+      <div class="company-tree">
+        @for (node of companies(); track node.key) {
+          <div class="company-tree__item" [class.company-tree__item--active]="selectedCompanyKey() === node.key" (click)="selectCompany(node.key)">
+            <div class="company-tree__row">
+              @if (node.children && node.children.length > 0) {
+                <span class="company-tree__chevron" [class.company-tree__chevron--expanded]="isExpanded(node.key)" (click)="toggleExpand(node.key); $event.stopPropagation()">
+                  <svg width="16" height="16" viewBox="0 0 16 16"><path d="M6 4l4 4-4 4" stroke="#999" stroke-width="1.5" fill="none"/></svg>
+                </span>
+              } @else {
+                <span class="company-tree__chevron-placeholder"></span>
+              }
+              <div class="company-tree__icon" [style.background]="node.iconColor || '#2e67f4'">
+                {{ node.iconText || node.label.substring(0, 2) }}
+              </div>
+              <span class="company-tree__label">{{ node.label }}</span>
+              @if (node.childCount) {
+                <app-child-count-badge [count]="node.childCount" />
+              }
+            </div>
+          </div>
+          @if (node.children && isExpanded(node.key)) {
+            @for (child of node.children; track child.key) {
+              <div class="company-tree__item company-tree__item--level-1" [class.company-tree__item--active]="selectedCompanyKey() === child.key" (click)="selectCompany(child.key)">
+                <div class="company-tree__row">
+                  @if (child.children && child.children.length > 0) {
+                    <span class="company-tree__chevron" [class.company-tree__chevron--expanded]="isExpanded(child.key)" (click)="toggleExpand(child.key); $event.stopPropagation()">
+                      <svg width="16" height="16" viewBox="0 0 16 16"><path d="M6 4l4 4-4 4" stroke="#999" stroke-width="1.5" fill="none"/></svg>
+                    </span>
+                  } @else {
+                    <span class="company-tree__chevron-placeholder"></span>
+                  }
+                  <div class="company-tree__icon" [style.background]="child.iconColor || '#2e67f4'">
+                    {{ child.iconText || child.label.substring(0, 2) }}
+                  </div>
+                  <span class="company-tree__label">{{ child.label }}</span>
+                  @if (child.childCount) {
+                    <app-child-count-badge [count]="child.childCount" />
+                  }
+                </div>
+              </div>
+            }
+          }
+        }
+      </div>
+    </div>
+    <div class="menu-assign__right">
+      <div class="assign-header">
+        <div class="assign-header__info">
+          <h3>分配中 - {{ selectedCompanyLabel() }}</h3>
+          <span class="assign-header__time">上次更新时间: 2025-12-01 14:14</span>
+        </div>
+        <div class="assign-header__actions">
+          <app-button label="取消" variant="outline" />
+          <app-button label="保存" variant="primary" />
+        </div>
+      </div>
+      <app-data-table [columns]="assignColumns()" [selectable]="true" [selectAll]="false">
+        @for (row of assignRows(); track row.key) {
+          <div class="table-row" [class.table-row--checked]="row.checked" [class.table-row--disabled]="row.disabled">
+            <div class="table-row__cell table-row__cell--checkbox">
+              <app-checkbox [checked]="row.checked" [disabled]="row.disabled" />
+            </div>
+            <div class="table-row__cell table-row__cell--name" style="flex:1">
+              <span>{{ row.name }}</span>
+              @if (row.childCount) {
+                <app-child-count-badge [count]="row.childCount" />
+              }
+            </div>
+            <div class="table-row__cell" style="flex:1">{{ row.icon }}</div>
+            <div class="table-row__cell" style="flex:1">{{ row.purchaseDate }}</div>
+            <div class="table-row__cell" style="flex:1">{{ row.duration }}</div>
+            <div class="table-row__cell" style="flex:1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">{{ row.description }}</div>
+          </div>
+        }
+      </app-data-table>
+    </div>
+  </div>
+</div>

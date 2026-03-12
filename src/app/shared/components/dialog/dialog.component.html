@@ -1,0 +1,17 @@
+@if (visible()) {
+  <div class="dialog-overlay" (click)="onOverlayClick($event)">
+    <div class="dialog" [style.width]="width()" (click)="$event.stopPropagation()">
+      <div class="dialog__header">
+        <span class="dialog__title">{{ title() }}</span>
+        @if (showClose()) {
+          <span class="dialog__close" (click)="onClose()">
+            <svg width="16" height="16" viewBox="0 0 16 16"><path d="M4 4l8 8M12 4l-8 8" stroke="#999" stroke-width="1.5"/></svg>
+          </span>
+        }
+      </div>
+      <div class="dialog__body">
+        <ng-content />
+      </div>
+    </div>
+  </div>
+}
