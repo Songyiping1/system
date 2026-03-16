@@ -8,24 +8,14 @@ export interface AccountTheme {
 
 export const THEME_PRESETS: Record<string, AccountTheme> = {
   blue: {
-    navBg: '#053b64',
+    navBg: '#053B64',
     navActive: '#165789',
-    logoBg: '#2a7a4f',
-  },
-  green: {
-    navBg: '#0a3d2a',
-    navActive: '#14654a',
-    logoBg: '#2a7a4f',
+    logoBg: '#053B64',
   },
   dark: {
-    navBg: '#1a1a2e',
-    navActive: '#2d2d44',
-    logoBg: '#4857e2',
-  },
-  purple: {
-    navBg: '#2e1a4a',
-    navActive: '#44296e',
-    logoBg: '#7c3aed',
+    navBg: '#2c2a3a',
+    navActive: '#525068',
+    logoBg: '#2c2a3a',
   },
 };
 

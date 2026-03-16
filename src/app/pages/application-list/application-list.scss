@@ -110,3 +110,49 @@
     white-space: nowrap;
   }
 }
+
+.reject-dialog-body {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding-top: 16px;
+
+  &__desc {
+    font-size: 12px;
+    color: var(--color-text-3);
+    width: 320px;
+    margin: 0;
+  }
+
+  &__input {
+    width: 320px;
+    border: none;
+    border-bottom: 1px solid var(--color-primary);
+    outline: none;
+    padding: 8px 0;
+    font-size: 14px;
+    font-family: var(--font-family);
+    color: var(--color-text-1);
+    background: transparent;
+    margin-top: 16px;
+
+    &::placeholder {
+      color: rgba(153, 153, 153, 0.5);
+    }
+  }
+
+  &__actions {
+    display: flex;
+    gap: 16px;
+    width: 320px;
+    margin-top: 16px;
+
+    app-button {
+      flex: 1;
+    }
+
+    ::ng-deep .btn {
+      width: 100%;
+    }
+  }
+}

@@ -1,4 +1,5 @@
 import { Component, signal, computed } from '@angular/core';
+import { FormsModule } from '@angular/forms';
 import { PageHeaderComponent } from '../../shared/components/page-header/page-header.component';
 import { ActionBarComponent } from '../../shared/components/action-bar/action-bar.component';
 import { SearchInputComponent } from '../../shared/components/search-input/search-input.component';
@@ -7,11 +8,12 @@ import { CheckboxComponent } from '../../shared/components/checkbox/checkbox.com
 import { TypeBadgeComponent } from '../../shared/components/type-badge/type-badge.component';
 import { StatusFilterComponent } from '../../shared/components/status-filter/status-filter.component';
 import { CompanyIconComponent } from '../../shared/components/company-icon/company-icon.component';
+import { DialogComponent } from '../../shared/components/dialog/dialog.component';
 import { FilterOption } from '../../shared/models';
 
 @Component({
   selector: 'app-application-list',
-  imports: [PageHeaderComponent, ActionBarComponent, SearchInputComponent, ButtonComponent, CheckboxComponent, TypeBadgeComponent, StatusFilterComponent, CompanyIconComponent],
+  imports: [FormsModule, PageHeaderComponent, ActionBarComponent, SearchInputComponent, ButtonComponent, CheckboxComponent, TypeBadgeComponent, StatusFilterComponent, CompanyIconComponent, DialogComponent],
   templateUrl: './application-list.html',
   styleUrl: './application-list.scss',
 })
@@ -19,6 +21,8 @@ export class ApplicationList {
   readonly searchValue = signal('');
   readonly statusFilter = signal('all');
   readonly selectedKeys = signal<string[]>([]);
+  readonly rejectDialogVisible = signal(false);
+  readonly rejectReason = signal('');
 
   readonly filterOptions = signal<FilterOption[]>([
     { value: 'all', label: '全部状态' },
@@ -27,7 +31,7 @@ export class ApplicationList {
     { value: 'rejected', label: '拒绝' },
   ]);
 
-  readonly showBatchActions = computed(() => this.statusFilter() === 'pending');
+  readonly showBatchActions = computed(() => this.selectedKeys().length > 0);
 
   readonly rows = signal([
     { key: '1', name: '润通求本', iconColor: '#f59e0b', status: '待处理', statusVariant: 'warning' as const, shortName: '润通', applyTime: '2025/10/10 13:25', approveTime: '-', phone: '15147888855' },
@@ -46,23 +50,29 @@ export class ApplicationList {
     { key: '14', name: '润通求本', iconColor: '#f59e0b', status: '待处理', statusVariant: 'warning' as const, shortName: '润通', applyTime: '2025/10/10 13:25', approveTime: '-', phone: '15147888855' },
   ]);
 
-  readonly allKeys = computed(() => this.rows().map(r => r.key));
+  readonly selectableKeys = computed(() => this.rows().filter(r => r.status === '待处理').map(r => r.key));
 
   readonly selectAll = computed(() => {
     const keys = this.selectedKeys();
-    return keys.length > 0 && keys.length === this.allKeys().length;
+    const selectable = this.selectableKeys();
+    return selectable.length > 0 && keys.length === selectable.length;
   });
 
   readonly indeterminate = computed(() => {
     const keys = this.selectedKeys();
-    return keys.length > 0 && keys.length < this.allKeys().length;
+    const selectable = this.selectableKeys();
+    return keys.length > 0 && keys.length < selectable.length;
   });
+
+  isRowDisabled(row: { status: string }): boolean {
+    return row.status !== '待处理';
+  }
 
   toggleSelectAll(): void {
     if (this.selectAll()) {
       this.selectedKeys.set([]);
     } else {
-      this.selectedKeys.set(this.allKeys());
+      this.selectedKeys.set(this.selectableKeys());
     }
   }
 
@@ -77,5 +87,20 @@ export class ApplicationList {
 
   isSelected(key: string): boolean {
     return this.selectedKeys().includes(key);
+  }
+
+  openRejectDialog(): void {
+    this.rejectReason.set('');
+    this.rejectDialogVisible.set(true);
+  }
+
+  closeRejectDialog(): void {
+    this.rejectDialogVisible.set(false);
+  }
+
+  confirmReject(): void {
+    // TODO: call API with this.rejectReason() and this.selectedKeys()
+    this.rejectDialogVisible.set(false);
+    this.selectedKeys.set([]);
   }
 }

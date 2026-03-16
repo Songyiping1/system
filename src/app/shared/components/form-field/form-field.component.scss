@@ -1,0 +1,29 @@
+.form-field {
+  display: flex;
+  align-items: center;
+  min-height: 44px;
+
+  &__label {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 14px;
+    color: var(--color-text-3);
+    white-space: nowrap;
+    width: 150px;
+    flex-shrink: 0;
+  }
+
+  &__icon {
+    flex-shrink: 0;
+  }
+
+  &__value {
+    flex: 1;
+    font-size: 14px;
+    color: var(--color-text-1);
+    border-bottom: 1px solid var(--color-border, #e6e6e6);
+    padding: 12px 0;
+    max-width: 469px;
+  }
+}

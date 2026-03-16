@@ -34,9 +34,11 @@
     </div>
     <div class="table-body">
       @for (row of flattenedRows(); track row.node.key) {
-        <div class="table-row" [class.table-row--selected]="isSelected(row.node.key)">
+        <div class="table-row" (contextmenu)="onRowContextMenu($event, row.node.key)" (click)="onRowClick(row.node.key)">
           <div class="table-row__cell table-row__cell--name" [style.width]="'290px'" [style.flex]="'none'">
-            <app-checkbox [checked]="isSelected(row.node.key)" (checkedChange)="toggleSelect(row.node.key)" />
+            <span (click)="$event.stopPropagation()">
+              <app-checkbox [checked]="isSelected(row.node.key)" (checkedChange)="toggleSelect(row.node.key)" />
+            </span>
             @for (_ of getIndent(row.level); track $index) {
               <span class="table-row__indent"></span>
             }
@@ -69,4 +71,14 @@
       }
     </div>
   </div>
+
+  @if (contextMenu(); as menu) {
+    <div class="context-menu" [style.left.px]="menu.x" [style.top.px]="menu.y" (click)="$event.stopPropagation()">
+      <div class="context-menu__item" (click)="onContextAction('config')">配置</div>
+      <div class="context-menu__item context-menu__item--danger" (click)="onContextAction('delete')">删除</div>
+      <div class="context-menu__item context-menu__item--disabled" (click)="onContextAction('disable')">停用</div>
+    </div>
+  }
 </div>
+
+<app-menu-detail [visible]="showDetail()" (visibleChange)="showDetail.set($event)" (closed)="showDetail.set(false)" />

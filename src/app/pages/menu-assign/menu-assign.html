@@ -1,6 +1,7 @@
 <div class="menu-assign">
   <app-page-header title="菜单分配" description="给公司配置菜单权限" />
   <div class="menu-assign__body">
+    <!-- Left: Company list -->
     <div class="menu-assign__left">
       <h3 class="section-title">公司列表</h3>
       <div class="search-wrapper">
@@ -55,36 +56,74 @@
         }
       </div>
     </div>
+
+    <!-- Right: Tree table -->
     <div class="menu-assign__right">
       <div class="assign-header">
         <div class="assign-header__info">
-          <h3>分配中 - {{ selectedCompanyLabel() }}</h3>
-          <span class="assign-header__time">上次更新时间: 2025-12-01 14:14</span>
+          <h3 class="assign-header__title">分配中 - {{ selectedCompanyLabel() }}</h3>
+          <span class="assign-header__time">上次更新时间：2025-12-01  14：14</span>
         </div>
         <div class="assign-header__actions">
           <app-button label="取消" variant="outline" />
           <app-button label="保存" variant="primary" />
         </div>
       </div>
-      <app-data-table [columns]="assignColumns()" [selectable]="true" [selectAll]="false">
-        @for (row of assignRows(); track row.key) {
-          <div class="table-row" [class.table-row--checked]="row.checked" [class.table-row--disabled]="row.disabled">
-            <div class="table-row__cell table-row__cell--checkbox">
-              <app-checkbox [checked]="row.checked" [disabled]="row.disabled" />
-            </div>
-            <div class="table-row__cell table-row__cell--name" style="flex:1">
-              <span>{{ row.name }}</span>
-              @if (row.childCount) {
-                <app-child-count-badge [count]="row.childCount" />
-              }
-            </div>
-            <div class="table-row__cell" style="flex:1">{{ row.icon }}</div>
-            <div class="table-row__cell" style="flex:1">{{ row.purchaseDate }}</div>
-            <div class="table-row__cell" style="flex:1">{{ row.duration }}</div>
-            <div class="table-row__cell" style="flex:1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">{{ row.description }}</div>
+
+      <div class="tree-table">
+        <!-- Table header -->
+        <div class="tree-table__header">
+          <div class="tree-table__header-cell tree-table__header-cell--name">
+            <app-checkbox [checked]="isAllChecked()" (checkedChange)="toggleSelectAll()" />
+            <span class="tree-table__header-label">名称</span>
           </div>
-        }
-      </app-data-table>
+          <div class="tree-table__header-cell tree-table__header-cell--icon">
+            <span class="tree-table__separator"></span>
+            <span class="tree-table__header-label">icon</span>
+          </div>
+          <div class="tree-table__header-cell tree-table__header-cell--date">
+            <span class="tree-table__separator"></span>
+            <span class="tree-table__header-label">购买时间</span>
+          </div>
+          <div class="tree-table__header-cell tree-table__header-cell--duration">
+            <span class="tree-table__separator"></span>
+            <span class="tree-table__header-label">使用期限（天）</span>
+          </div>
+          <div class="tree-table__header-cell tree-table__header-cell--desc">
+            <span class="tree-table__separator"></span>
+            <span class="tree-table__header-label">描述</span>
+          </div>
+        </div>
+
+        <!-- Table body -->
+        <div class="tree-table__body">
+          @for (row of flattenedRows(); track row.node.key) {
+            <div class="tree-table__row"
+              [class.tree-table__row--disabled]="row.node.data['disabled']"
+            >
+              <div class="tree-table__cell tree-table__cell--name">
+                @for (_ of getIndent(row.level); track $index) {
+                  <span class="tree-table__indent"></span>
+                }
+                <app-checkbox [checked]="isChecked(row.node.key)" [disabled]="row.node.data['disabled']" (checkedChange)="toggleCheck(row.node.key)" />
+                @if (row.node.children?.length) {
+                  <span class="tree-table__chevron" [class.tree-table__chevron--expanded]="isMenuExpanded(row.node.key)" (click)="toggleMenuExpand(row.node.key)">
+                    <svg width="16" height="16" viewBox="0 0 16 16"><path d="M6 4l4 4-4 4" stroke="#999" stroke-width="1.5" fill="none"/></svg>
+                  </span>
+                }
+                <span class="tree-table__name">{{ row.node.data['name'] }}</span>
+                @if (row.node.children?.length) {
+                  <app-child-count-badge [count]="row.node.children!.length" />
+                }
+              </div>
+              <div class="tree-table__cell tree-table__cell--icon">{{ row.node.data['icon'] }}</div>
+              <div class="tree-table__cell tree-table__cell--date">{{ row.node.data['purchaseDate'] }}</div>
+              <div class="tree-table__cell tree-table__cell--duration" [class.tree-table__cell--muted]="row.node.data['duration'] === '未开通'">{{ row.node.data['duration'] }}</div>
+              <div class="tree-table__cell tree-table__cell--desc">{{ row.node.data['description'] }}</div>
+            </div>
+          }
+        </div>
+      </div>
     </div>
   </div>
 </div>

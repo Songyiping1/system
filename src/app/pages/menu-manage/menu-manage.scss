@@ -10,6 +10,7 @@
   padding: 16px;
   height: 100%;
   overflow: hidden;
+  box-sizing: border-box;
 }
 
 .action-buttons {
@@ -79,8 +80,9 @@
   border-bottom: 1px solid var(--color-border);
   min-height: 52px;
 
-  &--selected {
+  &:hover {
     background: var(--color-row-hover);
+    border-radius: 8px;
   }
 
   &__cell {
@@ -143,5 +145,40 @@
     display: flex;
     margin-left: 4px;
     flex-shrink: 0;
+  }
+}
+
+.context-menu {
+  position: fixed;
+  z-index: 1000;
+  background: #fff;
+  border: 1px solid var(--color-border);
+  border-radius: 8px;
+  box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
+  padding: 8px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  min-width: 120px;
+
+  &__item {
+    padding: 8px;
+    font-size: 14px;
+    color: var(--color-text-1);
+    border-radius: 6px;
+    cursor: pointer;
+    white-space: nowrap;
+
+    &:hover {
+      background: var(--color-row-hover);
+    }
+
+    &--danger {
+      color: var(--color-danger);
+    }
+
+    &--disabled {
+      color: var(--color-text-3);
+    }
   }
 }

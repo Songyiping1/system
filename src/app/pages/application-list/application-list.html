@@ -12,7 +12,7 @@
     </div>
     @if (showBatchActions()) {
       <div actionBarRight class="action-buttons">
-        <app-button label="拒绝" variant="outline-danger" />
+        <app-button label="拒绝" variant="outline-danger" (clicked)="openRejectDialog()" />
         <app-button label="通过" variant="outline" />
       </div>
     }
@@ -48,7 +48,7 @@
       @for (row of rows(); track row.key) {
         <div class="table-row" [class.table-row--checked]="isSelected(row.key)">
           <div class="table-row__cell table-row__cell--name">
-            <app-checkbox [checked]="isSelected(row.key)" (checkedChange)="toggleRow(row.key)" />
+            <app-checkbox [checked]="isSelected(row.key)" [disabled]="isRowDisabled(row)" (checkedChange)="toggleRow(row.key)" />
             <app-company-icon [fallbackText]="row.name" [size]="32" [bgColor]="row.iconColor" />
             <span class="table-row__label">{{ row.name }}</span>
           </div>
@@ -64,3 +64,27 @@
     </div>
   </div>
 </div>
+
+<app-dialog
+  [visible]="rejectDialogVisible()"
+  title="拒绝理由"
+  width="584px"
+  [headerBorder]="true"
+  (visibleChange)="rejectDialogVisible.set($event)"
+  (closed)="closeRejectDialog()"
+>
+  <div class="reject-dialog-body">
+    <p class="reject-dialog-body__desc">拒绝理由将以短信形式发送至对方管理员手机上</p>
+    <input
+      class="reject-dialog-body__input"
+      type="text"
+      placeholder="您好，当前资质不符，请联系邀请人确认（选填）"
+      [ngModel]="rejectReason()"
+      (ngModelChange)="rejectReason.set($event)"
+    />
+    <div class="reject-dialog-body__actions">
+      <app-button label="取消" variant="outline" (clicked)="closeRejectDialog()" />
+      <app-button label="拒绝" variant="danger" (clicked)="confirmReject()" />
+    </div>
+  </div>
+</app-dialog>

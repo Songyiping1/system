@@ -7,48 +7,110 @@
       <app-button label="+ 新建公司" variant="primary" />
     </div>
   </app-action-bar>
-  <div class="table-wrapper">
-    <div class="table-header">
-      <div class="table-header__cell table-header__cell--first">
-        <app-checkbox [checked]="selectAll()" [indeterminate]="indeterminate()" (checkedChange)="toggleSelectAll()" />
-        <span class="table-header__label">公司名称</span>
+
+  <div class="company-resource__tables">
+    <!-- Company list table -->
+    <div class="company-table">
+      <div class="company-table__header">
+        <div class="company-table__header-cell company-table__header-cell--name">
+          <app-checkbox [checked]="isAllChecked()" [indeterminate]="isIndeterminate()" (checkedChange)="toggleSelectAll()" />
+          <span class="company-table__header-label">公司名称</span>
+        </div>
+        <div class="company-table__header-cell company-table__header-cell--alias">
+          <span class="company-table__separator"></span>
+          <span class="company-table__header-label">公司别名</span>
+        </div>
+        <div class="company-table__header-cell company-table__header-cell--count">
+          <span class="company-table__separator"></span>
+          <span class="company-table__header-label">人数</span>
+        </div>
+        <div class="company-table__header-cell company-table__header-cell--phone">
+          <span class="company-table__separator"></span>
+          <span class="company-table__header-label">管理员手机号</span>
+        </div>
       </div>
-      <div class="table-header__cell">
-        <span class="table-header__separator"></span>
-        <span class="table-header__label">公司别名</span>
-      </div>
-      <div class="table-header__cell">
-        <span class="table-header__separator"></span>
-        <span class="table-header__label">人数</span>
-      </div>
-      <div class="table-header__cell">
-        <span class="table-header__separator"></span>
-        <span class="table-header__label">管理员手机号</span>
+
+      <div class="company-table__body" (wheel)="onCompanyWheel($event)">
+        @for (row of flattenedCompanies(); track row.company.key) {
+          <div class="company-table__row" (click)="selectCompany(row.company.key)">
+            <div class="company-table__cell company-table__cell--name">
+              <app-checkbox [checked]="isChecked(row.company.key)" (checkedChange)="toggleCheck(row.company.key)" />
+              @for (_ of getCompanyIndent(row.level); track $index) {
+                <span class="company-table__indent"></span>
+              }
+              @if (row.company.children?.length) {
+                <span class="company-table__chevron" [class.company-table__chevron--expanded]="isCompanyExpanded(row.company.key)" (click)="toggleCompanyExpand(row.company.key); $event.stopPropagation()">
+                  <svg width="16" height="16" viewBox="0 0 16 16"><path d="M6 4l4 4-4 4" stroke="#999" stroke-width="1.5" fill="none"/></svg>
+                </span>
+              }
+              <span class="company-table__icon" [style.background]="row.company.color">{{ getInitial(row.company.name) }}</span>
+              <span class="company-table__name-text">{{ row.company.name }}</span>
+            </div>
+            <div class="company-table__cell company-table__cell--alias">{{ row.company.alias }}</div>
+            <div class="company-table__cell company-table__cell--count">{{ row.company.count }}</div>
+            <div class="company-table__cell company-table__cell--phone">{{ row.company.phone }}</div>
+          </div>
+        }
       </div>
     </div>
-    <div class="table-body">
-      @for (row of flattenedRows(); track row.node.key) {
-        <div class="table-row" [class.table-row--checked]="isSelected(row.node.key)">
-          <div class="table-row__cell table-row__cell--first">
-            <app-checkbox [checked]="isSelected(row.node.key)" (checkedChange)="toggleRow(row.node.key)" />
-            @for (_ of getIndent(row.level); track $index) {
-              <span class="table-row__indent"></span>
-            }
-            @if (row.node.children?.length) {
-              <span class="table-row__chevron" [class.table-row__chevron--expanded]="isExpanded(row.node.key)" (click)="toggleExpand(row.node.key); $event.stopPropagation()">
-                <svg width="16" height="16" viewBox="0 0 16 16"><path d="M6 4l4 4-4 4" stroke="#999" stroke-width="1.5" fill="none"/></svg>
-              </span>
-            } @else {
-              <span class="table-row__chevron-placeholder"></span>
-            }
-            <app-company-icon [fallbackText]="row.node.data['name']" [size]="32" [bgColor]="row.node.data['iconColor'] || '#2e67f4'" />
-            <span class="table-row__name">{{ row.node.data['name'] }}</span>
-          </div>
-          <div class="table-row__cell">{{ row.node.data['shortName'] }}</div>
-          <div class="table-row__cell">{{ row.node.data['count'] }}</div>
-          <div class="table-row__cell">{{ row.node.data['phone'] }}</div>
+
+    <!-- Tree table (bottom panel) -->
+    <div class="tree-table" [class.tree-table--collapsed]="isTreeCollapsed()">
+      <div class="tree-table__header">
+        <div class="tree-table__header-cell tree-table__header-cell--name">
+          <span class="tree-table__header-label">名称</span>
         </div>
-      }
+        <div class="tree-table__header-cell tree-table__header-cell--icon">
+          <span class="tree-table__separator"></span>
+          <span class="tree-table__header-label">icon</span>
+        </div>
+        <div class="tree-table__header-cell tree-table__header-cell--date">
+          <span class="tree-table__separator"></span>
+          <span class="tree-table__header-label">购买时间</span>
+        </div>
+        <div class="tree-table__header-cell tree-table__header-cell--duration">
+          <span class="tree-table__separator"></span>
+          <span class="tree-table__header-label">使用期限（天）</span>
+        </div>
+        <div class="tree-table__header-cell tree-table__header-cell--desc">
+          <span class="tree-table__separator"></span>
+          <span class="tree-table__header-label">描述</span>
+          <span class="tree-table__toggle" (click)="toggleTreeCollapsed()">
+            <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+              @if (isTreeCollapsed()) {
+                <path d="M4 10L8 6L12 10" stroke="#999" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+              } @else {
+                <path d="M4 6L8 10L12 6" stroke="#999" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+              }
+            </svg>
+          </span>
+        </div>
+      </div>
+
+      <div class="tree-table__body">
+        @for (row of flattenedRows(); track row.node.key) {
+          <div class="tree-table__row">
+            <div class="tree-table__cell tree-table__cell--name">
+              @if (row.node.children?.length) {
+                <span class="tree-table__chevron" [class.tree-table__chevron--expanded]="isExpanded(row.node.key)" (click)="toggleExpand(row.node.key)">
+                  <svg width="16" height="16" viewBox="0 0 16 16"><path d="M6 4l4 4-4 4" stroke="#999" stroke-width="1.5" fill="none"/></svg>
+                </span>
+              }
+              @for (_ of getIndent(row.level); track $index) {
+                <span class="tree-table__indent"></span>
+              }
+              <span class="tree-table__name">{{ row.node.data['name'] }}</span>
+              @if (row.node.children?.length) {
+                <app-child-count-badge [count]="row.node.children!.length" />
+              }
+            </div>
+            <div class="tree-table__cell tree-table__cell--icon">{{ row.node.data['icon'] }}</div>
+            <div class="tree-table__cell tree-table__cell--date">{{ row.node.data['purchaseDate'] }}</div>
+            <div class="tree-table__cell tree-table__cell--duration">{{ row.node.data['duration'] }}</div>
+            <div class="tree-table__cell tree-table__cell--desc">{{ row.node.data['description'] }}</div>
+          </div>
+        }
+      </div>
     </div>
   </div>
 </div>

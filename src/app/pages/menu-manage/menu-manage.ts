@@ -1,4 +1,4 @@
-import { Component, signal, computed } from '@angular/core';
+import { Component, signal, computed, HostListener } from '@angular/core';
 import { PageHeaderComponent } from '../../shared/components/page-header/page-header.component';
 import { ActionBarComponent } from '../../shared/components/action-bar/action-bar.component';
 import { SearchInputComponent } from '../../shared/components/search-input/search-input.component';
@@ -7,6 +7,7 @@ import { CheckboxComponent } from '../../shared/components/checkbox/checkbox.com
 import { TypeBadgeComponent } from '../../shared/components/type-badge/type-badge.component';
 import { ChildCountBadgeComponent } from '../../shared/components/child-count-badge/child-count-badge.component';
 import { TreeNode } from '../../shared/models';
+import { MenuDetailComponent } from './menu-detail/menu-detail.component';
 
 interface FlatRow {
   node: TreeNode;
@@ -15,7 +16,7 @@ interface FlatRow {
 
 @Component({
   selector: 'app-menu-manage',
-  imports: [PageHeaderComponent, ActionBarComponent, SearchInputComponent, ButtonComponent, CheckboxComponent, TypeBadgeComponent, ChildCountBadgeComponent],
+  imports: [PageHeaderComponent, ActionBarComponent, SearchInputComponent, ButtonComponent, CheckboxComponent, TypeBadgeComponent, ChildCountBadgeComponent, MenuDetailComponent],
   templateUrl: './menu-manage.html',
   styleUrl: './menu-manage.scss',
 })
@@ -87,5 +88,30 @@ export class MenuManage {
     } else {
       this.selectedKeys.set([...keys, key]);
     }
+  }
+
+  readonly showDetail = signal(false);
+
+  onRowClick(key: string): void {
+    this.showDetail.set(true);
+  }
+
+  readonly contextMenu = signal<{ x: number; y: number; key: string } | null>(null);
+
+  @HostListener('document:click')
+  onDocumentClick(): void {
+    this.contextMenu.set(null);
+  }
+
+  onRowContextMenu(event: MouseEvent, key: string): void {
+    event.preventDefault();
+    this.contextMenu.set({ x: event.clientX, y: event.clientY, key });
+  }
+
+  onContextAction(action: string): void {
+    const menu = this.contextMenu();
+    if (!menu) return;
+    this.contextMenu.set(null);
+    // TODO: handle action
   }
 }
