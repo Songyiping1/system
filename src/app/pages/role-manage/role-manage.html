@@ -1,73 +1,71 @@
 <div class="role-manage">
-  <div class="role-manage__left">
-    <div class="left-header">
-      <app-search-input [placeholder]="'搜索角色'" [value]="searchValue()" (valueChange)="searchValue.set($event)" />
-      <app-button label="添加角色" variant="primary" />
-    </div>
-    <app-role-list
-      [groups]="roleGroups()"
-      [selectedKeys]="selectedRoleKeys()"
-      [multiSelect]="false"
-      (selectionChange)="onRoleSelectionChange($event)"
-    />
+  <app-page-header title="角色管理" />
+  <div class="role-manage__desc">
+    <span>角色管理"效果定位"，通过将权限与角色关联最点击关注，起到对行政组织，实现权数的精准管，卫活配置，是动效与安全的关键模型。</span>
+    <span class="role-manage__config-link">配置</span>
   </div>
+  <div class="role-manage__body">
+    <div class="role-manage__left">
+      <app-role-list
+        [groups]="roleGroups()"
+        [selectedKeys]="selectedRoleKeys()"
+        [multiSelect]="false"
+        (selectionChange)="onRoleSelectionChange($event)"
+      />
+    </div>
 
-  <div class="role-manage__right">
-    @if (selectedRole()) {
-      <div class="right-header">
-        <div class="right-header__info">
-          <h3 class="right-header__title">{{ selectedRole()!.label }}</h3>
-          <span class="right-header__desc">{{ roleDescription() }}</span>
-        </div>
-        <app-button label="编辑" variant="outline" />
-      </div>
+    <div class="role-manage__right">
+      @if (selectedRole()) {
+        <h3 class="right-title">{{ selectedRole()!.label }}</h3>
 
-      <div class="tab-bar">
-        <div class="tab-bar__item" [class.tab-bar__item--active]="activeTab() === 'menu'" (click)="setActiveTab('menu')">菜单权限</div>
-        <div class="tab-bar__item" [class.tab-bar__item--active]="activeTab() === 'data'" (click)="setActiveTab('data')">数据权限</div>
-        <div class="tab-bar__item" [class.tab-bar__item--active]="activeTab() === 'members'" (click)="setActiveTab('members')">成员列表</div>
-      </div>
-
-      <div class="tab-content">
-        @if (activeTab() === 'menu') {
-          <app-tree-table
-            [columns]="menuPermissionColumns()"
-            [data]="menuPermissionData()"
-            [expandedKeys]="menuPermissionExpandedKeys()"
-            [selectable]="true"
-            (expandedKeysChange)="onMenuPermissionExpandedKeysChange($event)"
-          />
-        }
-
-        @if (activeTab() === 'data') {
-          <div class="data-permission-placeholder">
-            <span class="data-permission-placeholder__text">数据权限配置区域</span>
+        @if (isDefaultRole()) {
+          <div class="info-banner">
+            <svg class="info-banner__icon" width="14" height="14" viewBox="0 0 14 14" fill="none">
+              <circle cx="7" cy="7" r="6" stroke="#4857e2" stroke-width="1.2"/>
+              <path d="M7 6v4M7 4.5v0" stroke="#4857e2" stroke-width="1.2" stroke-linecap="round"/>
+            </svg>
+            <span>"部门主管"为默认角色，请到部门设置中设置主管设置完成后自动同步</span>
           </div>
         }
 
-        @if (activeTab() === 'members') {
-          <div class="members-actions">
-            <app-search-input [placeholder]="'搜索成员'" [value]="memberSearchValue()" (valueChange)="memberSearchValue.set($event)" />
-            <app-button label="+ 添加成员" variant="primary" />
+        <div class="member-table">
+          <div class="member-table__header">
+            <div class="member-table__cell member-table__cell--name">
+              <app-checkbox [checked]="selectAllMembers()" [indeterminate]="indeterminateMembers()" (checkedChange)="toggleSelectAllMembers()" />
+              <span class="member-table__header-label">姓名</span>
+            </div>
+            <div class="member-table__cell">
+              <span class="member-table__separator"></span>
+              <span class="member-table__header-label">部门</span>
+            </div>
+            <div class="member-table__cell">
+              <span class="member-table__separator"></span>
+              <span class="member-table__header-label">工号</span>
+            </div>
+            <div class="member-table__cell">
+              <span class="member-table__separator"></span>
+              <span class="member-table__header-label">管理范围</span>
+            </div>
           </div>
-          <app-data-table [columns]="memberColumns()" [selectable]="true" [selectAll]="selectAllMembers()" (selectAllChange)="toggleSelectAllMembers()">
+          <div class="member-table__body">
             @for (member of roleMembers(); track member.key) {
-              <div class="table-row" [class.table-row--checked]="isMemberSelected(member.key)">
-                <div class="table-row__cell table-row__cell--checkbox">
+              <div class="member-table__row">
+                <div class="member-table__cell member-table__cell--name">
                   <app-checkbox [checked]="isMemberSelected(member.key)" (checkedChange)="toggleMemberRow(member.key)" />
-                </div>
-                <div class="table-row__cell table-row__cell--name">
                   <app-avatar [name]="member.name" [size]="32" />
                   <span>{{ member.name }}</span>
                 </div>
-                <div class="table-row__cell">{{ member.department }}</div>
-                <div class="table-row__cell">{{ member.employeeId }}</div>
-                <div class="table-row__cell">{{ member.joinTime }}</div>
+                <div class="member-table__cell">{{ member.department }}</div>
+                <div class="member-table__cell">{{ member.employeeId }}</div>
+                <div class="member-table__cell member-table__cell--scope">{{ member.manageScope }}</div>
               </div>
             }
-          </app-data-table>
-        }
-      </div>
-    }
+          </div>
+          <div class="member-table__footer">
+            总人数 <strong>{{ totalCount() }}</strong>
+          </div>
+        </div>
+      }
+    </div>
   </div>
 </div>

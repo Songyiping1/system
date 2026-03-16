@@ -94,11 +94,20 @@ export class AdminAssign {
     { key: '9', name: '管理后台', purchaseDate: '-', duration: '未开通', description: '系统管理后台', checked: false, disabled: true },
   ]);
 
+  readonly hasCheckedRows = computed(() => this.assignRows().some(r => r.checked));
+  readonly showActions = computed(() => this.selectedPersonKeys().length > 0 && this.hasCheckedRows());
+
   onPersonSelectionChange(keys: string[]): void {
     this.selectedPersonKeys.set(keys);
   }
 
   toggleCollapseAll(): void {
     this.collapseAll.set(!this.collapseAll());
+  }
+
+  toggleAssignRow(key: string): void {
+    this.assignRows.update(rows =>
+      rows.map(row => row.key === key ? { ...row, checked: !row.checked } : row)
+    );
   }
 }

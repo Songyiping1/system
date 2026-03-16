@@ -3,7 +3,6 @@
     @for (row of visibleRows(); track row.node.key) {
       <div
         class="tree-row"
-        [class.tree-row--selected]="isSelected(row.node.key)"
         [class.tree-row--expanded]="isExpanded(row.node.key)"
         (click)="onRowClick(row.node)"
       >

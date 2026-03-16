@@ -60,6 +60,8 @@ export class MenuAssignNew {
     return labels;
   });
 
+  readonly showActions = computed(() => this.selectedRoleKeys().length > 0 && this.treeSelectedKeys().length > 0);
+
   readonly treeColumns = signal<ColumnDef[]>([
     { key: 'name', label: '名称', width: '290px' },
     { key: 'source', label: '权限归属' },
@@ -132,5 +134,9 @@ export class MenuAssignNew {
 
   onTreeSelectedKeysChange(keys: string[]): void {
     this.treeSelectedKeys.set(keys);
+  }
+
+  cancelTreeSelection(): void {
+    this.treeSelectedKeys.set([]);
   }
 }

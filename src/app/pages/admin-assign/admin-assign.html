@@ -27,16 +27,18 @@
           <h3>分配中 - {{ selectedPersonLabel() }}</h3>
           <span class="assign-header__time">上次更新时间: 2025-12-01 14:14</span>
         </div>
-        <div class="assign-header__actions">
-          <app-button label="取消" variant="outline" />
-          <app-button label="保存" variant="primary" />
-        </div>
+        @if (showActions()) {
+          <div class="assign-header__actions">
+            <app-button label="取消" variant="outline" />
+            <app-button label="保存" variant="primary" />
+          </div>
+        }
       </div>
       <app-data-table [columns]="assignColumns()" [selectable]="true" [selectAll]="false">
         @for (row of assignRows(); track row.key) {
-          <div class="table-row" [class.table-row--checked]="row.checked" [class.table-row--disabled]="row.disabled">
+          <div class="table-row" [class.table-row--disabled]="row.disabled">
             <div class="table-row__cell table-row__cell--checkbox">
-              <app-checkbox [checked]="row.checked" [disabled]="row.disabled" />
+              <app-checkbox [checked]="row.checked" [disabled]="row.disabled" (checkedChange)="toggleAssignRow(row.key)" />
             </div>
             <div class="table-row__cell table-row__cell--name" style="flex:1">
               <span>{{ row.name }}</span>

@@ -1,5 +1,6 @@
 import { Component, signal, computed } from '@angular/core';
 import { NgTemplateOutlet } from '@angular/common';
+import { PageHeaderComponent } from '../../shared/components/page-header/page-header.component';
 import { SearchInputComponent } from '../../shared/components/search-input/search-input.component';
 import { ButtonComponent } from '../../shared/components/button/button.component';
 import { FilterBarComponent } from '../../shared/components/filter-bar/filter-bar.component';
@@ -31,12 +32,13 @@ interface MemberRow {
 
 @Component({
   selector: 'app-member-manage',
-  imports: [NgTemplateOutlet, SearchInputComponent, ButtonComponent, FilterBarComponent, AvatarComponent, CheckboxComponent, CompanyIconComponent, TypeBadgeComponent],
+  imports: [NgTemplateOutlet, PageHeaderComponent, SearchInputComponent, ButtonComponent, FilterBarComponent, AvatarComponent, CheckboxComponent, CompanyIconComponent, TypeBadgeComponent],
   templateUrl: './member-manage.html',
   styleUrl: './member-manage.scss',
 })
 export class MemberManage {
-  readonly searchValue = signal('');
+  readonly leftSearchValue = signal('');
+  readonly rightSearchValue = signal('');
   readonly selectedDeptKey = signal('fe-group-1');
   readonly expandedKeys = signal<string[]>(['dev', 'fe']);
   readonly contextMenuKey = signal<string | null>('fe-group-1');
@@ -73,13 +75,20 @@ export class MemberManage {
 
   readonly members = signal<MemberRow[]>([
     { key: '1', name: '郑婷雅', status: '正常', department: '前端开发一组', position: '前端开发' },
-    { key: '2', name: '周静', status: '离职', department: '一组2部', position: '前端开发' },
+    { key: '2', name: '周静', status: '正常', department: '一组2部', position: '前端开发' },
     { key: '3', name: '钱雨萌', status: '正常', department: '前端开发一组', position: '前端开发' },
     { key: '4', name: '李婷', status: '未加入', department: '前端开发一组', position: '前端开发' },
     { key: '5', name: '孙旖茹', status: '未加入', department: '前端开发一组', position: '前端开发' },
     { key: '6', name: '赵萸艳', status: '正常', department: '一组2部', position: '前端开发' },
     { key: '7', name: '王晓芳', status: '正常', department: '前端开发一组', position: '前端开发' },
-    { key: '8', name: '张明远', status: '正常', department: '前端开发一组', position: '前端开发' },
+    { key: '8', name: '郑盈', status: '正常', department: '一组2部', position: '前端开发' },
+    { key: '9', name: '李豫卓', status: '正常', department: '一组2部', position: '前端开发' },
+    { key: '10', name: '李琳颖', status: '未加入', department: '一组2部', position: '前端开发' },
+    { key: '11', name: '周小艺', status: '正常', department: '前端开发一组', position: '前端开发' },
+    { key: '12', name: '冯云', status: '正常', department: '前端开发一组', position: '前端开发' },
+    { key: '13', name: '赵玉凤', status: '正常', department: '前端开发一组', position: '前端开发' },
+    { key: '14', name: '钱若霖', status: '正常', department: '前端开发一组', position: '前端开发' },
+    { key: '15', name: '钱奕霖', status: '正常', department: '前端开发一组', position: '前端开发' },
   ]);
 
   readonly selectedDept = computed(() => {
@@ -96,6 +105,8 @@ export class MemberManage {
     };
     return find(this.deptTree());
   });
+
+  readonly notJoinedCount = computed(() => this.members().filter(m => m.status === '未加入').length);
 
   readonly allMemberKeys = computed(() => this.members().map(m => m.key));
 

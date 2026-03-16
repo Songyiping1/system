@@ -8,9 +8,9 @@
   border-bottom: 1px solid var(--color-border);
   min-height: 52px;
 
-  &--selected {
-    background: var(--color-row-hover);
-    border-radius: var(--radius-md) 0 0 var(--radius-md);
+  &:hover {
+    background: #f5f5f5;
+    border-radius: 8px;
   }
 
   &__name-cell {

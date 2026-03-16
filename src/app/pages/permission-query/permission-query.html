@@ -1,8 +1,11 @@
 <div class="permission-query">
   <div class="permission-query__body">
     <div class="permission-query__left">
+      <div class="permission-query__left-header">
+        <span class="permission-query__left-title">人员</span>
+      </div>
       <div class="search-row">
-        <app-search-input [placeholder]="'搜索成员'" [value]="searchValue()" (valueChange)="searchValue.set($event)" />
+        <app-search-input [placeholder]="'搜索'" [value]="searchValue()" (valueChange)="searchValue.set($event)" />
       </div>
       <app-person-tree
         [nodes]="personNodes()"
@@ -10,14 +13,22 @@
         [maxSelect]="1"
         (selectionChange)="onPersonSelectionChange($event)"
       />
+      <div class="permission-query__left-footer">
+        <span class="permission-query__compare-link">添加对比</span>
+        <span class="permission-query__compare-count">{{ compareCount() }} / {{ compareMax }}</span>
+      </div>
     </div>
     <div class="permission-query__right">
       <div class="permission-panel">
         <div class="permission-panel__header">
           <div class="permission-panel__info">
-            <h3>权限查询 - {{ selectedPersonLabel() }}</h3>
-            <span class="permission-panel__desc">查看成员的菜单权限配置</span>
+            <h3>{{ selectedPersonLabel() }} - 拥有的权限</h3>
+            <span class="permission-panel__desc">上次更新时间: 2025-12-01 14:14</span>
           </div>
+        </div>
+        <div class="permission-panel__subheader">
+          <span class="permission-panel__subheader-text">查看企业全部成员当前所拥有的角色以及菜单的权限，并持实时查询</span>
+          <span class="permission-panel__config-link">配置</span>
         </div>
         <app-tree-table
           [columns]="permissionColumns()"

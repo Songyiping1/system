@@ -1,38 +1,60 @@
 <div class="member-admin-permission">
-  <div class="member-admin-permission__left">
-    <div class="search-row">
-      <app-search-input [placeholder]="'搜索成员'" [value]="searchValue()" (valueChange)="searchValue.set($event)" />
-    </div>
-    <app-person-tree
-      [nodes]="personNodes()"
-      [selectedKeys]="selectedPersonKeys()"
-      [maxSelect]="1"
-      (selectionChange)="onPersonSelectionChange($event)"
-    />
+  <app-page-header title="成员管理权限审计" description="查看全部成员拥有的管理员权限" />
+
+  <div class="filter-row">
+    <app-search-input [placeholder]="'搜索'" [value]="searchValue()" (valueChange)="searchValue.set($event)" />
+    <app-filter-bar [filters]="filters()" (filterChange)="onFilterChange($event)" />
   </div>
-  <div class="member-admin-permission__right">
-    <div class="right-header">
-      <h3 class="right-header__title">{{ selectedPersonLabel() }} 的管理权限</h3>
+
+  <div class="table-wrapper">
+    <div class="table-header">
+      <div class="table-header__cell table-header__cell--name">
+        <span class="table-header__label">管理员</span>
+      </div>
+      <div class="table-header__cell table-header__cell--dept">
+        <span class="table-header__separator"></span>
+        <span class="table-header__label">部门</span>
+      </div>
+      <div class="table-header__cell table-header__cell--id">
+        <span class="table-header__separator"></span>
+        <span class="table-header__label">工号</span>
+      </div>
+      <div class="table-header__cell table-header__cell--scope">
+        <span class="table-header__separator"></span>
+        <span class="table-header__label">管理范围</span>
+      </div>
+      <div class="table-header__cell table-header__cell--adder">
+        <span class="table-header__separator"></span>
+        <span class="table-header__label">添加者</span>
+      </div>
+      <div class="table-header__cell table-header__cell--time">
+        <span class="table-header__separator"></span>
+        <span class="table-header__label">操作时间</span>
+      </div>
     </div>
-    <div class="permission-list">
-      @for (category of permissionCategories(); track category.title; let ci = $index) {
-        <div class="permission-category">
-          <div class="permission-category__title">{{ category.title }}</div>
-          <div class="permission-category__items">
-            @for (item of category.items; track item.key; let ii = $index) {
-              <div class="permission-card">
-                <div class="permission-card__info">
-                  <div class="permission-card__name">{{ item.name }}</div>
-                  <div class="permission-card__desc">{{ item.description }}</div>
-                </div>
-                <label class="toggle-switch" (click)="togglePermission(ci, ii)">
-                  <span class="toggle-switch__track" [class.toggle-switch__track--on]="item.enabled">
-                    <span class="toggle-switch__thumb"></span>
-                  </span>
-                </label>
-              </div>
+
+    <div class="table-body">
+      @for (row of rows(); track row.key) {
+        <div class="table-row">
+          <div class="table-row__cell table-row__cell--name">
+            <span class="table-row__avatar">{{ getInitial(row.name) }}</span>
+            <span class="table-row__name-text">{{ row.name }}</span>
+            @if (row.badge) {
+              <span class="table-row__badge">{{ row.badge }}</span>
             }
           </div>
+          <div class="table-row__cell table-row__cell--dept">{{ row.department }}</div>
+          <div class="table-row__cell table-row__cell--id">{{ row.employeeId }}</div>
+          <div class="table-row__cell table-row__cell--scope">
+            @for (scope of row.scopes; track scope) {
+              <span class="scope-tag">{{ scope }}</span>
+            }
+          </div>
+          <div class="table-row__cell table-row__cell--adder">
+            <span class="table-row__avatar">{{ getInitial(row.adderName) }}</span>
+            <span class="table-row__name-text">{{ row.adderName }}</span>
+          </div>
+          <div class="table-row__cell table-row__cell--time">{{ row.operationTime }}</div>
         </div>
       }
     </div>

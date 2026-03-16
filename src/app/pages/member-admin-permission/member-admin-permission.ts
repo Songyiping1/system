@@ -1,142 +1,83 @@
-import { Component, signal, computed } from '@angular/core';
+import { Component, signal } from '@angular/core';
+import { PageHeaderComponent } from '../../shared/components/page-header/page-header.component';
 import { SearchInputComponent } from '../../shared/components/search-input/search-input.component';
-import { PersonTreeComponent } from '../../shared/components/person-tree/person-tree.component';
-import { PersonTreeNode } from '../../shared/models';
+import { FilterBarComponent } from '../../shared/components/filter-bar/filter-bar.component';
+import { DataTableComponent } from '../../shared/components/data-table/data-table.component';
+import { ColumnDef, FilterItem } from '../../shared/models';
 
-interface PermissionItem {
+interface AdminRow {
   key: string;
   name: string;
-  description: string;
-  enabled: boolean;
-}
-
-interface PermissionCategory {
-  title: string;
-  items: PermissionItem[];
+  avatar: string;
+  badge?: string;
+  department: string;
+  employeeId: string;
+  scopes: string[];
+  adderName: string;
+  adderAvatar: string;
+  operationTime: string;
 }
 
 @Component({
   selector: 'app-member-admin-permission',
-  imports: [SearchInputComponent, PersonTreeComponent],
+  imports: [PageHeaderComponent, SearchInputComponent, FilterBarComponent, DataTableComponent],
   templateUrl: './member-admin-permission.html',
   styleUrl: './member-admin-permission.scss',
 })
 export class MemberAdminPermission {
   readonly searchValue = signal('');
-  readonly selectedPersonKeys = signal<string[]>(['zhao-yuyan']);
 
-  readonly personNodes = signal<PersonTreeNode[]>([
-    {
-      key: 'company',
-      label: '中企云链（北京）信息科技有限公司',
-      icon: 'company',
-      iconColor: '#2e67f4',
-      iconText: '中',
-      children: [
-        {
-          key: 'dev-dept',
-          label: '开发部',
-          childCount: 2,
-          children: [
-            {
-              key: 'frontend',
-              label: '前端开发',
-              childCount: 2,
-              children: [
-                {
-                  key: 'frontend-group1',
-                  label: '前端开发一组',
-                  childCount: 30,
-                  children: [
-                    { key: 'zhao-yuyan', label: '赵萸艳', avatar: '' },
-                    { key: 'zheng-tingya', label: '郑婷雅', avatar: '' },
-                    { key: 'feng-yun', label: '冯云', avatar: '' },
-                    { key: 'zhou-jin', label: '周琎', avatar: '' },
-                  ],
-                },
-              ],
-            },
-          ],
-        },
-        { key: 'backend', label: '后端开发', childCount: 2 },
-        { key: 'product-dept', label: '产品部', childCount: 80 },
-        { key: 'ops-dept', label: '运营部', childCount: 80 },
-        { key: 'defense-dept', label: '国防部', childCount: 80 },
-        { key: 'police-dept', label: '公安部', childCount: 80 },
-      ],
-    },
+  readonly filters = signal<FilterItem[]>([
+    { key: 'department', label: '部门', value: '开发部', type: 'select', options: [
+      { label: '全部', value: '' },
+      { label: '开发部', value: '开发部' },
+      { label: '人力资源', value: '人力资源' },
+      { label: '运营部', value: '运营部' },
+      { label: '财务部', value: '财务部' },
+      { label: '管理部', value: '管理部' },
+    ]},
+    { key: 'scope', label: '管理范围', value: '', type: 'select', options: [
+      { label: '全部', value: '' },
+      { label: 'T度导向', value: 'T度导向' },
+      { label: '审批', value: '审批' },
+      { label: '商学院', value: '商学院' },
+      { label: '文档库', value: '文档库' },
+      { label: '日程', value: '日程' },
+    ]},
+    { key: 'permission', label: '权限点', value: '', type: 'select', options: [
+      { label: '全部', value: '' },
+      { label: '超级管理员', value: '超级管理员' },
+      { label: '系统管理员', value: '系统管理员' },
+    ]},
   ]);
 
-  readonly selectedPersonLabel = computed(() => {
-    const keys = this.selectedPersonKeys();
-    if (keys.length === 0) return '未选择';
-    const findLabel = (nodes: PersonTreeNode[]): string => {
-      for (const node of nodes) {
-        if (keys.includes(node.key)) return node.label;
-        if (node.children) {
-          const found = findLabel(node.children);
-          if (found) return found;
-        }
-      }
-      return '';
-    };
-    return findLabel(this.personNodes()) || '未选择';
-  });
-
-  readonly permissionCategories = signal<PermissionCategory[]>([
-    {
-      title: '组织管理',
-      items: [
-        { key: 'org-create', name: '创建部门', description: '允许创建新的组织部门', enabled: true },
-        { key: 'org-edit', name: '编辑部门', description: '允许编辑组织部门信息', enabled: true },
-        { key: 'org-delete', name: '删除部门', description: '允许删除组织部门', enabled: false },
-      ],
-    },
-    {
-      title: '成员管理',
-      items: [
-        { key: 'member-invite', name: '邀请成员', description: '允许邀请新成员加入组织', enabled: true },
-        { key: 'member-remove', name: '移除成员', description: '允许将成员从组织中移除', enabled: false },
-        { key: 'member-edit', name: '编辑成员信息', description: '允许编辑成员的基本信息', enabled: true },
-      ],
-    },
-    {
-      title: '角色管理',
-      items: [
-        { key: 'role-create', name: '创建角色', description: '允许创建新的角色', enabled: false },
-        { key: 'role-assign', name: '分配角色', description: '允许为成员分配角色', enabled: true },
-        { key: 'role-delete', name: '删除角色', description: '允许删除自定义角色', enabled: false },
-      ],
-    },
-    {
-      title: '权限管理',
-      items: [
-        { key: 'perm-menu', name: '菜单权限配置', description: '允许配置菜单访问权限', enabled: true },
-        { key: 'perm-data', name: '数据权限配置', description: '允许配置数据访问权限', enabled: false },
-        { key: 'perm-audit', name: '权限审计', description: '允许查看权限变更记录', enabled: true },
-      ],
-    },
+  readonly columns = signal<ColumnDef[]>([
+    { key: 'name', label: '管理员', width: '208px' },
+    { key: 'department', label: '部门', width: '161px' },
+    { key: 'employeeId', label: '工号', width: '160px' },
+    { key: 'scope', label: '管理范围' },
+    { key: 'adder', label: '添加者', width: '289px' },
+    { key: 'time', label: '操作时间', width: '253px' },
   ]);
 
-  onPersonSelectionChange(keys: string[]): void {
-    this.selectedPersonKeys.set(keys);
+  readonly rows = signal<AdminRow[]>([
+    { key: '1', name: '系统管理员', avatar: '', badge: '超级管理员', department: '开发部', employeeId: '154rt4ddf', scopes: ['T度导向'], adderName: '系统管理员', adderAvatar: '', operationTime: '2025/10/10  13:25:30' },
+    { key: '2', name: '赵吾光', avatar: '', department: '人力资源', employeeId: '154rt4ddf', scopes: ['审批'], adderName: '系统管理员', adderAvatar: '', operationTime: '2025/10/10  13:25:30' },
+    { key: '3', name: '郑盈', avatar: '', department: '运营部', employeeId: '154rt4ddf', scopes: ['商学院'], adderName: '系统管理员', adderAvatar: '', operationTime: '2025/10/10  13:25:30' },
+    { key: '4', name: '郑婷雅', avatar: '', department: '人力资源', employeeId: '154rt4ddf', scopes: ['文档库'], adderName: '系统管理员', adderAvatar: '', operationTime: '2025/10/10  13:25:30' },
+    { key: '5', name: '孙思达', avatar: '', department: '人力资源', employeeId: '154rt4ddf', scopes: ['日程'], adderName: '系统管理员', adderAvatar: '', operationTime: '2025/10/10  13:25:30' },
+    { key: '6', name: '赵萸艳', avatar: '', department: '财务部', employeeId: '154rt4ddf', scopes: ['薪酬管理'], adderName: '系统管理员', adderAvatar: '', operationTime: '2025/10/10  13:25:30' },
+    { key: '7', name: '周静', avatar: '', department: '管理部', employeeId: '154rt4ddf', scopes: ['T度导向', '项目管理'], adderName: '系统管理员', adderAvatar: '', operationTime: '2025/10/10  13:25:30' },
+    { key: '8', name: '冯艺莲', avatar: '', department: '人力资源部', employeeId: '154rt4ddf', scopes: ['智能人事', '后台管理：组织架构'], adderName: '系统管理员', adderAvatar: '', operationTime: '2025/10/10  13:25:30' },
+  ]);
+
+  onFilterChange(event: { key: string; value: string }): void {
+    this.filters.update(filters =>
+      filters.map(f => f.key === event.key ? { ...f, value: event.value } : f)
+    );
   }
 
-  togglePermission(categoryIndex: number, itemIndex: number): void {
-    const categories = this.permissionCategories().map((cat, ci) => {
-      if (ci === categoryIndex) {
-        return {
-          ...cat,
-          items: cat.items.map((item, ii) => {
-            if (ii === itemIndex) {
-              return { ...item, enabled: !item.enabled };
-            }
-            return item;
-          }),
-        };
-      }
-      return cat;
-    });
-    this.permissionCategories.set(categories);
+  getInitial(name: string): string {
+    return name.charAt(0);
   }
 }

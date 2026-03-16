@@ -1,102 +1,77 @@
 import { Component, signal, computed } from '@angular/core';
 import { SearchInputComponent } from '../../shared/components/search-input/search-input.component';
 import { ButtonComponent } from '../../shared/components/button/button.component';
-import { DataTableComponent } from '../../shared/components/data-table/data-table.component';
+import { PageHeaderComponent } from '../../shared/components/page-header/page-header.component';
 import { AvatarComponent } from '../../shared/components/avatar/avatar.component';
 import { CheckboxComponent } from '../../shared/components/checkbox/checkbox.component';
 import { RoleListComponent } from '../../shared/components/role-list/role-list.component';
-import { TreeTableComponent } from '../../shared/components/tree-table/tree-table.component';
-import { RoleGroup, ColumnDef, TreeNode } from '../../shared/models';
+import { RoleGroup } from '../../shared/models';
 
 interface RoleMemberRow {
   key: string;
   name: string;
   department: string;
   employeeId: string;
-  joinTime: string;
+  manageScope: string;
 }
 
 @Component({
   selector: 'app-role-manage',
-  imports: [SearchInputComponent, ButtonComponent, DataTableComponent, AvatarComponent, CheckboxComponent, RoleListComponent, TreeTableComponent],
+  imports: [SearchInputComponent, ButtonComponent, PageHeaderComponent, AvatarComponent, CheckboxComponent, RoleListComponent],
   templateUrl: './role-manage.html',
   styleUrl: './role-manage.scss',
 })
 export class RoleManage {
   readonly searchValue = signal('');
-  readonly memberSearchValue = signal('');
-  readonly selectedRoleKeys = signal<string[]>(['super-admin']);
+  readonly selectedRoleKeys = signal<string[]>(['dept-manager']);
   readonly selectedMemberKeys = signal<string[]>([]);
-  readonly activeTab = signal<'menu' | 'data' | 'members'>('menu');
 
   readonly roleGroups = signal<RoleGroup[]>([
     {
-      title: '系统角色',
-      expanded: true,
-      roles: [
-        { key: 'super-admin', label: '超级管理员', badge: '系统' },
-        { key: 'admin', label: '管理员', badge: '系统' },
-        { key: 'member', label: '普通成员', badge: '系统' },
-      ],
-    },
-    {
-      title: '自定义角色',
+      title: '默认角色',
       expanded: true,
       roles: [
         { key: 'dept-manager', label: '部门主管' },
-        { key: 'project-manager', label: '项目经理' },
-        { key: 'finance-auditor', label: '财务审核' },
-      ],
-    },
-  ]);
-
-  readonly menuPermissionColumns = signal<ColumnDef[]>([
-    { key: 'name', label: '菜单名称', width: '240px' },
-    { key: 'type', label: '权限类型' },
-    { key: 'status', label: '状态' },
-  ]);
-
-  readonly menuPermissionExpandedKeys = signal<string[]>(['mp-1', 'mp-2']);
-
-  readonly menuPermissionData = signal<TreeNode[]>([
-    {
-      key: 'mp-1',
-      data: { name: '工作台', type: '菜单权限', checked: true },
-      children: [
-        { key: 'mp-1-1', data: { name: '工作概览', type: '页面权限', checked: true } },
-        { key: 'mp-1-2', data: { name: '待办事项', type: '页面权限', checked: true } },
-        { key: 'mp-1-3', data: { name: '数据看板', type: '页面权限', checked: false } },
       ],
     },
     {
-      key: 'mp-2',
-      data: { name: '项目管理', type: '菜单权限', checked: true },
-      children: [
-        { key: 'mp-2-1', data: { name: '项目列表', type: '页面权限', checked: true } },
-        { key: 'mp-2-2', data: { name: '项目统计', type: '页面权限', checked: false } },
-        { key: 'mp-2-3', data: { name: '任务看板', type: '页面权限', checked: true } },
+      title: '自定义分组名称（非定义分组）',
+      expanded: true,
+      roles: [
+        { key: 'finance', label: '财务' },
+        { key: 'purchase', label: '采购' },
+        { key: 'it', label: 'IT' },
+        { key: 'admin-office', label: '行政' },
+        { key: 'operation', label: '运营' },
+        { key: 'service', label: '管理' },
       ],
     },
-    { key: 'mp-3', data: { name: '智能人事', type: '菜单权限', checked: true } },
-    { key: 'mp-4', data: { name: '文档库', type: '菜单权限', checked: false } },
-    { key: 'mp-5', data: { name: '日程', type: '菜单权限', checked: true } },
-    { key: 'mp-6', data: { name: '审批中心', type: '菜单权限', checked: false } },
-  ]);
-
-  readonly memberColumns = signal<ColumnDef[]>([
-    { key: 'name', label: '姓名' },
-    { key: 'department', label: '部门' },
-    { key: 'employeeId', label: '工号' },
-    { key: 'joinTime', label: '加入时间' },
+    {
+      title: '自定义分组名称（非定义分组）',
+      expanded: true,
+      roles: [
+        { key: 'supervisor', label: '主管' },
+        { key: 'senior-manager', label: '高级管理者' },
+        { key: 'section-chief', label: '科长' },
+        { key: 'general-manager', label: '总经理' },
+      ],
+    },
   ]);
 
   readonly roleMembers = signal<RoleMemberRow[]>([
-    { key: '1', name: '郑婷雅', department: '设计部', employeeId: 'EMP001', joinTime: '2025-10-15' },
-    { key: '2', name: '周静', department: '开发部', employeeId: 'EMP002', joinTime: '2025-10-16' },
-    { key: '3', name: '钱雨萌', department: '开发部', employeeId: 'EMP003', joinTime: '2025-10-17' },
-    { key: '4', name: '李婷', department: '产品部', employeeId: 'EMP004', joinTime: '2025-10-18' },
-    { key: '5', name: '孙旖茹', department: '运营部', employeeId: 'EMP005', joinTime: '2025-10-20' },
-    { key: '6', name: '赵萸艳', department: '开发部', employeeId: 'EMP006', joinTime: '2025-10-21' },
+    { key: '1', name: '郑婷雅', department: '设计部', employeeId: '545596841', manageScope: '全部' },
+    { key: '2', name: '周静', department: '开发部', employeeId: '545596841', manageScope: '网络部' },
+    { key: '3', name: '钱雨萌', department: '开发部', employeeId: '545596841', manageScope: '市场部' },
+    { key: '4', name: '李婷', department: '开发部', employeeId: '545596841', manageScope: '生产部' },
+    { key: '5', name: '孙旖茹', department: '开发部', employeeId: '545596841', manageScope: '管理部' },
+    { key: '6', name: '赵萸艳', department: '开发部', employeeId: '545596841', manageScope: '财务部' },
+    { key: '7', name: '郑盈', department: '开发部', employeeId: '545596841', manageScope: '品质管理部' },
+    { key: '8', name: '李豫卓', department: '开发部', employeeId: '545596841', manageScope: '安全部' },
+    { key: '9', name: '李琳颖', department: '开发部', employeeId: '545596841', manageScope: '客服部' },
+    { key: '10', name: '周小艺', department: '开发部', employeeId: '545596841', manageScope: '销售部' },
+    { key: '11', name: '冯云', department: '开发部', employeeId: '545596841', manageScope: '人力资源部' },
+    { key: '12', name: '赵玉凤', department: '开发部', employeeId: '545596841', manageScope: '研发部' },
+    { key: '13', name: '钱若霖', department: '开发部', employeeId: '545596841', manageScope: '采购部' },
   ]);
 
   readonly selectedRole = computed(() => {
@@ -111,19 +86,14 @@ export class RoleManage {
     return null;
   });
 
-  readonly roleDescription = computed(() => {
-    const role = this.selectedRole();
-    if (!role) return '';
-    const descriptions: Record<string, string> = {
-      'super-admin': '拥有系统全部权限，不可删除和修改',
-      'admin': '拥有大部分管理权限，可管理普通成员',
-      'member': '拥有基本的系统使用权限',
-      'dept-manager': '管理本部门的成员和业务',
-      'project-manager': '管理项目进度和项目成员',
-      'finance-auditor': '审核财务相关流程和数据',
-    };
-    return descriptions[role.key] || '';
+  readonly isDefaultRole = computed(() => {
+    const keys = this.selectedRoleKeys();
+    if (keys.length === 0) return false;
+    const defaultGroup = this.roleGroups()[0];
+    return defaultGroup.roles.some(r => r.key === keys[0]);
   });
+
+  readonly totalCount = computed(() => this.roleMembers().length);
 
   readonly allMemberKeys = computed(() => this.roleMembers().map(m => m.key));
 
@@ -133,18 +103,15 @@ export class RoleManage {
     return all.length > 0 && keys.length === all.length;
   });
 
+  readonly indeterminateMembers = computed(() => {
+    const keys = this.selectedMemberKeys();
+    const all = this.allMemberKeys();
+    return keys.length > 0 && keys.length < all.length;
+  });
+
   onRoleSelectionChange(keys: string[]): void {
     this.selectedRoleKeys.set(keys);
     this.selectedMemberKeys.set([]);
-    this.activeTab.set('menu');
-  }
-
-  setActiveTab(tab: 'menu' | 'data' | 'members'): void {
-    this.activeTab.set(tab);
-  }
-
-  onMenuPermissionExpandedKeysChange(keys: string[]): void {
-    this.menuPermissionExpandedKeys.set(keys);
   }
 
   toggleSelectAllMembers(): void {

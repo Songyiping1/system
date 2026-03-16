@@ -46,7 +46,7 @@
     </div>
     <div class="table-body">
       @for (row of rows(); track row.key) {
-        <div class="table-row" [class.table-row--checked]="isSelected(row.key)">
+        <div class="table-row">
           <div class="table-row__cell table-row__cell--name">
             <app-checkbox [checked]="isSelected(row.key)" [disabled]="isRowDisabled(row)" (checkedChange)="toggleRow(row.key)" />
             <app-company-icon [fallbackText]="row.name" [size]="32" [bgColor]="row.iconColor" />

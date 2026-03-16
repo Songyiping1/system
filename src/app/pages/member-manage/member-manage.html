@@ -6,7 +6,7 @@
     </div>
 
     <div class="tree-header">
-      <app-search-input [placeholder]="'搜索部门'" [value]="searchValue()" (valueChange)="searchValue.set($event)" />
+      <app-search-input [placeholder]="'搜索'" [value]="leftSearchValue()" (valueChange)="leftSearchValue.set($event)" />
       <button class="tree-header__add-btn" type="button">
         <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
           <path d="M7 1v12M1 7h12" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
@@ -25,19 +25,23 @@
   </div>
 
   <div class="member-manage__right">
-    <div class="right-header">
-      <div class="right-header__info">
-        <span class="right-header__dept-name">{{ selectedDept()?.name }}</span>
-        <span class="right-header__count">（{{ selectedDept()?.count }}人）</span>
-      </div>
-      <div class="right-header__actions">
-        <app-button label="导入人员" variant="outline" />
-        <app-button label="添加人员" variant="primary" />
-      </div>
-    </div>
+    <app-page-header title="成员管理" description="建立和数据化的电子员工档案，统一维护员工的基本信息 帮助" />
 
     <div class="right-filter">
+      <app-search-input [placeholder]="'搜索'" [value]="rightSearchValue()" (valueChange)="rightSearchValue.set($event)" />
       <app-filter-bar [filters]="filters()" (filterChange)="onFilterChange($event)" />
+      <div class="right-filter__actions">
+        <app-button label="邀请链接人员" variant="outline" />
+        <app-button label="+ 添加人员" variant="primary" />
+        <button class="more-btn" type="button">
+          <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
+            <circle cx="3" cy="7" r="1.2" fill="#333"/>
+            <circle cx="7" cy="7" r="1.2" fill="#333"/>
+            <circle cx="11" cy="7" r="1.2" fill="#333"/>
+          </svg>
+          更多
+        </button>
+      </div>
     </div>
 
     <div class="right-table">
@@ -46,11 +50,17 @@
           <app-checkbox [checked]="selectAllMembers()" [indeterminate]="indeterminate()" (checkedChange)="toggleSelectAllMembers()" />
         </div>
         <div class="table-header__cell table-header__cell--name">
-          <span class="table-header__label">姓名</span>
+          <span class="table-header__label">名称</span>
+          <svg class="table-header__sort" width="10" height="14" viewBox="0 0 10 14" fill="none">
+            <path d="M5 1v12M1 5l4-4 4 4" stroke="#999" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
         </div>
         <div class="table-header__cell">
           <span class="table-header__separator"></span>
           <span class="table-header__label">人员状态</span>
+          <svg class="table-header__sort" width="10" height="14" viewBox="0 0 10 14" fill="none">
+            <path d="M5 1v12M1 5l4-4 4 4" stroke="#999" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
         </div>
         <div class="table-header__cell">
           <span class="table-header__separator"></span>
@@ -63,7 +73,7 @@
       </div>
       <div class="table-body">
         @for (member of members(); track member.key) {
-          <div class="table-row" [class.table-row--checked]="isMemberSelected(member.key)">
+          <div class="table-row">
             <div class="table-row__cell table-row__cell--checkbox">
               <app-checkbox [checked]="isMemberSelected(member.key)" (checkedChange)="toggleMemberRow(member.key)" />
             </div>
@@ -78,6 +88,11 @@
             <div class="table-row__cell">{{ member.position }}</div>
           </div>
         }
+      </div>
+      <div class="table-footer">
+        <span class="table-footer__dept">{{ selectedDept()?.name }}</span>
+        <span class="table-footer__stat">总人数 <strong>{{ selectedDept()?.count }}</strong></span>
+        <span class="table-footer__stat">未加入 <strong>{{ notJoinedCount() }}</strong></span>
       </div>
     </div>
   </div>

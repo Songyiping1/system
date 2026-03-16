@@ -52,7 +52,7 @@
     </div>
     <div class="table-body">
       @for (row of rows(); track row.key) {
-        <div class="table-row" [class.table-row--checked]="isSelected(row.key)">
+        <div class="table-row">
           <div class="table-row__cell table-row__cell--checkbox">
             <app-checkbox [checked]="isSelected(row.key)" (checkedChange)="toggleRow(row.key)" />
           </div>

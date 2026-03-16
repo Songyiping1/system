@@ -2,7 +2,7 @@ import { Component, signal, computed } from '@angular/core';
 import { PersonTreeComponent } from '../../shared/components/person-tree/person-tree.component';
 import { TreeTableComponent } from '../../shared/components/tree-table/tree-table.component';
 import { SearchInputComponent } from '../../shared/components/search-input/search-input.component';
-import { ColumnDef, TreeNode, PersonTreeNode, BadgeVariant } from '../../shared/models';
+import { ColumnDef, TreeNode, PersonTreeNode } from '../../shared/models';
 
 @Component({
   selector: 'app-permission-query',
@@ -13,6 +13,8 @@ import { ColumnDef, TreeNode, PersonTreeNode, BadgeVariant } from '../../shared/
 export class PermissionQuery {
   readonly searchValue = signal('');
   readonly selectedPersonKeys = signal<string[]>(['zhao-yuyan']);
+  readonly compareCount = signal(0);
+  readonly compareMax = 2;
 
   readonly personNodes = signal<PersonTreeNode[]>([
     {
@@ -37,11 +39,15 @@ export class PermissionQuery {
                   label: '前端开发一组',
                   childCount: 30,
                   children: [
-                    { key: 'zhao-yuyan', label: '赵萸艳', avatar: '' },
-                    { key: 'zheng-tingya', label: '郑婷雅', avatar: '' },
-                    { key: 'feng-yun', label: '冯云', avatar: '' },
-                    { key: 'zhou-jin', label: '周琎', avatar: '' },
+                    { key: 'zhao-yuyan', label: '张竞元', avatar: '' },
+                    { key: 'zheng-tingya', label: '刘俊良', avatar: '' },
+                    { key: 'feng-yun', label: '张三', avatar: '' },
                   ],
+                },
+                {
+                  key: 'frontend-group2',
+                  label: '前端开发二组',
+                  childCount: 80,
                 },
               ],
             },
@@ -73,51 +79,50 @@ export class PermissionQuery {
   });
 
   readonly permissionColumns = signal<ColumnDef[]>([
-    { key: 'name', label: '菜单名称', width: '240px' },
-    { key: 'type', label: '权限类型' },
-    { key: 'status', label: '状态' },
+    { key: 'name', label: '名称', width: '240px' },
+    { key: 'route', label: 'route 路由' },
+    { key: 'source', label: '来源' },
+    { key: 'description', label: '描述' },
   ]);
 
-  readonly permissionExpandedKeys = signal<string[]>(['menu-1', 'menu-2', 'menu-3']);
+  readonly permissionExpandedKeys = signal<string[]>(['menu-1', 'menu-1-1']);
 
   readonly permissionData = signal<TreeNode[]>([
     {
+      key: 'menu-0',
+      data: { name: 'T度导向', route: '/doc', source: '角色：普通员工', description: '成员开月、周度导向会议及填写日导向...' },
+    },
+    {
       key: 'menu-1',
-      data: { name: '工作台', type: '菜单权限', status: '已启用', statusVariant: 'success' },
+      data: { name: '项目管理', route: '/doc', source: '岗位：前端开发工程师（总监）', description: '成员开月、周度导向会议及填写日导向...' },
       children: [
-        { key: 'menu-1-1', data: { name: '工作概览', type: '页面权限', status: '已启用', statusVariant: 'success' } },
-        { key: 'menu-1-2', data: { name: '待办事项', type: '页面权限', status: '已启用', statusVariant: 'success' } },
-        { key: 'menu-1-3', data: { name: '数据看板', type: '页面权限', status: '未启用', statusVariant: 'default' } },
+        {
+          key: 'menu-1-1',
+          data: { name: 'T度导向', route: '/doc', source: '角色：普通员工', description: '成员开月、周度导向会议及填写日导向...' },
+          children: [
+            { key: 'menu-1-1-1', data: { name: 'T度导向', route: '/doc', source: '角色：普通员工', description: '成员开月、周度导向会议及填写日导向...' } },
+            { key: 'menu-1-1-2', data: { name: 'T度导向', route: '/doc', source: '岗位：UI设计师（普通员工）', description: '成员开月、周度导向会议及填写日导向...' } },
+            { key: 'menu-1-1-3', data: { name: 'T度导向', route: '/doc', source: '岗位：UI设计师（组长）', description: '成员开月、周度导向会议及填写日导向...' } },
+          ],
+        },
+        { key: 'menu-1-2', data: { name: 'T度导向', route: '/doc', source: '角色：普通员工', description: '成员开月、周度导向会议及填写日导向...' } },
       ],
     },
     {
       key: 'menu-2',
-      data: { name: '项目管理', type: '菜单权限', status: '已启用', statusVariant: 'success' },
+      data: { name: 'T度导向', route: '/doc', source: '角色：普通员工', description: '成员开月、周度导向会议及填写日导向...' },
       children: [
-        { key: 'menu-2-1', data: { name: '项目列表', type: '页面权限', status: '已启用', statusVariant: 'success' } },
-        {
-          key: 'menu-2-2',
-          data: { name: '项目统计', type: '页面权限', status: '已启用', statusVariant: 'success' },
-          children: [
-            { key: 'menu-2-2-1', data: { name: '统计详情', type: '操作权限', status: '已启用', statusVariant: 'success' } },
-            { key: 'menu-2-2-2', data: { name: '导出报表', type: '操作权限', status: '未启用', statusVariant: 'default' } },
-          ],
-        },
-        { key: 'menu-2-3', data: { name: '任务看板', type: '页面权限', status: '未启用', statusVariant: 'default' } },
+        { key: 'menu-2-1', data: { name: 'T度导向', route: '/doc', source: '角色：普通员工', description: '成员开月、周度导向会议及填写日导向...' } },
       ],
     },
     {
       key: 'menu-3',
-      data: { name: '智能人事', type: '菜单权限', status: '已启用', statusVariant: 'success' },
+      data: { name: 'T度导向', route: '/doc', source: '角色：普通员工', description: '成员开月、周度导向会议及填写日导向...' },
       children: [
-        { key: 'menu-3-1', data: { name: '员工花名册', type: '页面权限', status: '已启用', statusVariant: 'success' } },
-        { key: 'menu-3-2', data: { name: '考勤管理', type: '页面权限', status: '未启用', statusVariant: 'default' } },
-        { key: 'menu-3-3', data: { name: '薪酬管理', type: '页面权限', status: '未启用', statusVariant: 'default' } },
+        { key: 'menu-3-1', data: { name: 'T度导向', route: '/doc', source: '岗位：UI设计师（主管）', description: '成员开月、周度导向会议及填写日导向...' } },
+        { key: 'menu-3-2', data: { name: 'T度导向', route: '/doc', source: '岗位：UI设计师（主管）', description: '成员开月、周度导向会议及填写日导向...' } },
       ],
     },
-    { key: 'menu-4', data: { name: '文档库', type: '菜单权限', status: '已启用', statusVariant: 'success' } },
-    { key: 'menu-5', data: { name: '日程', type: '菜单权限', status: '未启用', statusVariant: 'default' } },
-    { key: 'menu-6', data: { name: '审批中心', type: '菜单权限', status: '已启用', statusVariant: 'success' } },
   ]);
 
   onPersonSelectionChange(keys: string[]): void {
@@ -126,9 +131,5 @@ export class PermissionQuery {
 
   onPermissionExpandedKeysChange(keys: string[]): void {
     this.permissionExpandedKeys.set(keys);
-  }
-
-  getStatusVariant(variant: string): BadgeVariant {
-    return (variant as BadgeVariant) || 'default';
   }
 }
