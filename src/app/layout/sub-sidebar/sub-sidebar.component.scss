@@ -1,0 +1,55 @@
+.sub-sidebar {
+  width: 232px;
+  flex-shrink: 0;
+  background: #f7f9fc;
+  padding: 16px 8px;
+  height: 100%;
+  overflow-y: auto;
+  border-top-left-radius: 8px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.menu-group {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+
+  & + .menu-group {
+    padding-top: 16px;
+    border-top: 1px solid #e6e6e6;
+  }
+}
+
+.group-label {
+  font-size: 14px;
+  color: #999;
+  padding: 0 8px;
+}
+
+.group-items {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.menu-item {
+  height: 36px;
+  display: flex;
+  align-items: center;
+  padding: 8px;
+  border-radius: 4px;
+  font-size: 14px;
+  color: #333;
+  cursor: pointer;
+
+  &:hover:not(.active) {
+    background: rgba(0, 0, 0, 0.04);
+  }
+
+  &.active {
+    background: rgba(95, 111, 255, 0.08);
+    color: #4857e2;
+  }
+}

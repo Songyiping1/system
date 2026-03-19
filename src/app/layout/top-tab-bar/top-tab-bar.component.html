@@ -1,0 +1,31 @@
+<div class="top-tab-bar">
+  <div class="tabs-area">
+    @for (tab of tabs(); track tab.id) {
+      <div class="tab-item" [class.active]="false">
+        <span class="tab-label">{{ tab.label }}</span>
+        @if (tab.closable) {
+          <span class="tab-close">&times;</span>
+        }
+      </div>
+    }
+    <div class="tab-item active">
+      <span class="tab-label">{{ activeNavLabel() }}</span>
+      <span class="tab-close">&times;</span>
+    </div>
+  </div>
+
+  <div class="toolbar">
+    <div class="notification">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2">
+        <path d="M18 8A6 6 0 006 8c0 7-3 9-3 9h18s-3-2-3-9"/>
+        <path d="M13.73 21a2 2 0 01-3.46 0"/>
+      </svg>
+      <span class="badge">2</span>
+    </div>
+    <div class="user-avatars">
+      <div class="avatar-dot" (click)="onLogout()">
+        <span>{{ user()?.name?.charAt(0) }}</span>
+      </div>
+    </div>
+  </div>
+</div>

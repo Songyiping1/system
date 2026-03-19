@@ -1,0 +1,82 @@
+.icon-sidebar {
+  width: 72px;
+  flex-shrink: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 12px 16px 16px;
+  height: 100%;
+}
+
+// Admin 深蓝配色
+:host(.admin) .icon-sidebar {
+  background: #053b64;
+}
+
+:host(.admin) .nav-icon-item.active {
+  background: #165789;
+}
+
+// User 深灰紫配色
+:host(.user) .icon-sidebar {
+  background: #1a1a2e;
+}
+
+:host(.user) .nav-icon-item.active {
+  background: #2d2d4a;
+}
+
+.sidebar-top {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 16px;
+  flex: 1;
+}
+
+.app-logo {
+  width: 42px;
+  height: 42px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.nav-icon-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  padding: 4px 0;
+  border-radius: 8px;
+  cursor: pointer;
+  width: 65px;
+
+  &:hover:not(.active) {
+    background: rgba(255, 255, 255, 0.08);
+  }
+}
+
+.nav-icon-circle {
+  width: 24px;
+  height: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #8c8c8d;
+
+  .active & {
+    color: #fff;
+  }
+}
+
+.nav-icon-label {
+  font-size: 14px;
+  color: #8c8c8d;
+  text-align: center;
+  white-space: nowrap;
+
+  .active & {
+    color: #fff;
+  }
+}
