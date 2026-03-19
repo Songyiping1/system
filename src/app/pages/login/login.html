@@ -1,10 +1,9 @@
 <div class="login-container">
   <!-- 左侧蓝色面板 -->
   <div class="login-left">
-    <div class="left-decoration decoration-1"></div>
-    <div class="left-decoration decoration-2"></div>
-    <div class="left-decoration decoration-3"></div>
-    <div class="left-decoration decoration-4"></div>
+    @for (size of decorationSizes; track size) {
+      <div class="left-decoration" [style.width.px]="size" [style.height.px]="size"></div>
+    }
     <div class="left-content">
       <h1 class="left-title">CSES管理后台</h1>
       <p class="left-subtitle">CSES Admin Panel</p>
@@ -23,15 +22,15 @@
       <div class="login-tabs">
         <div
           class="login-tab"
-          [class.active]="activeTab === 'password'"
-          (click)="activeTab = 'password'"
+          [class.active]="activeTab() === 'password'"
+          (click)="activeTab.set('password')"
         >
           账号密码登录
         </div>
         <div
           class="login-tab"
-          [class.active]="activeTab === 'code'"
-          (click)="activeTab = 'code'"
+          [class.active]="activeTab() === 'code'"
+          (click)="activeTab.set('code')"
         >
           验证码登录
         </div>
@@ -45,13 +44,13 @@
             class="form-input"
             type="text"
             [(ngModel)]="username"
-            [class.focused]="usernameFocused"
-            (focus)="usernameFocused = true"
-            (blur)="usernameFocused = false"
+            [class.focused]="usernameFocused()"
+            (focus)="usernameFocused.set(true)"
+            (blur)="usernameFocused.set(false)"
           />
         </div>
 
-        @if (activeTab === 'password') {
+        @if (activeTab() === 'password') {
           <div class="form-group">
             <label class="form-label">密码</label>
             <input

@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 
 @Component({
@@ -8,21 +8,22 @@ import { FormsModule } from '@angular/forms';
   styleUrl: './login.scss'
 })
 export class LoginComponent {
-  activeTab: 'password' | 'code' = 'password';
-  username = '';
-  password = '';
-  verifyCode = '';
-  usernameFocused = false;
+  activeTab = signal<'password' | 'code'>('password');
+  username = signal('');
+  password = signal('');
+  verifyCode = signal('');
+  usernameFocused = signal(false);
+  decorationSizes = [241, 297, 356, 414];
 
   onLogin() {
-    if (this.activeTab === 'password') {
-      console.log('账号密码登录', this.username, this.password);
+    if (this.activeTab() === 'password') {
+      console.log('账号密码登录', this.username(), this.password());
     } else {
-      console.log('验证码登录', this.username, this.verifyCode);
+      console.log('验证码登录', this.username(), this.verifyCode());
     }
   }
 
   onSendCode() {
-    console.log('发送验证码', this.username);
+    console.log('发送验证码', this.username());
   }
 }
