@@ -1,36 +1,101 @@
+@use "../../shared/styles/tokens" as *;
+
 .page {
   display: flex;
   flex-direction: column;
-  gap: 16px;
-  padding: 16px;
+  gap: $page-gap;
+  padding: $page-padding;
   height: 100%;
+  background: $white;
+  font-family: $font-family;
 }
 
-.page-header {
-  border-bottom: 1px solid #e6e6e6;
-  padding-bottom: 16px;
-}
-
-.page-title {
-  font-size: 16px;
-  font-weight: 600;
-  color: #333;
-  margin: 0;
-}
-
-.page-desc {
-  font-size: 12px;
-  color: #999;
-  margin: 4px 0 0;
-}
-
-.page-content {
+.state-loading {
   flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: $text-2;
+  font-size: $font-size-14;
 }
 
-.placeholder {
-  color: #999;
-  font-size: 14px;
-  text-align: center;
-  padding: 60px 0;
+.panel-title {
+  font-size: $font-size-16;
+  font-weight: $font-weight-semibold;
+  color: $text-1;
+}
+
+.assign-header {
+  display: flex;
+  align-items: baseline;
+  gap: 12px;
+}
+
+.update-time {
+  font-size: $font-size-12;
+  color: $text-2;
+}
+
+.table-wrap {
+  flex: 1;
+  overflow: auto;
+  border: 1px solid $border;
+  border-radius: $table-radius;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+thead {
+  background: $table-header-bg;
+  position: sticky;
+  top: 0;
+  z-index: 1;
+}
+
+th {
+  padding: $table-cell-padding-y $table-cell-padding-x;
+  font-size: $font-size-14;
+  font-weight: $font-weight-regular;
+  color: $text-2;
+  text-align: left;
+  border-bottom: 1px solid $border;
+  white-space: nowrap;
+  height: $table-header-height;
+  box-sizing: border-box;
+}
+
+td {
+  padding: $table-cell-padding-y $table-cell-padding-x;
+  font-size: $font-size-14;
+  color: $text-1;
+  border-bottom: 1px solid $border;
+  height: 52px;
+  box-sizing: border-box;
+  vertical-align: middle;
+}
+
+tr:last-child td {
+  border-bottom: none;
+}
+
+tbody tr:hover {
+  background: $sub-sidebar-bg;
+}
+
+.col-check {
+  width: 50px;
+}
+
+.checkbox {
+  width: $checkbox-size;
+  height: $checkbox-size;
+  cursor: pointer;
+  accent-color: $primary;
+}
+
+.text-muted {
+  color: $text-2;
 }

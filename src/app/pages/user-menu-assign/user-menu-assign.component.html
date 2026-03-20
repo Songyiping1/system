@@ -1,11 +1,69 @@
 <div class="page">
-  <div class="page-header">
-    <div class="page-header-info">
-      <h2 class="page-title">菜单分配</h2>
-      <p class="page-desc">给公司内部按角色配置菜单权限</p>
-    </div>
-  </div>
-  <div class="page-content">
-    <p class="placeholder">页面开发中...</p>
-  </div>
+  <app-page-header title="菜单分配" desc="给公司内部按角色配置菜单权限" />
+  <app-split-layout>
+    <ng-container left>
+      <div class="panel-title">角色列表</div>
+      <app-search-input placeholder="搜索" [fullWidth]="true" />
+      @if (selectedRoles().length > 0) {
+        <div class="selected-roles">
+          <span class="selected-label">角色：{{ selectedRoles().join('、') }}</span>
+          <span class="cancel-link" (click)="selectedRoles.set([])">取消选择</span>
+        </div>
+      }
+      <app-tree-list [items]="treeItems()" [activeId]="activeTreeId()" (select)="onTreeSelect($event)" />
+    </ng-container>
+    <ng-container right>
+      <app-action-bar>
+        <ng-container left>
+          <div class="assign-header">
+            <span class="panel-title">分配中 - {{ selectedRoles().join('、') }}</span>
+            <span class="update-time">更新时间：2025-11-01 14:30</span>
+          </div>
+        </ng-container>
+        <ng-container right>
+          <app-button label="取消" type="outline" />
+          <app-button label="保存" type="primary" />
+        </ng-container>
+      </app-action-bar>
+      @if (isLoading()) {
+        <div class="state-loading">加载中...</div>
+      } @else {
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th class="col-check"><input type="checkbox" class="checkbox" /></th>
+                <th>名称</th>
+                <th>权限归属</th>
+                <th>描述</th>
+              </tr>
+            </thead>
+            <tbody>
+              @for (row of flattenMenuItems(); track row.name) {
+                <tr>
+                  <td class="col-check"><input type="checkbox" class="checkbox" checked /></td>
+                  <td>
+                    <div class="cell-name" [style.padding-left.px]="row.level * 24">
+                      @if (row.children && row.children.length > 0) {
+                        <span class="expand-icon" (click)="toggleExpand(row)">{{ row.expanded ? '▾' : '▸' }}</span>
+                      }
+                      <span>{{ row.name }}</span>
+                    </div>
+                  </td>
+                  <td>
+                    <div class="badges">
+                      @for (p of row.permissions; track p) {
+                        <app-type-badge [label]="p" />
+                      }
+                    </div>
+                  </td>
+                  <td class="text-muted">{{ row.desc }}</td>
+                </tr>
+              }
+            </tbody>
+          </table>
+        </div>
+      }
+    </ng-container>
+  </app-split-layout>
 </div>

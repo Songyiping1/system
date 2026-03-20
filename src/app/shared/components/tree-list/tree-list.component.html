@@ -1,0 +1,25 @@
+<div class="tree-list">
+  <ng-container *ngTemplateOutlet="nodeList; context: { $implicit: items(), level: 0 }" />
+</div>
+
+<ng-template #nodeList let-nodes let-level="level">
+  @for (node of nodes; track node.id) {
+    <div
+      class="tree-item"
+      [class.active]="activeId() === node.id"
+      [style.padding-left.px]="8 + level * 20"
+      (click)="onSelect(node)"
+    >
+      @if (node.children?.length) {
+        <span class="expand-icon" [class.expanded]="node.expanded" (click)="toggleExpand(node, $event)">›</span>
+      }
+      <span class="tree-label">{{ node.label }}</span>
+      @if (node.count !== undefined) {
+        <span class="tree-count">({{ node.count }})</span>
+      }
+    </div>
+    @if (node.expanded && node.children?.length) {
+      <ng-container *ngTemplateOutlet="nodeList; context: { $implicit: node.children, level: level + 1 }" />
+    }
+  }
+</ng-template>

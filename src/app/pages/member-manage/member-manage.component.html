@@ -1,11 +1,57 @@
 <div class="page">
-  <div class="page-header">
-    <div class="page-header-info">
-      <h2 class="page-title">成员管理</h2>
-      <p class="page-desc">建立数据化的电子员工档案，统一维护员工的基本信息 帮助</p>
-    </div>
-  </div>
-  <div class="page-content">
-    <p class="placeholder">页面开发中...</p>
-  </div>
+  <app-page-header title="成员管理" desc="建立数据化的电子员工档案，统一维护员工的基本信息" [showHelp]="true" />
+  <app-split-layout>
+    <ng-container left>
+      <app-search-input placeholder="搜索" [fullWidth]="true" />
+      <app-tree-list [items]="treeItems()" [activeId]="activeTreeId()" (select)="onTreeSelect($event)" />
+    </ng-container>
+    <ng-container right>
+      <app-action-bar>
+        <ng-container left>
+          <app-search-input placeholder="搜索" (search)="onSearch($event)" />
+          <app-filter-select label="人员状态" [options]="['全部', '已加入', '未加入']" />
+          <app-filter-select label="显示人员" [options]="['显示全部人员', '仅直属人员']" />
+        </ng-container>
+        <ng-container right>
+          <app-button label="邀请人员" type="outline" />
+          <app-button label="+ 添加人员" type="primary" />
+          <app-button label="更多" type="outline" />
+        </ng-container>
+      </app-action-bar>
+      @if (isLoading()) {
+        <div class="state-loading">加载中...</div>
+      } @else {
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>名称</th>
+                <th>人员状态</th>
+                <th>部门</th>
+                <th>岗位</th>
+              </tr>
+            </thead>
+            <tbody>
+              @for (row of members(); track row.name) {
+                <tr>
+                  <td>
+                    <div class="cell-user">
+                      <div class="avatar">{{ row.avatar }}</div>
+                      <span>{{ row.name }}</span>
+                    </div>
+                  </td>
+                  <td>
+                    <span class="status-text" [class.status-joined]="row.status === '已加入'" [class.status-not-joined]="row.status === '未加入'">{{ row.status }}</span>
+                  </td>
+                  <td>{{ row.dept }}</td>
+                  <td>{{ row.position }}</td>
+                </tr>
+              }
+            </tbody>
+          </table>
+          <div class="table-footer">前端开发一组&nbsp;&nbsp;总人数 30&nbsp;&nbsp;未加入 3</div>
+        </div>
+      }
+    </ng-container>
+  </app-split-layout>
 </div>

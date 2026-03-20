@@ -1,0 +1,8 @@
+<div class="stats-row">
+  @for (item of items(); track item.label) {
+    <div class="stat-card" (click)="itemClick.emit(item)">
+      <span class="stat-label">{{ item.label }}</span>
+      <span class="stat-value">{{ item.value }} ›</span>
+    </div>
+  }
+</div>

@@ -1,11 +1,95 @@
 <div class="page">
-  <div class="page-header">
-    <div class="page-header-info">
-      <h2 class="page-title">菜单分配</h2>
-      <p class="page-desc">给公司配置菜单权限</p>
+  <app-page-header title="菜单分配" desc="给公司配置菜单权限" />
+
+  <div class="split-container">
+    <!-- 左侧：公司列表 -->
+    <div class="left-panel">
+      <div class="panel-title">公司列表</div>
+      <app-search-input placeholder="搜索公司" [fullWidth]="true" (search)="onSearch($event)" />
+
+      <div class="company-list">
+        @for (row of flatCompanies(); track row.item.id) {
+          <div
+            class="company-item"
+            [class.active]="activeCompanyId() === row.item.id"
+            [style.padding-left.px]="16 + row.level * 24"
+            (click)="selectCompany(row.item)"
+          >
+            @if (row.item.children?.length) {
+              <span class="expand-icon" [class.expanded]="row.item.expanded" (click)="toggleCompanyExpand(row.item, $event)">›</span>
+            }
+            <span class="company-icon">{{ row.item.icon }}</span>
+            <span class="company-name">{{ row.item.name }}</span>
+            @if (row.item.childCount) {
+              <span class="child-count">
+                <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+                  <circle cx="4" cy="4" r="2" fill="#999"/>
+                  <circle cx="11" cy="8" r="2" fill="#999"/>
+                  <path d="M4 6V10C4 11.1 4.9 12 6 12H9" stroke="#999" stroke-width="1.2"/>
+                </svg>
+                {{ row.item.childCount }}
+              </span>
+            }
+          </div>
+        }
+      </div>
     </div>
-  </div>
-  <div class="page-content">
-    <p class="placeholder">页面开发中...</p>
+
+    <!-- 右侧：分配表格 -->
+    <div class="right-panel">
+      <div class="right-header">
+        <div class="right-header-info">
+          <div class="panel-title">分配中 - {{ selectedCompanyName() }}</div>
+          <div class="update-time">上次更新时间：2025-12-01 14：14</div>
+        </div>
+        <div class="right-header-actions">
+          <app-button label="取消" type="outline" />
+          <app-button label="保存" type="primary" />
+        </div>
+      </div>
+
+      @if (isLoading()) {
+        <div class="state-loading">加载中...</div>
+      } @else {
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th class="col-check"><input type="checkbox" class="checkbox" [checked]="allChecked" (change)="toggleAllCheck()" /></th>
+                <th class="col-name">名称</th>
+                <th class="col-icon">icon</th>
+                <th class="col-date">购买时间</th>
+                <th class="col-period">使用期限（天）</th>
+                <th class="col-desc">描述</th>
+              </tr>
+            </thead>
+            <tbody>
+              @for (row of assignRows(); track row.id) {
+                <tr [class.row-checked]="row.checked">
+                  <td class="col-check"><input type="checkbox" class="checkbox" [checked]="row.checked" (change)="toggleRowCheck(row)" /></td>
+                  <td class="col-name">
+                    <span class="row-name">{{ row.name }}</span>
+                    @if (row.childCount) {
+                      <span class="row-child-count">
+                        <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+                          <circle cx="4" cy="4" r="2" fill="#999"/>
+                          <circle cx="11" cy="8" r="2" fill="#999"/>
+                          <path d="M4 6V10C4 11.1 4.9 12 6 12H9" stroke="#999" stroke-width="1.2"/>
+                        </svg>
+                        {{ row.childCount }}
+                      </span>
+                    }
+                  </td>
+                  <td class="col-icon">{{ row.icon }}</td>
+                  <td class="col-date">{{ row.buyDate }}</td>
+                  <td class="col-period">{{ row.period }}</td>
+                  <td class="col-desc">{{ row.desc }}</td>
+                </tr>
+              }
+            </tbody>
+          </table>
+        </div>
+      }
+    </div>
   </div>
 </div>

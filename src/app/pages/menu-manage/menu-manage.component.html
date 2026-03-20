@@ -1,11 +1,94 @@
 <div class="page">
-  <div class="page-header">
-    <div class="page-header-info">
-      <h2 class="page-title">菜单</h2>
-      <p class="page-desc">查看全部菜单，管理与编辑菜单配置</p>
+  <app-page-header title="菜单" desc="查看全部菜单，管理与编辑菜单配置" />
+
+  <app-action-bar>
+    <app-search-input left placeholder="搜索" (search)="onSearch($event)" />
+    <ng-container right>
+      <app-button label="删除" type="danger" />
+      <app-button label="新建菜单" type="primary" />
+    </ng-container>
+  </app-action-bar>
+
+  @if (isLoading()) {
+    <div class="state-loading">加载中...</div>
+  } @else {
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th class="col-name">
+              <div class="th-name-inner">
+                <input type="checkbox" class="checkbox" [checked]="allSelected()" (change)="toggleAll()" />
+                <span>姓名</span>
+              </div>
+            </th>
+            <th class="col-flex">类型</th>
+            <th class="col-flex">位置</th>
+            <th class="col-flex">route 路由</th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (row of flatRows(); track row.item.id) {
+            <tr [class.row-expanded]="row.item.expanded">
+              <!-- 名称列 -->
+              <td class="col-name">
+                <div class="cell-name-inner">
+                  <input
+                    type="checkbox"
+                    class="checkbox"
+                    [checked]="isSelected(row.item.id)"
+                    (change)="toggleSelect(row.item.id)"
+                  />
+                  <!-- 缩进占位 -->
+                  @for (_ of [].constructor(row.level); track $index) {
+                    <div class="indent-spacer"></div>
+                  }
+                  <!-- 展开箭头 -->
+                  @if (row.item.children?.length || row.item.childCount) {
+                    <div class="expand-btn" [class.expanded]="row.item.expanded" (click)="toggleExpand(row.item)">
+                      <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+                        <path d="M6 4L10 8L6 12" stroke="#999" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                      </svg>
+                    </div>
+                  }
+                  <!-- 名称 -->
+                  <div class="cell-name-text">
+                    <span class="name-title">{{ row.item.name }}</span>
+                    <span class="name-desc">{{ row.item.desc }}</span>
+                  </div>
+                  <!-- 操作按钮（展开行） -->
+                  @if (row.item.expanded) {
+                    <div class="row-actions">
+                      <svg class="action-icon" width="16" height="16" viewBox="0 0 16 16" fill="none">
+                        <path d="M8 3V13M3 8H13" stroke="#999" stroke-width="1.5" stroke-linecap="round"/>
+                      </svg>
+                    </div>
+                  }
+                  <!-- 子节点数 -->
+                  @if (row.item.childCount) {
+                    <div class="child-count">
+                      <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+                        <circle cx="4" cy="4" r="2" fill="#999"/>
+                        <circle cx="11" cy="8" r="2" fill="#999"/>
+                        <path d="M4 6V10C4 11.1 4.9 12 6 12H9" stroke="#999" stroke-width="1.2"/>
+                      </svg>
+                      <span>{{ row.item.childCount }}</span>
+                    </div>
+                  }
+                </div>
+              </td>
+              <!-- 类型列 -->
+              <td class="col-flex">
+                <span class="type-badge">{{ row.item.type }}</span>
+              </td>
+              <!-- 位置列 -->
+              <td class="col-flex">{{ row.item.position }}</td>
+              <!-- 路由列 -->
+              <td class="col-flex">{{ row.item.route }}</td>
+            </tr>
+          }
+        </tbody>
+      </table>
     </div>
-  </div>
-  <div class="page-content">
-    <p class="placeholder">页面开发中...</p>
-  </div>
+  }
 </div>

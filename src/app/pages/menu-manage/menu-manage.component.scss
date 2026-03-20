@@ -1,36 +1,225 @@
+@use "../../shared/styles/tokens" as *;
+
 .page {
   display: flex;
   flex-direction: column;
-  gap: 16px;
-  padding: 16px;
+  gap: $page-gap;
+  padding: $page-padding;
+  height: 100%;
+  background: $white;
+  font-family: $font-family;
+}
+
+.state-loading {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: $text-2;
+  font-size: $font-size-14;
+}
+
+// ===== 树形表格 =====
+.table-wrap {
+  flex: 1;
+  overflow: auto;
+  border: 1px solid $border;
+  border-radius: $table-radius;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+// --- 表头 ---
+thead {
+  background: $table-header-bg;
+  position: sticky;
+  top: 0;
+  z-index: 1;
+}
+
+th {
+  padding: $table-cell-padding-y $table-cell-padding-x;
+  font-size: $font-size-14;
+  font-weight: $font-weight-regular;
+  color: $text-2;
+  text-align: left;
+  border-bottom: 1px solid $border;
+  white-space: nowrap;
+  height: $table-header-height;
+  box-sizing: border-box;
+}
+
+.col-name {
+  width: 290px;
+  min-width: 290px;
+}
+
+.col-flex {
+  // 三列均分右侧空间
+}
+
+.th-name-inner {
+  display: flex;
+  align-items: center;
+  gap: $checkbox-name-gap;
+  padding-left: $page-padding + 8px;  // 24px
+}
+
+// --- 表体行 ---
+td {
+  padding: $table-cell-padding-y $table-cell-padding-x;
+  font-size: $font-size-14;
+  color: $text-1;
+  border-bottom: 1px solid $border;
+  height: $table-row-height;
+  box-sizing: border-box;
+  vertical-align: middle;
+}
+
+tr:last-child td {
+  border-bottom: none;
+}
+
+.row-expanded > .col-name {
+  background: #f5f5f5;
+  border-radius: $radius-md 0 0 $radius-md;
+}
+
+.row-expanded > .col-flex:last-child {
+  // 选中行右侧无特殊背景
+}
+
+// --- 名称列内部 ---
+.cell-name-inner {
+  display: flex;
+  align-items: center;
+  padding-left: 8px;
   height: 100%;
 }
 
-.page-header {
-  border-bottom: 1px solid #e6e6e6;
-  padding-bottom: 16px;
+.checkbox {
+  width: $checkbox-size;
+  height: $checkbox-size;
+  cursor: pointer;
+  accent-color: $primary;
+  flex-shrink: 0;
 }
 
-.page-title {
-  font-size: 16px;
-  font-weight: 600;
-  color: #333;
-  margin: 0;
+.indent-spacer {
+  width: 16px;
+  height: 100%;
+  flex-shrink: 0;
 }
 
-.page-desc {
-  font-size: 12px;
-  color: #999;
-  margin: 4px 0 0;
+.expand-btn {
+  width: 16px;
+  height: 16px;
+  flex-shrink: 0;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: transform 0.15s;
+  margin: 0 8px 0 8px;
+
+  &.expanded {
+    transform: rotate(90deg);
+  }
 }
 
-.page-content {
-  flex: 1;
+.cell-name-text {
+  display: flex;
+  flex-direction: column;
+  gap: $cell-name-gap;
+  margin-left: 8px;
+  min-width: 0;
 }
 
-.placeholder {
-  color: #999;
-  font-size: 14px;
-  text-align: center;
-  padding: 60px 0;
+.name-title {
+  font-size: $font-size-14;
+  font-weight: $font-weight-semibold;
+  color: $text-1;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.name-desc {
+  font-size: $font-size-12;
+  color: $text-2;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+// --- 操作按钮 ---
+.row-actions {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-left: auto;
+  flex-shrink: 0;
+}
+
+.action-icon {
+  cursor: pointer;
+
+  &:hover path {
+    stroke: $primary;
+  }
+}
+
+// --- 子节点数 ---
+.child-count {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  margin-left: auto;
+  flex-shrink: 0;
+  padding-right: 8px;
+
+  span {
+    font-size: $font-size-12;
+    color: $text-2;
+  }
+}
+
+// --- 类型标签 ---
+.type-badge {
+  display: inline-block;
+  padding: $badge-padding-y $badge-padding-x;
+  background: $badge-bg;
+  color: $badge-text;
+  border-radius: $badge-radius;
+  font-size: $font-size-10;
+  line-height: 1;
+}
+
+// --- 列分隔线（表头+表体统一） ---
+th.col-flex,
+td.col-flex {
+  position: relative;
+
+  &::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 0;
+    height: 16px;
+    border-left: 1px solid $border;
+  }
+}
+
+// --- 行 hover ---
+tbody tr:hover {
+  background: $sub-sidebar-bg;
+}
+
+tbody tr.row-expanded:hover > .col-name {
+  background: darken(#f5f5f5, 2%);
 }

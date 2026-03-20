@@ -1,0 +1,12 @@
+<div class="search-input-wrap" [class.full-width]="fullWidth()">
+  <svg class="search-icon" width="12" height="12" viewBox="0 0 12 12" fill="none">
+    <circle cx="5" cy="5" r="4" stroke="#999" stroke-width="1.2"/>
+    <line x1="8" y1="8" x2="11" y2="11" stroke="#999" stroke-width="1.2" stroke-linecap="round"/>
+  </svg>
+  <input
+    type="text"
+    [placeholder]="placeholder()"
+    [value]="value()"
+    (input)="onInput($event)"
+  />
+</div>

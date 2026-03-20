@@ -1,0 +1,100 @@
+// ========================================
+// Design Tokens - 精确从 Figma 提取
+// ========================================
+
+// --- Color ---
+$sidebar-bg: #053b64;
+$sidebar-active: #165789;
+$sidebar-text: #8c8c8d;
+$sidebar-text-active: #ffffff;
+
+$sub-sidebar-bg: #f7f9fc;
+
+$primary: #4857e2;
+$primary-bg: rgba(95, 111, 255, 0.08);
+$danger: #e11212;
+
+$text-1: #333333;
+$text-2: #999999;
+$white: #ffffff;
+
+$border: #e6e6e6;
+$table-header-bg: #f8f8f8;
+
+$badge-bg: #eaecff;
+$badge-text: #4857e2;
+
+$notification-bg: #ff0004;
+$status-success: #22c55e;
+$status-danger: #e11212;
+$status-warning: #f59e0b;
+
+// --- Spacing ---
+$icon-sidebar-width: 97px;
+$icon-sidebar-padding: 16px;
+$icon-sidebar-content-width: 65px;
+
+$sub-sidebar-width: 232px;
+$sub-sidebar-padding-x: 8px;
+$sub-sidebar-padding-y: 16px;
+$sub-sidebar-content-width: 216px;
+
+$top-tab-bar-height: 36px;
+$tab-width: 232px;
+$tab-height: 32px;
+
+$nav-item-width: 65px;
+$nav-item-height: 56px;
+$nav-item-gap: 4px;
+$nav-items-gap: 16px;
+
+$menu-group-gap: 16px;
+$menu-item-height: 36px;
+$menu-item-padding: 8px;
+$menu-item-gap: 4px;
+$group-label-padding-left: 8px;
+
+$page-padding: 16px;
+$page-gap: 16px;
+$header-padding-bottom: 16px;
+$title-desc-gap: 4px;
+
+$search-input-width: 296px;
+$search-input-height: 33px;
+$search-input-padding-x: 16px;
+$search-input-padding-y: 6px;
+
+$button-height: 33px;
+$button-radius: 8px;
+$button-padding-x: 12px;
+$button-padding-x-danger: 24px;
+
+$table-radius: 8px;
+$table-header-height: 44px;
+$table-row-height: 60px;
+$table-cell-padding-x: 16px;
+$table-cell-padding-y: 12px;
+
+$checkbox-size: 18px;
+$checkbox-name-gap: 24px;
+$cell-name-gap: 4px;
+
+$badge-padding-x: 4px;
+$badge-padding-y: 2px;
+$badge-radius: 4px;
+
+$split-left-width: 280px;
+
+$radius-sm: 4px;
+$radius-md: 8px;
+
+// --- Typography ---
+$font-family: 'PingFang SC', -apple-system, sans-serif;
+
+$font-size-10: 10px;
+$font-size-12: 12px;
+$font-size-14: 14px;
+$font-size-16: 16px;
+
+$font-weight-regular: 400;
+$font-weight-semibold: 600;

@@ -1,11 +1,59 @@
 <div class="page">
-  <div class="page-header">
-    <div class="page-header-info">
-      <h2 class="page-title">集团上下级申请列表</h2>
-      <p class="page-desc">处理子公司的关联审批，帮助企业有效管理的属性子公司</p>
+  <app-page-header title="集团上下级申请列表" desc="处理子公司的关联审批，帮助企业有效管理的属性子公司" />
+  <app-action-bar>
+    <ng-container left>
+      <app-search-input placeholder="搜索" (search)="onSearch($event)" />
+      <app-filter-select label="审批状态" [options]="['全部状态', '待处理', '审批通过', '拒绝关联', '审批中']" />
+    </ng-container>
+  </app-action-bar>
+  @if (isLoading()) {
+    <div class="state-loading">加载中...</div>
+  } @else {
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th class="col-check"><input type="checkbox" class="checkbox" /></th>
+            <th>组织名称</th>
+            <th>组织人数</th>
+            <th>审批状态</th>
+            <th>申请人</th>
+            <th>申请时间</th>
+            <th>审批</th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (row of applications(); track row.name) {
+            <tr>
+              <td class="col-check"><input type="checkbox" class="checkbox" /></td>
+              <td>
+                <div class="cell-org">
+                  <div class="org-icon">{{ row.icon }}</div>
+                  <span>{{ row.name }}</span>
+                </div>
+              </td>
+              <td>{{ row.count }}</td>
+              <td>
+                <app-status-badge [status]="row.status" />
+              </td>
+              <td>
+                <div class="cell-user">
+                  <div class="avatar">{{ row.applicantAvatar }}</div>
+                  <span>{{ row.applicant }}</span>
+                </div>
+              </td>
+              <td>{{ row.applyTime }}</td>
+              <td>
+                @if (row.status === '待处理') {
+                  <app-button label="审批" type="primary" />
+                } @else {
+                  <span class="text-muted">--</span>
+                }
+              </td>
+            </tr>
+          }
+        </tbody>
+      </table>
     </div>
-  </div>
-  <div class="page-content">
-    <p class="placeholder">页面开发中...</p>
-  </div>
+  }
 </div>

@@ -1,36 +1,256 @@
+@use "../../shared/styles/tokens" as *;
+
 .page {
   display: flex;
   flex-direction: column;
-  gap: 16px;
-  padding: 16px;
+  gap: $page-gap;
+  padding: $page-padding;
   height: 100%;
+  background: $white;
+  font-family: $font-family;
 }
 
-.page-header {
-  border-bottom: 1px solid #e6e6e6;
-  padding-bottom: 16px;
+.state-loading {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: $text-2;
+  font-size: $font-size-14;
 }
 
-.page-title {
-  font-size: 16px;
-  font-weight: 600;
-  color: #333;
-  margin: 0;
+// ===== 左右分栏 =====
+.split-container {
+  display: flex;
+  flex: 1;
+  min-height: 0;
 }
 
-.page-desc {
-  font-size: 12px;
-  color: #999;
-  margin: 4px 0 0;
+// --- 左侧：公司列表 ---
+.left-panel {
+  width: 351px;
+  flex-shrink: 0;
+  padding: $page-padding;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  overflow-y: auto;
 }
 
-.page-content {
+.panel-title {
+  font-size: $font-size-16;
+  font-weight: $font-weight-semibold;
+  color: $text-1;
+}
+
+.company-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+}
+
+.company-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  height: 52px;
+  padding: 0 16px;
+  cursor: pointer;
+  border-radius: $radius-sm;
+
+  &:hover:not(.active) {
+    background: rgba(0, 0, 0, 0.04);
+  }
+
+  &.active {
+    background: $primary-bg;
+    font-weight: $font-weight-semibold;
+  }
+}
+
+.expand-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 16px;
+  height: 16px;
+  font-size: 14px;
+  color: $text-2;
+  flex-shrink: 0;
+  transition: transform 0.15s;
+
+  &.expanded {
+    transform: rotate(90deg);
+  }
+}
+
+.company-icon {
+  width: 32px;
+  height: 32px;
+  border-radius: $radius-md;
+  background: $primary;
+  color: $white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: $font-size-12;
+  font-weight: $font-weight-semibold;
+  flex-shrink: 0;
+}
+
+.company-name {
+  font-size: $font-size-14;
+  color: $text-1;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
   flex: 1;
 }
 
-.placeholder {
-  color: #999;
-  font-size: 14px;
-  text-align: center;
-  padding: 60px 0;
+.child-count {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  font-size: $font-size-12;
+  color: $text-2;
+  flex-shrink: 0;
+}
+
+// --- 右侧：分配表格 ---
+.right-panel {
+  flex: 1;
+  min-width: 0;
+  border-left: 1px solid $border;
+  display: flex;
+  flex-direction: column;
+}
+
+.right-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  padding: $page-padding $page-padding 12px;
+}
+
+.right-header-info {
+  display: flex;
+  flex-direction: column;
+  gap: $cell-name-gap;
+}
+
+.update-time {
+  font-size: $font-size-12;
+  color: $text-2;
+}
+
+.right-header-actions {
+  display: flex;
+  align-items: center;
+  gap: $page-gap;
+}
+
+// --- 表格 ---
+.table-wrap {
+  flex: 1;
+  overflow: auto;
+  margin: 0 $page-padding;
+  border: 1px solid $border;
+  border-radius: $table-radius;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+thead {
+  background: $table-header-bg;
+  position: sticky;
+  top: 0;
+  z-index: 1;
+}
+
+th {
+  padding: $table-cell-padding-y $table-cell-padding-x;
+  font-size: $font-size-14;
+  font-weight: $font-weight-regular;
+  color: $text-2;
+  text-align: left;
+  border-bottom: 1px solid $border;
+  white-space: nowrap;
+  height: $table-header-height;
+  box-sizing: border-box;
+}
+
+td {
+  padding: $table-cell-padding-y $table-cell-padding-x;
+  font-size: $font-size-14;
+  color: $text-1;
+  border-bottom: 1px solid $border;
+  height: $table-row-height;
+  box-sizing: border-box;
+  vertical-align: middle;
+}
+
+tr:last-child td {
+  border-bottom: none;
+}
+
+.col-check {
+  width: 40px;
+  padding-left: 24px;
+}
+
+.checkbox {
+  width: $checkbox-size;
+  height: $checkbox-size;
+  cursor: pointer;
+  accent-color: $primary;
+}
+
+// 列分隔线
+th.col-icon,
+th.col-date,
+th.col-period,
+th.col-desc,
+td.col-icon,
+td.col-date,
+td.col-period,
+td.col-desc {
+  position: relative;
+
+  &::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 0;
+    height: 16px;
+    border-left: 1px solid $border;
+  }
+}
+
+.row-name {
+  font-size: $font-size-14;
+  color: $text-1;
+}
+
+.row-child-count {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  margin-left: 8px;
+  font-size: $font-size-12;
+  color: $text-2;
+}
+
+// 选中行样式（蓝色背景）
+.row-checked {
+  background: rgba($primary, 0.02);
+}
+
+// 行 hover
+tbody tr:hover {
+  background: $sub-sidebar-bg;
 }

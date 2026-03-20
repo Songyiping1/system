@@ -1,11 +1,49 @@
 <div class="page">
-  <div class="page-header">
-    <div class="page-header-info">
-      <h2 class="page-title">角色管理</h2>
-      <p class="page-desc">角色管理设置权位，通过将权限与岗位或者员品动态关联，超越行政级别，实现灵活的赋能，灵活配置，是结构与安全的关键杠杆。 帮助</p>
-    </div>
-  </div>
-  <div class="page-content">
-    <p class="placeholder">页面开发中...</p>
-  </div>
+  <app-page-header title="角色管理" desc="角色管理设置权位，通过将权限与岗位或者员工动态关联，超越行政级别，实现灵活的赋能。" [showHelp]="true" />
+  <app-split-layout>
+    <ng-container left>
+      <app-search-input placeholder="搜索" [fullWidth]="true" />
+      <app-tree-list [items]="treeItems()" [activeId]="activeTreeId()" (select)="onTreeSelect($event)" />
+    </ng-container>
+    <ng-container right>
+      <div class="panel-header">
+        <span class="panel-title">主管</span>
+        <span class="panel-note">该角色下的成员将自动获得对应的管理权限</span>
+      </div>
+      @if (isLoading()) {
+        <div class="state-loading">加载中...</div>
+      } @else {
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th class="col-check"><input type="checkbox" class="checkbox" /></th>
+                <th>姓名</th>
+                <th>部门</th>
+                <th>工号</th>
+                <th>管理范围</th>
+              </tr>
+            </thead>
+            <tbody>
+              @for (row of members(); track row.jobNo) {
+                <tr>
+                  <td class="col-check"><input type="checkbox" class="checkbox" /></td>
+                  <td>
+                    <div class="cell-user">
+                      <div class="avatar">{{ row.avatar }}</div>
+                      <span>{{ row.name }}</span>
+                    </div>
+                  </td>
+                  <td>{{ row.dept }}</td>
+                  <td>{{ row.jobNo }}</td>
+                  <td>{{ row.scope }}</td>
+                </tr>
+              }
+            </tbody>
+          </table>
+          <div class="table-footer">总人数 30</div>
+        </div>
+      }
+    </ng-container>
+  </app-split-layout>
 </div>

@@ -1,14 +1,16 @@
+@use '../../shared/styles/tokens' as *;
+
 .sub-sidebar {
-  width: 232px;
+  width: $sub-sidebar-width;
   flex-shrink: 0;
-  background: #f7f9fc;
-  padding: 16px 8px;
+  background: $sub-sidebar-bg;
+  padding: $sub-sidebar-padding-y $sub-sidebar-padding-x;
   height: 100%;
   overflow-y: auto;
-  border-top-left-radius: 8px;
+  border-top-left-radius: $radius-md;
   display: flex;
   flex-direction: column;
-  gap: 16px;
+  gap: $menu-group-gap;
 }
 
 .menu-group {
@@ -17,39 +19,41 @@
   gap: 12px;
 
   & + .menu-group {
-    padding-top: 16px;
-    border-top: 1px solid #e6e6e6;
+    padding-top: $menu-group-gap;
+    border-top: 1px solid $border;
   }
 }
 
 .group-label {
-  font-size: 14px;
-  color: #999;
-  padding: 0 8px;
+  font-size: $font-size-14;
+  color: $text-2;
+  padding: 0 $group-label-padding-left;
+  font-family: $font-family;
 }
 
 .group-items {
   display: flex;
   flex-direction: column;
-  gap: 4px;
+  gap: $menu-item-gap;
 }
 
 .menu-item {
-  height: 36px;
+  height: $menu-item-height;
   display: flex;
   align-items: center;
-  padding: 8px;
-  border-radius: 4px;
-  font-size: 14px;
-  color: #333;
+  padding: $menu-item-padding;
+  border-radius: $radius-sm;
+  font-size: $font-size-14;
+  color: $text-1;
   cursor: pointer;
+  font-family: $font-family;
 
   &:hover:not(.active) {
     background: rgba(0, 0, 0, 0.04);
   }
 
   &.active {
-    background: rgba(95, 111, 255, 0.08);
-    color: #4857e2;
+    background: $primary-bg;
+    color: $primary;
   }
 }

@@ -1,0 +1,54 @@
+@use '../../styles/tokens' as *;
+
+.tree-list {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.tree-item {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  padding: 6px 8px;
+  border-radius: $radius-sm;
+  font-size: $font-size-14;
+  color: $text-1;
+  cursor: pointer;
+  font-family: $font-family;
+
+  &:hover:not(.active) {
+    background: rgba(0, 0, 0, 0.04);
+  }
+
+  &.active {
+    background: $primary-bg;
+    color: $primary;
+  }
+}
+
+.expand-icon {
+  display: inline-block;
+  width: 16px;
+  text-align: center;
+  font-size: 14px;
+  color: $text-2;
+  transition: transform 0.15s;
+  flex-shrink: 0;
+
+  &.expanded {
+    transform: rotate(90deg);
+  }
+}
+
+.tree-label {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.tree-count {
+  color: $text-2;
+  font-size: $font-size-12;
+  flex-shrink: 0;
+}

@@ -1,0 +1,8 @@
+<div class="split-layout">
+  <div class="split-left" [style.width.px]="leftWidth()">
+    <ng-content select="[left]" />
+  </div>
+  <div class="split-right">
+    <ng-content select="[right]" />
+  </div>
+</div>
