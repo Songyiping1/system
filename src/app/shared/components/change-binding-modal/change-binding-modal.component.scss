@@ -1,0 +1,104 @@
+@use '../../styles/tokens' as *;
+
+// Body 居中内容区
+.binding-body {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding-top: 14px;
+}
+
+.binding-form {
+  width: 320px;
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+// --- 标题 + 描述 ---
+.binding-header {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.binding-title {
+  font-size: $font-size-16;
+  font-weight: $font-weight-semibold;
+  color: $text-1;
+  margin: 0;
+  font-family: $font-family;
+}
+
+.binding-desc {
+  font-size: $font-size-12;
+  color: $text-2;
+  margin: 0;
+  line-height: 1.5;
+  font-family: $font-family;
+}
+
+.link {
+  color: $primary;
+  text-decoration: none;
+  font-size: inherit;
+}
+
+// --- 输入行 ---
+.input-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  border-bottom: 1px solid $border;
+  padding: 8px 0;
+  background: $white;
+}
+
+.binding-input {
+  flex: 1;
+  border: none;
+  outline: none;
+  font-size: $font-size-14;
+  color: $text-1;
+  font-family: $font-family;
+  background: transparent;
+
+  &::placeholder {
+    color: rgba(153, 153, 153, 0.5);
+  }
+}
+
+.get-code-link {
+  font-size: $font-size-12;
+  color: $primary;
+  text-decoration: none;
+  white-space: nowrap;
+  flex-shrink: 0;
+
+  &.counting {
+    color: $text-2;
+    pointer-events: none;
+  }
+}
+
+// --- 确定按钮 ---
+.submit-btn {
+  width: 100%;
+  padding: 8px 24px;
+  border: none;
+  border-radius: $radius-md;
+  background: $primary;
+  color: $white;
+  font-size: $font-size-14;
+  font-family: $font-family;
+  cursor: pointer;
+
+  &.disabled {
+    background: #bbbfc4;
+    cursor: not-allowed;
+  }
+
+  &:not(.disabled):hover {
+    opacity: 0.9;
+  }
+}

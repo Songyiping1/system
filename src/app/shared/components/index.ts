@@ -15,3 +15,4 @@ export { StatsRowComponent, type StatItem } from './stats-row/stats-row.componen
 // Container
 export { ActionBarComponent } from './action-bar/action-bar.component';
 export { SplitLayoutComponent } from './split-layout/split-layout.component';
+export { ModalComponent } from './modal/modal.component';

@@ -26,13 +26,14 @@ export class LoginComponent {
     this.errorMessage.set('');
 
     if (this.activeTab() === 'password') {
-      const result = this.auth.login(this.username(), this.password());
-
-      if (result.success) {
-        this.router.navigate([this.auth.getHomePath()]);
-      } else {
-        this.errorMessage.set(result.message);
-      }
+      this.auth.login(this.username(), this.password()).subscribe({
+        next: () => {
+          this.router.navigate([this.auth.getHomePath()]);
+        },
+        error: () => {
+          this.errorMessage.set('账号或密码错误');
+        },
+      });
     } else {
       console.log('验证码登录', this.username(), this.verifyCode());
     }

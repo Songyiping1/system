@@ -1,53 +1,42 @@
 import { inject, Injectable, signal, computed } from '@angular/core';
 import { Router } from '@angular/router';
+import { Observable, tap } from 'rxjs';
+import { UserApiService, LoginVo } from '../api';
 
 export type Role = 'admin' | 'user';
 
 export interface User {
-  username: string;
-  role: Role;
+  userId: string;
+  userName: string;
   name: string;
-}
-
-interface MockAccount {
-  username: string;
-  password: string;
   role: Role;
-  name: string;
 }
-
-const MOCK_ACCOUNTS: MockAccount[] = [
-  { username: 'admin', password: 'admin123', role: 'admin', name: '管理员' },
-  { username: 'user', password: 'user123', role: 'user', name: '普通用户' },
-];
 
 @Injectable({ providedIn: 'root' })
 export class AuthService {
   private router = inject(Router);
+  private userApi = inject(UserApiService);
 
   currentUser = signal<User | null>(null);
   isLoggedIn = computed(() => !!this.currentUser());
   isAdmin = computed(() => this.currentUser()?.role === 'admin');
 
-  login(username: string, password: string): { success: boolean; message: string } {
-    const account = MOCK_ACCOUNTS.find(
-      (a) => a.username === username && a.password === password
+  login(userName: string, password: string): Observable<LoginVo> {
+    return this.userApi.login({ userName, password, action: 'login' }).pipe(
+      tap((res) => {
+        localStorage.setItem('token', res.token);
+        this.currentUser.set({
+          userId: res.userId,
+          userName: res.userName,
+          name: res.name,
+          role: res.role as Role,
+        });
+      }),
     );
-
-    if (!account) {
-      return { success: false, message: '账号或密码错误' };
-    }
-
-    this.currentUser.set({
-      username: account.username,
-      role: account.role,
-      name: account.name,
-    });
-
-    return { success: true, message: '登录成功' };
   }
 
   logout() {
+    localStorage.removeItem('token');
     this.currentUser.set(null);
     this.router.navigate(['/login']);
   }

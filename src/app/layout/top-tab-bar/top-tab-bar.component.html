@@ -22,10 +22,49 @@
       </svg>
       <span class="badge">2</span>
     </div>
-    <div class="user-avatars">
-      <div class="avatar-dot" (click)="onLogout()">
+
+    <div class="user-avatar-wrap">
+      <div class="avatar-dot" (click)="toggleUserMenu()">
         <span>{{ user()?.name?.charAt(0) }}</span>
       </div>
+
+      <!-- 用户下拉菜单 -->
+      @if (showUserMenu()) {
+        <div class="user-menu">
+          <div class="user-menu-header">
+            <div class="menu-avatar">{{ user()?.name?.charAt(0) }}</div>
+            <div class="menu-user-info">
+              <span class="menu-user-name">{{ user()?.name }}</span>
+              <span class="menu-user-company">中企云链（北京）信息科技有限公司</span>
+            </div>
+          </div>
+          <div class="user-menu-section">
+            <div class="user-menu-item" (click)="onChangePassword()">修改密码</div>
+            <div class="user-menu-item" (click)="onChangeBinding()">修改绑定</div>
+          </div>
+          <div class="user-menu-section">
+            <div class="user-menu-item">
+              <span>切换账号</span>
+              <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
+                <path d="M5 3L9 7L5 11" stroke="#999" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+              </svg>
+            </div>
+            <div class="user-menu-item" (click)="onLogout()">退出登录</div>
+          </div>
+        </div>
+      }
     </div>
   </div>
 </div>
+
+<!-- 修改密码弹窗 -->
+<app-change-password-modal
+  [visible]="showChangePwd()"
+  (closed)="showChangePwd.set(false)"
+/>
+
+<!-- 修改绑定弹窗 -->
+<app-change-binding-modal
+  [visible]="showChangeBinding()"
+  (closed)="showChangeBinding.set(false)"
+/>

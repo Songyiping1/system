@@ -1,0 +1,56 @@
+<app-modal
+  title="修改绑定"
+  size="md"
+  [radius]="16"
+  [visible]="visible()"
+  [showFooter]="false"
+  (closed)="onClose()"
+>
+  <div class="binding-body">
+    <div class="binding-form">
+      <div class="binding-header">
+        <h3 class="binding-title">输入手机号验证码</h3>
+        <p class="binding-desc">
+          请输入发送至 +86151****4955 的 6 位验证码，有效期 10 分钟
+          <a class="link" href="javascript:void(0)">联系平台管理员</a>
+        </p>
+      </div>
+
+      <!-- 验证码 -->
+      <div class="input-row">
+        <input
+          type="text"
+          class="binding-input"
+          placeholder="请输入验证码"
+          [value]="verifyCode()"
+          (input)="verifyCode.set($any($event.target).value)"
+        />
+        <a
+          class="get-code-link"
+          [class.counting]="codeCountdown() > 0"
+          href="javascript:void(0)"
+          (click)="onGetCode()"
+        >{{ codeButtonText() }}</a>
+      </div>
+
+      <!-- 新手机号 -->
+      <div class="input-row">
+        <input
+          type="text"
+          class="binding-input"
+          placeholder="请输入新手机号"
+          [value]="newPhone()"
+          (input)="newPhone.set($any($event.target).value)"
+        />
+      </div>
+
+      <!-- 确定 -->
+      <button
+        class="submit-btn"
+        [class.disabled]="!canSubmit()"
+        [disabled]="!canSubmit()"
+        (click)="onSubmit()"
+      >确定</button>
+    </div>
+  </div>
+</app-modal>
