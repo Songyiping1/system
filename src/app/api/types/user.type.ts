@@ -9,9 +9,15 @@ export interface LoginCommand {
 
 /** 登录响应 */
 export interface LoginVo {
-  token: string;
+  isSuccess: boolean;
   userId: string;
-  userName: string;
+  id: string;
   name: string;
-  role: string;
+  userName: string;
+  cookieId: string;
+  mobile: string;
+  roles: string[];
+  orgRole: string[];
+  companyId: string;
+  serverName: string;
 }

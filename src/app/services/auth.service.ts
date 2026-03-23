@@ -24,12 +24,12 @@ export class AuthService {
   login(userName: string, password: string): Observable<LoginVo> {
     return this.userApi.login({ userName, password, action: 'login' }).pipe(
       tap((res) => {
-        localStorage.setItem('token', res.token);
+        localStorage.setItem('cookieId', res.cookieId);
         this.currentUser.set({
           userId: res.userId,
-          userName: res.userName,
+          userName: res.name,
           name: res.name,
-          role: res.role as Role,
+          role: res.roles?.includes('Root') ? 'admin' : 'user',
         });
       }),
     );
@@ -43,5 +43,6 @@ export class AuthService {
 
   getHomePath(): string {
     return this.currentUser()?.role === 'admin' ? '/admin' : '/user';
+    // return '/admin'
   }
 }

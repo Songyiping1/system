@@ -15,8 +15,8 @@ export class LoginComponent {
   private router = inject(Router);
 
   activeTab = signal<'password' | 'code'>('password');
-  username = signal('admin');
-  password = signal('admin123');
+  username = signal('000');
+  password = signal('hao123');
   verifyCode = signal('');
   usernameFocused = signal(false);
   errorMessage = signal('');
