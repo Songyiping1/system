@@ -22,7 +22,6 @@ export interface MenuConfig {
 const ADMIN_CONFIG: MenuConfig = {
   navItems: [
     { id: 'control', label: '控制中心', icon: 'control' },
-    { id: 'support', label: '支持', icon: 'support' },
   ],
   subMenus: {
     control: [

@@ -306,7 +306,7 @@ Controller 路径前缀：`/company`
 
 | 参数 | 类型 | 说明 |
 | --- | --- | --- |
-| name | String | 公司名称，可空 |
+| name | String | 公司名称，可空 |    
 | type | String | 公司类型 |
 
 ### 2.8 GET `/company/list`

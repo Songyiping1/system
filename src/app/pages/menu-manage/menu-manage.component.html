@@ -4,8 +4,8 @@
   <app-action-bar>
     <app-search-input left placeholder="搜索" (search)="onSearch($event)" />
     <ng-container right>
-      <app-button label="删除" type="danger" />
-      <app-button label="新建菜单" type="primary" />
+      <app-button label="删除" type="danger" (btnClick)="onDeleteSelected()" />
+      <app-button label="新建菜单" type="primary" (btnClick)="onCreateMenu()" />
     </ng-container>
   </app-action-bar>
 
@@ -29,7 +29,21 @@
         </thead>
         <tbody>
           @for (row of flatRows(); track row.item.id) {
-            <tr [class.row-expanded]="row.item.expanded">
+            <tr
+              [class.row-expanded]="row.item.expanded"
+              [class.drag-over-before]="dragOverIndex() === $index && dragPosition() === 'before'"
+              [class.drag-over-after]="dragOverIndex() === $index && dragPosition() === 'after'"
+              [class.drag-over-child]="dragOverIndex() === $index && dragPosition() === 'child'"
+              [class.dragging]="dragItem()?.id === row.item.id"
+              class="clickable-row"
+              draggable="true"
+              (click)="onRowClick(row.item)"
+              (dragstart)="onDragStart($event, row.item)"
+              (dragover)="onDragOver($event, $index)"
+              (dragleave)="onDragLeave($event)"
+              (drop)="onDrop($event, $index)"
+              (dragend)="onDragEnd()"
+            >
               <!-- 名称列 -->
               <td class="col-name">
                 <div class="cell-name-inner">
@@ -37,7 +51,9 @@
                     type="checkbox"
                     class="checkbox"
                     [checked]="isSelected(row.item.id)"
+                    [disabled]="isLockedByParent(row.item.id)"
                     (change)="toggleSelect(row.item.id)"
+                    (click)="$event.stopPropagation()"
                   />
                   <!-- 缩进占位 -->
                   @for (_ of [].constructor(row.level); track $index) {
@@ -45,7 +61,7 @@
                   }
                   <!-- 展开箭头 -->
                   @if (row.item.children?.length || row.item.childCount) {
-                    <div class="expand-btn" [class.expanded]="row.item.expanded" (click)="toggleExpand(row.item)">
+                    <div class="expand-btn" [class.expanded]="row.item.expanded" (click)="toggleExpand(row.item); $event.stopPropagation()">
                       <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
                         <path d="M6 4L10 8L6 12" stroke="#999" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
                       </svg>
@@ -92,3 +108,22 @@
     </div>
   }
 </div>
+
+<!-- 新建/编辑菜单抽屉 -->
+<app-menu-detail-drawer
+  [visible]="showDrawer()"
+  [editId]="editMenuId()"
+  (closed)="showDrawer.set(false)"
+  (saved)="onDrawerSaved()"
+/>
+
+<app-modal
+  title="删除确认"
+  size="sm"
+  [visible]="deleteModalVisible()"
+  confirmText="确认删除"
+  (closed)="onDeleteCancelled()"
+  (confirmed)="onDeleteConfirmed()"
+>
+  <p>确当前菜单下的子菜单也会被一并删除，删除后不可恢复。确定要删除选中的菜单吗？</p>
+</app-modal>

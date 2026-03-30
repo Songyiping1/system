@@ -1,8 +1,12 @@
-import { Component, signal, computed } from '@angular/core';
+import { Component, inject, signal, computed, OnInit } from '@angular/core';
 import { PageHeaderComponent, SearchInputComponent, SplitLayoutComponent, TreeListComponent, type TreeNode } from '../../shared/components';
 import { type PageState } from '../../shared/models/page-state';
+import { OrganizeApiService, OrganizeMemberApiService, MenuApiService } from '../../api';
+import { type TreeNodeOrganize, type Organize, type OrganizeUserVo } from '../../api/types/organize.type';
+import { AuthService } from '../../services/auth.service';
 
 interface PermissionRow {
+  id: string;
   name: string;
   level: number;
   route: string;
@@ -19,49 +23,49 @@ interface PermissionRow {
   templateUrl: './permission-query.component.html',
   styleUrl: './permission-query.component.scss',
 })
-export class PermissionQueryComponent {
-  pageState = signal<PageState>('normal');
+export class PermissionQueryComponent implements OnInit {
+  private organizeApi = inject(OrganizeApiService);
+  private memberApi = inject(OrganizeMemberApiService);
+  private menuApi = inject(MenuApiService);
+  private auth = inject(AuthService);
+
+  pageState = signal<PageState>('loading');
   searchKeyword = signal('');
-  selectedPerson = signal('张竞元');
+  selectedPerson = signal('');
+  selectedUserId = signal('');
 
-  treeItems = signal<TreeNode[]>([
-    {
-      id: '1', label: '中企云链', expanded: true, children: [
-        {
-          id: '2', label: '开发部', expanded: true, children: [
-            { id: '3', label: '张竞元' },
-            { id: '4', label: '赵莫艳' },
-            { id: '5', label: '郑婷雅' },
-          ],
-        },
-        {
-          id: '6', label: '产品部', children: [
-            { id: '7', label: '冯云' },
-            { id: '8', label: '周健' },
-          ],
-        },
-      ],
-    },
-  ]);
-  activeTreeId = signal('3');
+  treeItems = signal<TreeNode[]>([]);
+  activeTreeId = signal('');
 
-  permissionItems = signal<PermissionRow[]>([
-    {
-      name: '工作台', level: 0, route: '/workbench', source: '角色-主管', desc: '工作台首页', expanded: true, children: [
-        { name: '待办事项', level: 1, route: '/workbench/todo', source: '角色-主管', desc: '待办任务列表' },
-        { name: '数据看板', level: 1, route: '/workbench/dashboard', source: '角色-总监', desc: '数据统计概览' },
-      ],
-    },
-    {
-      name: '通讯录', level: 0, route: '/contacts', source: '角色-主管', desc: '企业通讯录', expanded: true, children: [
-        { name: '组织架构', level: 1, route: '/contacts/org', source: '角色-主管', desc: '组织架构管理' },
-        { name: '成员管理', level: 1, route: '/contacts/member', source: '直接授权', desc: '成员信息管理' },
-      ],
-    },
-    { name: '审批', level: 0, route: '/approval', source: '角色-主管', desc: '审批流程管理' },
-  ]);
+  permissionItems = signal<PermissionRow[]>([]);
 
   isLoading = computed(() => this.pageState() === 'loading');
+
+  ngOnInit() {
+    this.loadOrganizeTree();
+  }
+
+  loadOrganizeTree() {
+    this.pageState.set('loading');
+    const companyId = this.auth.currentUser()?.companyId ?? '';
+    this.organizeApi.loadOrganize({ companyId }).subscribe({
+      next: (res) => {
+        const items = this.convertOrgTree(res);
+        this.treeItems.set(items);
+        this.pageState.set(items.length > 0 ? 'normal' : 'empty');
+      },
+      error: () => this.pageState.set('error'),
+    });
+  }
+
+  loadUserAuth(userId: string) {
+    const companyId = this.auth.currentUser()?.companyId ?? '';
+    this.menuApi.getUserAuthTree({ companyId, userId }).subscribe({
+      next: (res) => {
+        this.permissionItems.set(this.convertAuthTree(res, 0));
+      },
+    });
+  }
 
   onSearch(keyword: string) {
     this.searchKeyword.set(keyword);
@@ -71,6 +75,8 @@ export class PermissionQueryComponent {
     this.activeTreeId.set(node.id);
     if (!node.children || node.children.length === 0) {
       this.selectedPerson.set(node.label);
+      this.selectedUserId.set(node.id);
+      this.loadUserAuth(node.id);
     }
   }
 
@@ -91,5 +97,33 @@ export class PermissionQueryComponent {
   toggleExpand(item: PermissionRow) {
     item.expanded = !item.expanded;
     this.permissionItems.update(items => [...items]);
+  }
+
+  private convertOrgTree(nodes: TreeNodeOrganize[]): TreeNode[] {
+    return nodes.map(node => {
+      const children = node.children?.length ? this.convertOrgTree(node.children) : undefined;
+      return {
+        id: node.id ?? '',
+        label: node.name ?? '',
+        expanded: true,
+        children,
+      };
+    });
+  }
+
+  private convertAuthTree(nodes: any[], level: number): PermissionRow[] {
+    return nodes.map(node => {
+      const children = node.children?.length ? this.convertAuthTree(node.children, level + 1) : undefined;
+      return {
+        id: node.id ?? '',
+        name: node.name ?? '',
+        level,
+        route: node.route ?? '',
+        source: node.source ?? '',
+        desc: node.description ?? '',
+        expanded: true,
+        children,
+      };
+    });
   }
 }

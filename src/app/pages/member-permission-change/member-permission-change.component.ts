@@ -1,6 +1,9 @@
-import { Component, signal, computed } from '@angular/core';
+import { Component, inject, signal, computed, OnInit } from '@angular/core';
 import { PageHeaderComponent, ActionBarComponent, FilterSelectComponent } from '../../shared/components';
 import { type PageState } from '../../shared/models/page-state';
+import { OrganizeApiService } from '../../api';
+import { type PermissionLogVo } from '../../api/types/organize.type';
+import { AuthService } from '../../services/auth.service';
 
 interface ChangeRow {
   target: string;
@@ -20,15 +23,38 @@ interface ChangeRow {
   templateUrl: './member-permission-change.component.html',
   styleUrl: './member-permission-change.component.scss',
 })
-export class MemberPermissionChangeComponent {
-  pageState = signal<PageState>('normal');
+export class MemberPermissionChangeComponent implements OnInit {
+  private organizeApi = inject(OrganizeApiService);
+  private auth = inject(AuthService);
 
-  changeList = signal<ChangeRow[]>([
-    { target: '王凡玄', targetAvatar: '王', operator: '赵莫艳', operatorAvatar: '赵', dept: '前端开发一组', eventType: '添加角色', eventDesc: '添加角色「主管」', time: '2025-11-06 14:30' },
-    { target: '郑婷雅', targetAvatar: '郑', operator: '赵莫艳', operatorAvatar: '赵', dept: '产品部', eventType: '移除角色', eventDesc: '移除角色「运营」', time: '2025-11-05 09:15' },
-    { target: '冯云', targetAvatar: '冯', operator: '周健', operatorAvatar: '周', dept: '运营部', eventType: '修改管理范围', eventDesc: '管理范围由「所在部门」变更为「全公司」', time: '2025-11-04 16:45' },
-    { target: '周健', targetAvatar: '周', operator: '赵莫艳', operatorAvatar: '赵', dept: '开发部', eventType: '添加管理员', eventDesc: '添加为子管理员', time: '2025-11-03 11:20' },
-  ]);
+  pageState = signal<PageState>('loading');
+
+  changeList = signal<ChangeRow[]>([]);
 
   isLoading = computed(() => this.pageState() === 'loading');
+
+  ngOnInit() {
+    this.loadPermissionList();
+  }
+
+  loadPermissionList(userId?: string, startTime?: string, endTime?: string) {
+    this.pageState.set('loading');
+    const companyId = this.auth.currentUser()?.companyId ?? '';
+    this.organizeApi.getPermissionList({ companyId, userId, startTime, endTime }).subscribe({
+      next: (res) => {
+        this.changeList.set(res.map(log => ({
+          target: '',
+          targetAvatar: '',
+          operator: log.operateUserName ?? '',
+          operatorAvatar: (log.operateUserName ?? '').charAt(0),
+          dept: '',
+          eventType: log.type ?? '',
+          eventDesc: log.description ?? '',
+          time: log.createTime ?? '',
+        })));
+        this.pageState.set(res.length > 0 ? 'normal' : 'empty');
+      },
+      error: () => this.pageState.set('error'),
+    });
+  }
 }

@@ -10,6 +10,7 @@ export interface User {
   userName: string;
   name: string;
   role: Role;
+  companyId: string;
 }
 
 @Injectable({ providedIn: 'root' })
@@ -30,13 +31,14 @@ export class AuthService {
           userName: res.name,
           name: res.name,
           role: res.roles?.includes('Root') ? 'admin' : 'user',
+          companyId: res.companyId,
         });
       }),
     );
   }
 
   logout() {
-    localStorage.removeItem('token');
+    localStorage.removeItem('cookieId');
     this.currentUser.set(null);
     this.router.navigate(['/login']);
   }

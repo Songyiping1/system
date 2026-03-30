@@ -43,8 +43,8 @@
           <div class="update-time">上次更新时间：2025-12-01 14：14</div>
         </div>
         <div class="right-header-actions">
-          <app-button label="取消" type="outline" />
-          <app-button label="保存" type="primary" />
+          <app-button label="取消" type="outline" (click)="openCancelModal()" />
+          <app-button label="保存" type="primary" (click)="saveAssign()" />
         </div>
       </div>
 
@@ -64,26 +64,31 @@
               </tr>
             </thead>
             <tbody>
-              @for (row of assignRows(); track row.id) {
-                <tr [class.row-checked]="row.checked">
-                  <td class="col-check"><input type="checkbox" class="checkbox" [checked]="row.checked" (change)="toggleRowCheck(row)" /></td>
+              @for (item of flatAssignRows(); track item.row.id) {
+                <tr [class.row-checked]="item.row.checked">
+                  <td class="col-check"><input type="checkbox" class="checkbox" [checked]="item.row.checked" [disabled]="isLockedByChild(item.row)" (change)="toggleRowCheck(item.row)" /></td>
                   <td class="col-name">
-                    <span class="row-name">{{ row.name }}</span>
-                    @if (row.childCount) {
-                      <span class="row-child-count">
-                        <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
-                          <circle cx="4" cy="4" r="2" fill="#999"/>
-                          <circle cx="11" cy="8" r="2" fill="#999"/>
-                          <path d="M4 6V10C4 11.1 4.9 12 6 12H9" stroke="#999" stroke-width="1.2"/>
-                        </svg>
-                        {{ row.childCount }}
-                      </span>
-                    }
+                    <div class="cell-name-inner" [style.padding-left.px]="item.level * 24">
+                      @if (item.row.children?.length) {
+                        <span class="expand-icon" [class.expanded]="item.row.expanded" (click)="toggleRowExpand(item.row, $event)">›</span>
+                      }
+                      <span class="row-name">{{ item.row.name }}</span>
+                      @if (item.row.childCount) {
+                        <span class="row-child-count">
+                          <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+                            <circle cx="4" cy="4" r="2" fill="#999"/>
+                            <circle cx="11" cy="8" r="2" fill="#999"/>
+                            <path d="M4 6V10C4 11.1 4.9 12 6 12H9" stroke="#999" stroke-width="1.2"/>
+                          </svg>
+                          {{ item.row.childCount }}
+                        </span>
+                      }
+                    </div>
                   </td>
-                  <td class="col-icon">{{ row.icon }}</td>
-                  <td class="col-date">{{ row.buyDate }}</td>
-                  <td class="col-period">{{ row.period }}</td>
-                  <td class="col-desc">{{ row.desc }}</td>
+                  <td class="col-icon">{{ item.row.icon }}</td>
+                  <td class="col-date">{{ item.row.buyDate }}</td>
+                  <td class="col-period">{{ item.row.period }}</td>
+                  <td class="col-desc">{{ item.row.desc }}</td>
                 </tr>
               }
             </tbody>
@@ -93,3 +98,14 @@
     </div>
   </div>
 </div>
+
+<app-modal
+  title="取消分配确认"
+  size="sm"
+  [visible]="cancelModalVisible()"
+  confirmText="确认取消"
+  (closed)="onCancelDismissed()"
+  (confirmed)="onCancelConfirmed()"
+>
+  <p>确定要取消分配给「{{ selectedCompanyName() }}」的所有菜单吗？</p>
+</app-modal>

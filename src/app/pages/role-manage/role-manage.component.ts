@@ -1,8 +1,12 @@
-import { Component, signal, computed } from '@angular/core';
+import { Component, inject, signal, computed, OnInit } from '@angular/core';
 import { PageHeaderComponent, SearchInputComponent, SplitLayoutComponent, TreeListComponent, type TreeNode } from '../../shared/components';
 import { type PageState } from '../../shared/models/page-state';
+import { RoleApiService } from '../../api';
+import { type RoleVo } from '../../api/types';
+import { AuthService } from '../../services/auth.service';
 
 interface RoleRow {
+  id: string;
   name: string;
   avatar: string;
   dept: string;
@@ -17,45 +21,57 @@ interface RoleRow {
   templateUrl: './role-manage.component.html',
   styleUrl: './role-manage.component.scss',
 })
-export class RoleManageComponent {
-  pageState = signal<PageState>('normal');
+export class RoleManageComponent implements OnInit {
+  private roleApi = inject(RoleApiService);
+  private auth = inject(AuthService);
+
+  pageState = signal<PageState>('loading');
   searchKeyword = signal('');
 
-  treeItems = signal<TreeNode[]>([
-    {
-      id: '1', label: '默认角色', expanded: true, children: [
-        { id: '2', label: '部门主管' },
-      ],
-    },
-    {
-      id: '3', label: '自定义分组', expanded: true, children: [
-        { id: '4', label: '财务' },
-        { id: '5', label: '采购' },
-        { id: '6', label: 'IT' },
-        { id: '7', label: '行政' },
-        { id: '8', label: '运营' },
-        { id: '9', label: '客服' },
-      ],
-    },
-    {
-      id: '10', label: '自定义分组名称', expanded: true, children: [
-        { id: '11', label: '主管' },
-        { id: '12', label: '高级管理者' },
-        { id: '13', label: '科长' },
-        { id: '14', label: '总经理' },
-      ],
-    },
-  ]);
-  activeTreeId = signal('11');
+  treeItems = signal<TreeNode[]>([]);
+  activeTreeId = signal('');
 
-  members = signal<RoleRow[]>([
-    { name: '赵莫艳', avatar: '赵', dept: '前端开发一组', jobNo: '10001', scope: '所在部门' },
-    { name: '郑婷雅', avatar: '郑', dept: '产品部', jobNo: '10023', scope: '所在部门' },
-    { name: '冯云', avatar: '冯', dept: '运营部', jobNo: '10045', scope: '全公司' },
-    { name: '周健', avatar: '周', dept: '开发部', jobNo: '10067', scope: '所在部门及下级部门' },
-  ]);
+  members = signal<RoleRow[]>([]);
 
   isLoading = computed(() => this.pageState() === 'loading');
+
+  ngOnInit() {
+    this.loadRoleTree();
+  }
+
+  loadRoleTree() {
+    this.pageState.set('loading');
+    const companyId = this.auth.currentUser()?.companyId ?? '';
+    this.roleApi.listRole({ companyId }).subscribe({
+      next: (res) => {
+        const items = this.convertRoleTree(res);
+        this.treeItems.set(items);
+        const firstLeaf = this.findFirstLeaf(items);
+        if (firstLeaf) {
+          this.activeTreeId.set(firstLeaf.id);
+          this.loadRoleUsers(firstLeaf.id);
+        }
+        this.pageState.set(items.length > 0 ? 'normal' : 'empty');
+      },
+      error: () => this.pageState.set('error'),
+    });
+  }
+
+  loadRoleUsers(roleId: string) {
+    const companyId = this.auth.currentUser()?.companyId ?? '';
+    this.roleApi.listRoleUser({ roleId, companyId }).subscribe({
+      next: (res: any[]) => {
+        this.members.set(res.map(u => ({
+          id: u.userId ?? '',
+          name: u.name ?? '',
+          avatar: (u.name ?? '').charAt(0),
+          dept: u.deptName ?? '',
+          jobNo: u.jobNo ?? '',
+          scope: u.scope ?? '',
+        })));
+      },
+    });
+  }
 
   onSearch(keyword: string) {
     this.searchKeyword.set(keyword);
@@ -63,5 +79,24 @@ export class RoleManageComponent {
 
   onTreeSelect(node: TreeNode) {
     this.activeTreeId.set(node.id);
+    this.loadRoleUsers(node.id);
+  }
+
+  private convertRoleTree(roles: RoleVo[]): TreeNode[] {
+    return roles.map(r => ({
+      id: r.id ?? '',
+      label: r.name ?? '',
+      expanded: true,
+      children: r.children?.length ? this.convertRoleTree(r.children) : undefined,
+    }));
+  }
+
+  private findFirstLeaf(items: TreeNode[]): TreeNode | null {
+    for (const item of items) {
+      if (!item.children?.length) return item;
+      const found = this.findFirstLeaf(item.children);
+      if (found) return found;
+    }
+    return null;
   }
 }

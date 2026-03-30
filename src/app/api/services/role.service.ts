@@ -1,8 +1,8 @@
 // src/app/api/services/role.service.ts
 import { Injectable, inject } from '@angular/core';
-import { Observable } from 'rxjs';
+import { Observable, map } from 'rxjs';
 import { HttpService } from '../request/http.service';
-import { RoleUpsertCommand, RoleBindMenuCommand, RoleBindUserCommand, RoleVo, RoleMenuVo, Role } from '../types';
+import { ApiResponse, RoleUpsertCommand, RoleBindMenuCommand, RoleBindUserCommand, RoleVo, RoleMenuVo, Role } from '../types';
 import { UserVo } from '../types';
 
 @Injectable({ providedIn: 'root' })
@@ -26,7 +26,7 @@ export class RoleApiService {
 
   /** 角色关联菜单列表 */
   getRoleMenuList(params: { companyId: string; roleId: string }): Observable<RoleMenuVo[]> {
-    return this.http.get<RoleMenuVo[]>('/role/menu/list', params);
+    return this.http.get<ApiResponse<RoleMenuVo[]>>('/role/menu/list', params).pipe(map(res => res.items));
   }
 
   /** 删除角色 */
@@ -46,12 +46,12 @@ export class RoleApiService {
 
   /** 角色绑定用户列表 */
   listRoleUser(params: { roleId: string; companyId: string }): Observable<UserVo[]> {
-    return this.http.get<UserVo[]>('/role/user/list', params);
+    return this.http.get<ApiResponse<UserVo[]>>('/role/user/list', params).pipe(map(res => res.items));
   }
 
   /** 角色列表 */
   listRole(params: { companyId: string; type?: string }): Observable<RoleVo[]> {
-    return this.http.get<RoleVo[]>('/role/list', params as Record<string, string>);
+    return this.http.get<ApiResponse<RoleVo[]>>('/role/list', params as Record<string, string>).pipe(map(res => res.items));
   }
 
   /** 角色详情 */

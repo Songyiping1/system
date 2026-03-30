@@ -1,6 +1,10 @@
-import { Component, signal, computed } from '@angular/core';
-import { PageHeaderComponent, SearchInputComponent, ActionBarComponent, ButtonComponent } from '../../shared/components';
+import { Component, inject, signal, computed, OnInit, ElementRef, afterNextRender } from '@angular/core';
+import { PageHeaderComponent, SearchInputComponent, ActionBarComponent, ButtonComponent, ModalComponent } from '../../shared/components';
 import { type PageState } from '../../shared/models/page-state';
+import { CompanyApiService, MenuApiService } from '../../api';
+import { type CompanyVo } from '../../api/types/company.type';
+import { type TreeNodeMenu } from '../../api/types/menu.type';
+import { CompanyCreateDrawerComponent } from './company-create-drawer/company-create-drawer.component';
 
 export interface CompanyRow {
   id: string;
@@ -26,31 +30,23 @@ export interface DetailRow {
 @Component({
   selector: 'app-company-resource',
   standalone: true,
-  imports: [PageHeaderComponent, SearchInputComponent, ActionBarComponent, ButtonComponent],
+  imports: [PageHeaderComponent, SearchInputComponent, ActionBarComponent, ButtonComponent, CompanyCreateDrawerComponent, ModalComponent],
   templateUrl: './company-resource.component.html',
   styleUrl: './company-resource.component.scss',
 })
-export class CompanyResourceComponent {
-  pageState = signal<PageState>('normal');
+export class CompanyResourceComponent implements OnInit {
+  private companyApi = inject(CompanyApiService);
+  private menuApi = inject(MenuApiService);
+
+  pageState = signal<PageState>('loading');
   searchKeyword = signal('');
   selectedCompanyId = signal<string | null>(null);
 
-  companies = signal<CompanyRow[]>([
-    { id: '1', icon: '润', iconColor: '#e74c3c', name: '润通求本', shortName: '润通', count: 79, phone: '15147888855', checked: false },
-    { id: '2', icon: 'F', iconColor: '#333', name: 'FOCO', shortName: 'FO', count: 12, phone: '15147888855', checked: false },
-    { id: '3', icon: '天', iconColor: '#3498db', name: '天格环慧', shortName: '天格', count: 31, phone: '15147888855', checked: false },
-    { id: '4', icon: 'P', iconColor: '#27ae60', name: 'Painting', shortName: '润庭', count: 24, phone: '15147888855', checked: false },
-    { id: '5', icon: 'm', iconColor: '#2980b9', name: 'miniCo', shortName: '米妮玩', count: 353, phone: '15147888855', checked: false },
-    { id: '6', icon: '华', iconColor: '#8e44ad', name: '华通电力', shortName: '华通', count: 56, phone: '15147888855', checked: false },
-    { id: '7', icon: '惠', iconColor: '#27ae60', name: '惠华集团', shortName: '惠华', count: 335, phone: '15147888855', checked: false },
-    { id: '8', icon: '国', iconColor: '#e67e22', name: '国药集团', shortName: '国药', count: 7121, phone: '15147888855', checked: false },
-    { id: '9', icon: '国', iconColor: '#1abc9c', name: '国控星鲨', shortName: '星鲨', count: 6542, phone: '15147888855', checked: false, hasChildren: true },
-    { id: '10', icon: '国', iconColor: '#1abc9c', name: '国控星鲨', shortName: '星鲨', count: 6542, phone: '15147888855', checked: false, hasChildren: true },
-    { id: '11', icon: '国', iconColor: '#1abc9c', name: '国控星鲨', shortName: '星鲨', count: 6542, phone: '15147888855', checked: false, hasChildren: true },
-    { id: '12', icon: '国', iconColor: '#1abc9c', name: '国控星鲨', shortName: '星鲨', count: 6542, phone: '15147888855', checked: false, hasChildren: true },
-  ]);
-
+  companies = signal<CompanyRow[]>([]);
   detailRows = signal<DetailRow[]>([]);
+  drawerVisible = signal(false);
+  deleteModalVisible = signal(false);
+  menuCollapsed = signal(false);
 
   isLoading = computed(() => this.pageState() === 'loading');
 
@@ -59,8 +55,70 @@ export class CompanyResourceComponent {
     return c.length > 0 && c.every(r => r.checked);
   }
 
+  ngOnInit() {
+    this.loadCompanies();
+  }
+
+  onCompanyScroll(event: Event) {
+    const el = event.target as HTMLElement;
+    const atBottom = el.scrollHeight - el.scrollTop - el.clientHeight < 2;
+    if (atBottom && !this.menuCollapsed()) {
+      this.menuCollapsed.set(true);
+    }
+  }
+
+  loadCompanies() {
+    this.pageState.set('loading');
+    this.companyApi.loadCompanies({ type: 'company' }).subscribe({
+      next: (res) => {
+        const rows = res.map(c => this.convertCompany(c));
+        this.companies.set(rows);
+        if (rows.length > 0) {
+          this.selectedCompanyId.set(rows[0].id);
+          this.loadCompanyMenus(rows[0].id);
+        }
+        this.pageState.set(rows.length > 0 ? 'normal' : 'empty');
+      },
+      error: () => this.pageState.set('error'),
+    });
+  }
+
+  loadCompanyMenus(companyId: string) {
+    this.menuApi.getAssignedMenuList({ companyId }).subscribe({
+      next: (res) => {
+        this.detailRows.set(this.flattenMenuTree(res));
+      },
+      error: () => {
+        this.detailRows.set([]);
+      },
+    });
+  }
+
   onSearch(keyword: string) {
     this.searchKeyword.set(keyword);
+    if (!keyword) {
+      this.loadCompanies();
+      return;
+    }
+    this.companyApi.searchCompanies({ keyword, pageNum: 1 }).subscribe({
+      next: (res) => {
+        const rows = res.map((c: any) => ({
+          id: c.creditCode ?? '',
+          icon: (c.companyName ?? '').charAt(0),
+          iconColor: '#333',
+          name: c.companyName ?? '',
+          shortName: (c.companyName ?? '').slice(0, 2),
+          count: 0,
+          phone: '',
+          checked: false,
+        }));
+        this.companies.set(rows);
+      },
+    });
+  }
+
+  toggleMenuCollapse() {
+    this.menuCollapsed.update(v => !v);
   }
 
   toggleCheck(row: CompanyRow) {
@@ -75,5 +133,74 @@ export class CompanyResourceComponent {
 
   selectCompany(row: CompanyRow) {
     this.selectedCompanyId.set(row.id);
+    this.loadCompanyMenus(row.id);
+  }
+
+  openCreateDrawer() {
+    this.drawerVisible.set(true);
+  }
+
+  onDrawerClosed() {
+    this.drawerVisible.set(false);
+  }
+
+  onDrawerSaved() {
+    this.drawerVisible.set(false);
+    this.loadCompanies();
+  }
+
+  openDeleteModal() {
+    const selected = this.companies().filter(r => r.checked);
+    if (selected.length === 0) return;
+    this.deleteModalVisible.set(true);
+  }
+
+  onDeleteConfirmed() {
+    this.deleteModalVisible.set(false);
+    const selected = this.companies().filter(r => r.checked);
+    for (const row of selected) {
+      this.companyApi.removeCompany({ id: row.id }).subscribe({
+        next: () => {
+          if (row === selected[selected.length - 1]) {
+            this.loadCompanies();
+          }
+        },
+      });
+    }
+  }
+
+  onDeleteCancelled() {
+    this.deleteModalVisible.set(false);
+  }
+
+  private flattenMenuTree(nodes: TreeNodeMenu[]): DetailRow[] {
+    const rows: DetailRow[] = [];
+    const walk = (list: TreeNodeMenu[]) => {
+      for (const node of list) {
+        rows.push({
+          name: node.name ?? '',
+          icon: node.icon?.uri ?? '-',
+          buyDate: '-',
+          period: '-',
+          desc: node.description ?? '',
+        });
+        if (node.children?.length) walk(node.children);
+      }
+    };
+    walk(nodes);
+    return rows;
+  }
+
+  private convertCompany(c: CompanyVo): CompanyRow {
+    return {
+      id: c.id ?? '',
+      icon: (c.name ?? '').charAt(0),
+      iconColor: '#333',
+      name: c.name ?? '',
+      shortName: c.aliasName ?? (c.name ?? '').slice(0, 2),
+      count: c.headCount ?? 0,
+      phone: c.contactPhone ?? '',
+      checked: false,
+    };
   }
 }

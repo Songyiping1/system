@@ -4,8 +4,8 @@
   <app-action-bar>
     <app-search-input left placeholder="根据企业名称或完整企业标号搜索" (search)="onSearch($event)" />
     <ng-container right>
-      <app-button label="删除" type="danger" />
-      <app-button label="+ 新建公司" type="primary" />
+      <app-button label="删除" type="danger" (click)="deleteSelected()" />
+      <app-button label="+ 新建公司" type="primary" (click)="openCreateDrawer()" />
     </ng-container>
   </app-action-bar>
 
@@ -54,3 +54,9 @@
     </div>
   }
 </div>
+
+<app-course-create-drawer
+  [visible]="drawerVisible()"
+  (closed)="onDrawerClosed()"
+  (saved)="onDrawerSaved()"
+/>

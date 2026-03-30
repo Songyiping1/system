@@ -1,5 +1,12 @@
 // src/app/api/types/common.type.ts
 
+/** 后端统一响应格式 */
+export interface ApiResponse<T> {
+  isSuccess: boolean;
+  items: T;
+  serverName?: string;
+}
+
 export interface PictureEntry {
   ossType?: string;
   bucket?: string;
@@ -14,10 +21,9 @@ export interface UserVo {
   name?: string;
 }
 
-export interface TreeNode<T> {
-  data?: T;
+export type TreeNode<T> = T & {
   children?: TreeNode<T>[];
-}
+};
 
 export interface ImportResultVo {
   success?: number;

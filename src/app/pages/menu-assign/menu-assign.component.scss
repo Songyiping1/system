@@ -231,6 +231,12 @@ td.col-desc {
   }
 }
 
+.cell-name-inner {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
 .row-name {
   font-size: $font-size-14;
   color: $text-1;

@@ -1,8 +1,12 @@
-import { Component, signal, computed } from '@angular/core';
+import { Component, inject, signal, computed, OnInit } from '@angular/core';
 import { PageHeaderComponent, SearchInputComponent, SplitLayoutComponent, TreeListComponent, ActionBarComponent, ButtonComponent, TypeBadgeComponent, type TreeNode } from '../../shared/components';
 import { type PageState } from '../../shared/models/page-state';
+import { RoleApiService } from '../../api';
+import { type RoleVo, type RoleMenuVo } from '../../api/types/role.type';
+import { AuthService } from '../../services/auth.service';
 
 interface MenuRow {
+  id: string;
   name: string;
   level: number;
   permissions: string[];
@@ -18,51 +22,57 @@ interface MenuRow {
   templateUrl: './user-menu-assign.component.html',
   styleUrl: './user-menu-assign.component.scss',
 })
-export class UserMenuAssignComponent {
-  pageState = signal<PageState>('normal');
+export class UserMenuAssignComponent implements OnInit {
+  private roleApi = inject(RoleApiService);
+  private auth = inject(AuthService);
+
+  pageState = signal<PageState>('loading');
   searchKeyword = signal('');
-  selectedRoles = signal<string[]>(['总监', '主管']);
+  selectedRoles = signal<string[]>([]);
 
-  treeItems = signal<TreeNode[]>([
-    {
-      id: '1', label: '默认', expanded: true, children: [
-        { id: '2', label: '部门主管' },
-        { id: '3', label: '总监' },
-      ],
-    },
-    {
-      id: '4', label: '自定义分组', expanded: true, children: [
-        { id: '5', label: '财务' },
-        { id: '6', label: '采购' },
-        { id: '7', label: 'IT' },
-        { id: '8', label: '行政' },
-        { id: '9', label: '运营' },
-        { id: '10', label: '客服' },
-      ],
-    },
-    {
-      id: '11', label: '自定义分组名称', expanded: true, children: [
-        { id: '12', label: '主管' },
-        { id: '13', label: '高级管理者' },
-        { id: '14', label: '科长' },
-      ],
-    },
-  ]);
-  activeTreeId = signal('3');
+  treeItems = signal<TreeNode[]>([]);
+  activeTreeId = signal('');
 
-  menuItems = signal<MenuRow[]>([
-    { name: '工作台', level: 0, permissions: ['角色'], desc: '工作台首页', expanded: true, children: [
-      { name: '待办事项', level: 1, permissions: ['角色', '总监'], desc: '待办任务列表' },
-      { name: '数据看板', level: 1, permissions: ['总监'], desc: '数据统计概览' },
-    ]},
-    { name: '通讯录', level: 0, permissions: ['角色'], desc: '企业通讯录管理', expanded: true, children: [
-      { name: '组织架构', level: 1, permissions: ['角色', '总监'], desc: '组织架构管理' },
-      { name: '成员管理', level: 1, permissions: ['角色'], desc: '成员信息管理' },
-    ]},
-    { name: '审批', level: 0, permissions: ['角色', '总监'], desc: '审批流程管理' },
-  ]);
+  menuItems = signal<MenuRow[]>([]);
 
   isLoading = computed(() => this.pageState() === 'loading');
+
+  ngOnInit() {
+    this.loadRoleTree();
+  }
+
+  loadRoleTree() {
+    this.pageState.set('loading');
+    const companyId = this.auth.currentUser()?.companyId ?? '';
+    this.roleApi.listRole({ companyId }).subscribe({
+      next: (res) => {
+        const items = this.convertRoleTree(res);
+        this.treeItems.set(items);
+        const firstLeaf = this.findFirstLeaf(items);
+        if (firstLeaf) {
+          this.activeTreeId.set(firstLeaf.id);
+          this.loadRoleMenus(firstLeaf.id);
+        }
+        this.pageState.set(items.length > 0 ? 'normal' : 'empty');
+      },
+      error: () => this.pageState.set('error'),
+    });
+  }
+
+  loadRoleMenus(roleId: string) {
+    const companyId = this.auth.currentUser()?.companyId ?? '';
+    this.roleApi.getRoleMenuList({ companyId, roleId }).subscribe({
+      next: (res) => {
+        this.menuItems.set(res.map(m => ({
+          id: m.id ?? '',
+          name: m.id ?? '',
+          level: 0,
+          permissions: m.roleNames ?? [],
+          desc: '',
+        })));
+      },
+    });
+  }
 
   onSearch(keyword: string) {
     this.searchKeyword.set(keyword);
@@ -70,10 +80,20 @@ export class UserMenuAssignComponent {
 
   onTreeSelect(node: TreeNode) {
     this.activeTreeId.set(node.id);
+    this.loadRoleMenus(node.id);
   }
 
   removeRole(role: string) {
     this.selectedRoles.update(roles => roles.filter(r => r !== role));
+  }
+
+  saveMenuAssign() {
+    const companyId = this.auth.currentUser()?.companyId ?? '';
+    const roleIds = [this.activeTreeId()];
+    const menuIds = this.menuItems().map(m => m.id);
+    this.roleApi.bindRoleMenu({ companyId, roleIds, menuIds }).subscribe({
+      next: () => this.loadRoleMenus(this.activeTreeId()),
+    });
   }
 
   flattenMenuItems(): MenuRow[] {
@@ -93,5 +113,23 @@ export class UserMenuAssignComponent {
   toggleExpand(item: MenuRow) {
     item.expanded = !item.expanded;
     this.menuItems.update(items => [...items]);
+  }
+
+  private convertRoleTree(roles: RoleVo[]): TreeNode[] {
+    return roles.map(r => ({
+      id: r.id ?? '',
+      label: r.name ?? '',
+      expanded: true,
+      children: r.children?.length ? this.convertRoleTree(r.children) : undefined,
+    }));
+  }
+
+  private findFirstLeaf(items: TreeNode[]): TreeNode | null {
+    for (const item of items) {
+      if (!item.children?.length) return item;
+      const found = this.findFirstLeaf(item.children);
+      if (found) return found;
+    }
+    return null;
   }
 }

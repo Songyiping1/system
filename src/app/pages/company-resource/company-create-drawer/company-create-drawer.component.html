@@ -1,0 +1,106 @@
+@if (visible()) {
+  <div class="drawer-overlay" (click)="onClose()">
+    <div class="drawer-panel" (click)="$event.stopPropagation()">
+      <!-- Header -->
+      <div class="drawer-header">
+        <span class="drawer-close" (click)="onClose()">
+          <svg width="17" height="17" viewBox="0 0 17 17" fill="none">
+            <path d="M4 4L13 13M13 4L4 13" stroke="#333" stroke-width="1.5" stroke-linecap="round"/>
+          </svg>
+        </span>
+      </div>
+
+      <!-- Title -->
+      <div class="drawer-title-row">
+        <span class="drawer-title">新建公司</span>
+      </div>
+
+      <!-- Body -->
+      <div class="drawer-body">
+        <div class="form-row">
+          <label class="form-label">
+            <span class="label-icon">To</span>
+            公司名称
+          </label>
+          <div class="form-input-wrap">
+            <div class="form-input">
+              <input type="text" [value]="name()" (input)="onNameInput($any($event.target).value)" (blur)="hideSuggestions()" placeholder="请填写" />
+            </div>
+            @if (showSuggestions() && suggestions().length > 0) {
+              <ul class="suggestions-dropdown">
+                @for (item of suggestions(); track item.companyName) {
+                  <li class="suggestion-item" (mousedown)="selectSuggestion(item)">
+                    {{ item.companyName }}
+                  </li>
+                }
+              </ul>
+            }
+          </div>
+        </div>
+
+        <div class="form-row">
+          <label class="form-label">
+            <span class="label-icon">To</span>
+            统一社会引用代码
+          </label>
+          <div class="form-input">
+            <input type="text" [value]="creditNo()" (input)="creditNo.set($any($event.target).value)" placeholder="请填写" />
+          </div>
+        </div>
+
+        <div class="form-row">
+          <label class="form-label">
+            <span class="label-icon">To</span>
+            公司别名
+          </label>
+          <div class="form-input">
+            <input type="text" [value]="aliasName()" (input)="aliasName.set($any($event.target).value)" placeholder="请填写" />
+          </div>
+        </div>
+
+        <div class="form-row">
+          <label class="form-label">
+            <span class="label-icon">To</span>
+            公司导向
+          </label>
+          <div class="form-input">
+            <input type="text" [value]="guide()" (input)="guide.set($any($event.target).value)" placeholder="请填写导向" />
+          </div>
+        </div>
+
+        <div class="form-row">
+          <label class="form-label">
+            <span class="label-icon">To</span>
+            管理员手机号
+          </label>
+          <div class="form-input">
+            <input type="text" [value]="contactPhone()" (input)="contactPhone.set($any($event.target).value)" placeholder="请填写" />
+          </div>
+        </div>
+
+        <div class="form-row form-row-top">
+          <label class="form-label">
+            <span class="label-icon">To</span>
+            公司Logo
+          </label>
+          <div class="form-upload">
+            <label class="upload-box">
+              @if (logoPreview()) {
+                <img [src]="logoPreview()" class="upload-preview" alt="logo" />
+              } @else {
+                <span class="upload-plus">+</span>
+              }
+              <input type="file" accept="image/*" class="upload-input" (change)="onLogoSelect($event)" />
+            </label>
+          </div>
+        </div>
+      </div>
+
+      <!-- Footer -->
+      <div class="drawer-footer">
+        <button class="btn-cancel" (click)="onClose()">取消</button>
+        <button class="btn-save" [class.disabled]="!canSave()" [disabled]="!canSave()" (click)="onSave()">保存</button>
+      </div>
+    </div>
+  </div>
+}

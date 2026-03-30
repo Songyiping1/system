@@ -1,8 +1,8 @@
 // src/app/api/services/company.service.ts
 import { Injectable, inject } from '@angular/core';
-import { Observable } from 'rxjs';
+import { Observable, map } from 'rxjs';
 import { HttpService } from '../request/http.service';
-import { CompanyUpsertCommand, ApplyReviewCommand, CompanyMatchVo, CompanyVo, TreeNodeCompanyVo } from '../types';
+import { ApiResponse, CompanyUpsertCommand, ApplyReviewCommand, CompanyMatchVo, CompanyVo, TreeNodeCompanyVo } from '../types';
 
 @Injectable({ providedIn: 'root' })
 export class CompanyApiService {
@@ -10,7 +10,7 @@ export class CompanyApiService {
 
   /** 搜索匹配公司 */
   searchCompanies(params: { keyword: string; pageNum: number }): Observable<CompanyMatchVo[]> {
-    return this.http.get<CompanyMatchVo[]>('/company/match', params);
+    return this.http.get<ApiResponse<CompanyMatchVo[]>>('/company/match', params).pipe(map(res => res.items));
   }
 
   /** 创建公司 */
@@ -30,7 +30,7 @@ export class CompanyApiService {
 
   /** 入驻申请列表 */
   listApply(params: { companyId: string; applyStatus?: number }): Observable<CompanyVo[]> {
-    return this.http.get<CompanyVo[]>('/company/apply/list', params as Record<string, string | number>);
+    return this.http.get<ApiResponse<CompanyVo[]>>('/company/apply/list', params as Record<string, string | number>).pipe(map(res => res.items));
   }
 
   /** 审核入驻申请 */
@@ -40,16 +40,16 @@ export class CompanyApiService {
 
   /** 加载公司列表(按类型) */
   loadCompanies(params: { type: string }): Observable<CompanyVo[]> {
-    return this.http.get<CompanyVo[]>('/company/load', params);
+    return this.http.get<ApiResponse<CompanyVo[]>>('/company/load', params).pipe(map(res => res.items));
   }
 
   /** 公司树形列表 */
-  listCompanies(params: { companyId: string }): Observable<TreeNodeCompanyVo[]> {
-    return this.http.get<TreeNodeCompanyVo[]>('/company/list', params);
+  listCompanies(params?: { companyId: string }): Observable<TreeNodeCompanyVo[]> {
+    return this.http.get<ApiResponse<TreeNodeCompanyVo[]>>('/company/list', params).pipe(map(res => res.items));
   }
 
   /** 删除公司(物理删除) */
-  removeCompany(params: { companyId: string }): Observable<void> {
+  removeCompany(params: { id: string }): Observable<void> {
     return this.http.get<void>('/company/remove', params);
   }
 }

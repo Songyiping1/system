@@ -1,8 +1,9 @@
 // src/app/api/services/organize-member.service.ts
 import { Injectable, inject } from '@angular/core';
-import { Observable } from 'rxjs';
+import { Observable, map } from 'rxjs';
 import { HttpService } from '../request/http.service';
 import {
+  ApiResponse,
   OrganizeBindCommand,
   OrganizeUserRemoveCommand,
   OrganizeUserTransferCommand,
@@ -16,7 +17,7 @@ export class OrganizeMemberApiService {
 
   /** 部门成员列表 */
   listOrganizeMember(params: { companyId: string; deptId: string; state?: number }): Observable<OrganizeUserVo[]> {
-    return this.http.get<OrganizeUserVo[]>('/organize/member/list', params as Record<string, string | number>);
+    return this.http.get<ApiResponse<OrganizeUserVo[]>>('/organize/member/list', params as Record<string, string | number>).pipe(map(res => res.items));
   }
 
   /** 添加员工 */

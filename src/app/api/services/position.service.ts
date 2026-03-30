@@ -1,8 +1,8 @@
 // src/app/api/services/position.service.ts
 import { Injectable, inject } from '@angular/core';
-import { Observable } from 'rxjs';
+import { Observable, map } from 'rxjs';
 import { HttpService } from '../request/http.service';
-import { PositionUpsertCommand, PositionVo } from '../types';
+import { ApiResponse, PositionUpsertCommand, PositionVo } from '../types';
 import { UserVo } from '../types';
 
 @Injectable({ providedIn: 'root' })
@@ -26,7 +26,7 @@ export class PositionApiService {
 
   /** 岗位列表 */
   listPosition(params: { companyId: string; deptId?: string }): Observable<PositionVo[]> {
-    return this.http.get<PositionVo[]>('/position/list', params as Record<string, string>);
+    return this.http.get<ApiResponse<PositionVo[]>>('/position/list', params as Record<string, string>).pipe(map(res => res.items));
   }
 
   /** 岗位详情 */
@@ -36,6 +36,6 @@ export class PositionApiService {
 
   /** 岗位下用户列表 */
   listPositionUser(params: { positionId: string; companyId: string }): Observable<UserVo[]> {
-    return this.http.get<UserVo[]>('/position/user/list', params);
+    return this.http.get<ApiResponse<UserVo[]>>('/position/user/list', params).pipe(map(res => res.items));
   }
 }

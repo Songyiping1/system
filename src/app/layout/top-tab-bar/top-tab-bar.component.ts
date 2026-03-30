@@ -47,6 +47,11 @@ export class TopTabBarComponent {
     this.showChangeBinding.set(true);
   }
 
+  onSwitchAccount() {
+    this.showUserMenu.set(false);
+    this.auth.logout();
+  }
+
   onLogout() {
     this.showUserMenu.set(false);
     this.auth.logout();

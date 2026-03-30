@@ -1,8 +1,9 @@
 // src/app/api/services/organize.service.ts
 import { Injectable, inject } from '@angular/core';
-import { Observable } from 'rxjs';
+import { Observable, map } from 'rxjs';
 import { HttpService } from '../request/http.service';
 import {
+  ApiResponse,
   OrganizeUpsertCommand,
   OrganizeRemoveCommand,
   TreeNodeOrganize,
@@ -21,7 +22,7 @@ export class OrganizeApiService {
 
   /** 加载组织架构树 */
   loadOrganize(params: { companyId: string }): Observable<TreeNodeOrganize[]> {
-    return this.http.get<TreeNodeOrganize[]>('/organize/load', params);
+    return this.http.get<ApiResponse<TreeNodeOrganize[]>>('/organize/load', params).pipe(map(res => res.items));
   }
 
   /** 更新部门 */
@@ -41,7 +42,7 @@ export class OrganizeApiService {
 
   /** 权限操作日志列表 */
   getPermissionList(body: PermissionLogQuery): Observable<PermissionLogVo[]> {
-    return this.http.post<PermissionLogVo[]>('/organize/permission/list', body);
+    return this.http.post<ApiResponse<PermissionLogVo[]>>('/organize/permission/list', body).pipe(map(res => res.items));
   }
 
   /** 解绑用户 */

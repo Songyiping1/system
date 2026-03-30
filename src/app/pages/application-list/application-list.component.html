@@ -52,3 +52,28 @@
     </div>
   }
 </div>
+
+<!-- 拒绝理由弹窗 -->
+<app-modal
+  title="拒绝理由"
+  size="sm"
+  [radius]="16"
+  [visible]="rejectVisible()"
+  [showFooter]="false"
+  (closed)="closeReject()"
+>
+  <div class="reject-body">
+    <p class="reject-hint">拒绝理由将以短信形式发送至对方管理员手机上</p>
+    <input
+      class="reject-input"
+      type="text"
+      placeholder="您好，当前资质不符，请联系邀请人确认（选填）"
+      [ngModel]="rejectReason()"
+      (ngModelChange)="rejectReason.set($event)"
+    />
+    <div class="reject-actions">
+      <button class="reject-btn-cancel" (click)="closeReject()">取消</button>
+      <button class="reject-btn-confirm" (click)="confirmReject()">拒绝</button>
+    </div>
+  </div>
+</app-modal>
