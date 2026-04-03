@@ -2,20 +2,46 @@
   <app-page-header title="成员管理" desc="建立数据化的电子员工档案，统一维护员工的基本信息" [showHelp]="true" />
   <app-split-layout>
     <ng-container left>
-      <app-search-input placeholder="搜索" [fullWidth]="true" />
-      <app-tree-list [items]="treeItems()" [activeId]="activeTreeId()" (select)="onTreeSelect($event)" />
+      <div class="left-header">
+        <app-search-input placeholder="搜索" [fullWidth]="true" />
+        <button class="add-dept-btn" (click)="onAddRootDept()">
+          <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
+            <path d="M7 2V12M2 7H12" stroke="#333" stroke-width="1.5" stroke-linecap="round"/>
+          </svg>
+        </button>
+      </div>
+      <app-tree-list
+        [items]="treeItems()"
+        [activeId]="activeTreeId()"
+        (select)="onTreeSelect($event)"
+        (contextMenu)="onTreeContextMenu($event)"
+      />
     </ng-container>
     <ng-container right>
       <app-action-bar>
         <ng-container left>
           <app-search-input placeholder="搜索" (search)="onSearch($event)" />
-          <app-filter-select label="人员状态" [options]="['全部', '已加入', '未加入']" />
-          <app-filter-select label="显示人员" [options]="['显示全部人员', '仅直属人员']" />
+          <app-filter-select label="人员状态" [options]="['全部', '正常', '已暂停', '未加入', '主动退出']" (change)="onStatusFilterChange($event)" />
+          <app-filter-select label="显示人员" [options]="['展示全部人员', '仅展示部门直属人员']" (change)="onShowPersonFilterChange($event)" />
+          <label class="filter-resigned">
+            <input type="checkbox" [checked]="showResigned()" (change)="showResigned.set(!showResigned())" />
+            <span>90天内离职人员</span>
+          </label>
         </ng-container>
         <ng-container right>
           <app-button label="邀请人员" type="outline" />
-          <app-button label="+ 添加人员" type="primary" />
-          <app-button label="更多" type="outline" />
+          <app-button label="+ 添加人员" type="primary" (click)="onAddMember()" />
+          <div class="more-wrap">
+            <app-button label="更多" type="outline" (click)="$event.stopPropagation(); toggleMoreMenu()" />
+            @if (showMoreMenu()) {
+              <div class="dropdown-menu more-menu">
+                <div class="dropdown-item primary" (click)="onBatchImportExport()">批量导入/导出</div>
+                <div class="dropdown-item" (click)="onChangeDept()">变更部门</div>
+                <div class="dropdown-item" (click)="onEditColumns()">编辑列表</div>
+                <div class="dropdown-item danger" (click)="onBatchResign()">操作离职</div>
+              </div>
+            }
+          </div>
         </ng-container>
       </app-action-bar>
       @if (isLoading()) {
@@ -25,15 +51,36 @@
           <table>
             <thead>
               <tr>
-                <th>名称</th>
-                <th>人员状态</th>
-                <th>部门</th>
-                <th>岗位</th>
+                <th class="col-check">
+                  <input type="checkbox" class="checkbox" [checked]="allSelected()" (change)="toggleSelectAll()" />
+                </th>
+                <th class="sortable" (click)="onSort('name')">
+                  <span>名称</span>
+                  <span class="sort-icon" [class.active]="sortColumn() === 'name'">
+                    @if (sortColumn() === 'name' && sortDirection() === 'desc') { ↓ } @else { ↑ }
+                  </span>
+                </th>
+                <th class="sortable" (click)="onSort('status')">
+                  <span>人员状态</span>
+                  <span class="sort-icon" [class.active]="sortColumn() === 'status'">↕</span>
+                </th>
+                <th class="sortable" (click)="onSort('position')">
+                  <span>岗位</span>
+                  <span class="sort-icon" [class.active]="sortColumn() === 'position'">↕</span>
+                </th>
+                <th class="sortable" (click)="onSort('dept')">
+                  <span>部门</span>
+                  <span class="sort-icon" [class.active]="sortColumn() === 'dept'">↕</span>
+                </th>
+                <th>登录手机</th>
               </tr>
             </thead>
             <tbody>
-              @for (row of members(); track row.name) {
-                <tr>
+              @for (row of filteredMembers(); track row.id) {
+                <tr (contextmenu)="onMemberContextMenu($event, row)">
+                  <td class="col-check">
+                    <input type="checkbox" class="checkbox" [checked]="isSelected(row.id)" (change)="toggleSelect(row.id)" />
+                  </td>
                   <td>
                     <div class="cell-user">
                       <div class="avatar">{{ row.avatar }}</div>
@@ -41,17 +88,180 @@
                     </div>
                   </td>
                   <td>
-                    <span class="status-text" [class.status-joined]="row.status === '已加入'" [class.status-not-joined]="row.status === '未加入'">{{ row.status }}</span>
+                    <span class="status-cell">
+                      <span class="status-dot" [class.success]="row.status === '正常'"></span>
+                      {{ row.status }}
+                    </span>
                   </td>
-                  <td>{{ row.dept }}</td>
                   <td>{{ row.position }}</td>
+                  <td>{{ row.dept }}</td>
+                  <td>{{ row.mobile }}</td>
                 </tr>
               }
             </tbody>
           </table>
-          <div class="table-footer">前端开发一组&nbsp;&nbsp;总人数 30&nbsp;&nbsp;未加入 3</div>
+          <div class="table-footer">{{ activeDeptName() }}&nbsp;&nbsp;总人数 {{ totalCount() }}&nbsp;&nbsp;未加入 {{ notJoinedCount() }}</div>
         </div>
       }
     </ng-container>
   </app-split-layout>
 </div>
+
+<!-- 部门右键菜单 -->
+@if (contextMenuPos()) {
+  <div class="context-menu" [style.left.px]="contextMenuPos()!.x" [style.top.px]="contextMenuPos()!.y" (click)="$event.stopPropagation()">
+    <div class="context-menu-item" (click)="onEditDept()">编辑部门信息</div>
+    <div class="context-menu-item" (click)="onAddChildDept()">添加子部门</div>
+    <div class="context-menu-item danger" (click)="onDeleteDept()">删除部门</div>
+  </div>
+}
+
+<!-- 成员右键菜单 -->
+@if (memberMenuPos()) {
+  <div class="context-menu" [style.left.px]="memberMenuPos()!.x" [style.top.px]="memberMenuPos()!.y" (click)="$event.stopPropagation()">
+    <div class="context-menu-item primary" (click)="onEditMember()">编辑人员信息</div>
+    <div class="context-menu-item" (click)="onSetLeader()">设置为主管</div>
+    <div class="context-menu-item" (click)="onDeleteMember()">直接删除</div>
+    <div class="context-menu-item" (click)="onTransferAndDelete()">资源转移并删除</div>
+  </div>
+}
+
+<!-- 新建/编辑部门弹窗 -->
+<app-modal
+  [title]="deptModalTitle()"
+  size="sm"
+  [visible]="showDeptModal()"
+  (closed)="showDeptModal.set(false)"
+  (confirmed)="onDeptModalConfirm()"
+>
+  <div class="dept-form">
+    <label class="dept-form-label">部门名称</label>
+    <input
+      class="dept-form-input"
+      type="text"
+      placeholder="请输入部门名称"
+      [value]="deptFormName()"
+      (input)="deptFormName.set($any($event.target).value)"
+    />
+  </div>
+</app-modal>
+
+<!-- 删除确认弹窗 -->
+<app-modal
+  title="删除确认"
+  size="sm"
+  [visible]="showDeleteModal()"
+  confirmText="确认删除"
+  (closed)="showDeleteModal.set(false)"
+  (confirmed)="onDeleteConfirmed()"
+>
+  <p>确定要删除该部门吗？删除后将无法恢复。</p>
+</app-modal>
+
+<!-- 子部门提示弹窗 -->
+<app-modal
+  title="提示"
+  size="sm"
+  [visible]="showChildDeptHint()"
+  confirmText="我知道了"
+  (closed)="showChildDeptHint.set(false)"
+  (confirmed)="showChildDeptHint.set(false)"
+>
+  <p>请删除所有子部门再进行删除部门操作</p>
+</app-modal>
+
+<!-- 添加人员抽屉 -->
+<app-member-add-drawer
+  [visible]="showAddMemberDrawer()"
+  [deptId]="activeTreeId()"
+  [deptName]="activeDeptName()"
+  (closed)="showAddMemberDrawer.set(false)"
+  (saved)="onMemberAdded()"
+/>
+
+<!-- 编辑人员信息抽屉 -->
+<app-member-add-drawer
+  [visible]="showEditMemberDrawer()"
+  [deptId]="activeTreeId()"
+  [deptName]="activeDeptName()"
+  [editMode]="true"
+  [editName]="editMemberName()"
+  [editMobile]="editMemberMobile()"
+  [editUserId]="editingMemberId() ?? ''"
+  (closed)="showEditMemberDrawer.set(false)"
+  (saved)="onEditMemberSaved()"
+/>
+
+<!-- 删除成员确认弹窗 -->
+<app-modal
+  title="删除确认"
+  size="sm"
+  [visible]="showDeleteMemberModal()"
+  confirmText="确认删除"
+  (closed)="showDeleteMemberModal.set(false)"
+  (confirmed)="onDeleteMemberConfirmed()"
+>
+  @if (deleteMemberMode() === 'single') {
+    <p>确定要删除成员「{{ deletingMember()?.name }}」吗？删除后将无法恢复。</p>
+  } @else {
+    <p>确定要将选中的 {{ selectedIds().size }} 位成员操作离职吗？此操作无法恢复。</p>
+  }
+</app-modal>
+
+<!-- 变更部门/资源转移弹窗 -->
+<app-modal
+  [title]="transferMode() === 'change' ? '变更部门' : '资源转移并删除'"
+  size="sm"
+  [visible]="showTransferModal()"
+  confirmText="确认"
+  (closed)="showTransferModal.set(false)"
+  (confirmed)="onTransferConfirmed()"
+>
+  <div class="transfer-form">
+    <p class="transfer-hint">
+      @if (transferMode() === 'transferAndDelete') {
+        将「{{ transferringMember()?.name }}」的资源转移到目标部门后删除
+      } @else {
+        将选中的 {{ selectedIds().size }} 位成员变更到目标部门
+      }
+    </p>
+    <label class="dept-form-label">选择目标部门</label>
+    <div class="transfer-tree">
+      <app-tree-list
+        [items]="treeItems()"
+        [activeId]="transferTargetDeptId()"
+        (select)="onTransferTreeSelect($event)"
+      />
+    </div>
+  </div>
+</app-modal>
+
+<!-- 批量导入/导出弹窗 -->
+<app-member-import-modal
+  [visible]="showImportModal()"
+  [deptId]="activeTreeId()"
+  (closed)="showImportModal.set(false)"
+  (imported)="onImported()"
+/>
+
+<!-- 编辑列表弹窗 -->
+@if (showColumnEditor()) {
+  <div class="column-editor-overlay" (click)="showColumnEditor.set(false)">
+    <div class="column-editor" (click)="$event.stopPropagation()">
+      <div class="column-editor-title">请选择列表中要展示的信息</div>
+      <div class="column-editor-list">
+        @for (col of columnOptions; track col.key) {
+          <label class="column-editor-item" [class.disabled]="col.disabled">
+            <input
+              type="checkbox"
+              [checked]="visibleColumns().has(col.key)"
+              [disabled]="col.disabled"
+              (change)="toggleColumn(col.key)"
+            />
+            <span>{{ col.label }}</span>
+          </label>
+        }
+      </div>
+    </div>
+  </div>
+}

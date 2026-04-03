@@ -32,7 +32,7 @@ export class OrganizeApiService {
 
   /** 删除部门 */
   deleteOrganize(params: { id: string; companyId: string }): Observable<void> {
-    return this.http.delete<void>('/organize/delete', params);
+    return this.http.post<void>('/organize/delete', params);
   }
 
   /** 设置部门主管 */

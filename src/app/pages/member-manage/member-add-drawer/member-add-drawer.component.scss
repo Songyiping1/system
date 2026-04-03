@@ -70,14 +70,11 @@
   display: flex;
   flex-direction: column;
   gap: 9px;
-}
+  scrollbar-width: none;
 
-.section-title {
-  font-size: 18px;
-  font-weight: $font-weight-semibold;
-  color: $text-1;
-  margin: 0;
-  font-family: $font-family;
+  &::-webkit-scrollbar {
+    display: none;
+  }
 }
 
 // ===== 表单行 =====
@@ -86,7 +83,7 @@
   align-items: center;
   justify-content: space-between;
   min-height: 44px;
-  width: 100%;
+  width: 619px;
 }
 
 .form-label {
@@ -107,10 +104,6 @@
   justify-content: center;
   font-size: 10px;
   color: $text-2;
-
-  &.star {
-    font-size: 14px;
-  }
 }
 
 .form-input {
@@ -121,8 +114,7 @@
   align-items: center;
   padding: 12px 0;
 
-  input[type="text"],
-  input[type="password"] {
+  input[type="text"] {
     flex: 1;
     border: none;
     outline: none;
@@ -134,29 +126,10 @@
     &::placeholder {
       color: rgba(153, 153, 153, 0.5);
     }
-  }
-}
 
-// ===== Radio Group =====
-.radio-group {
-  border-bottom: none;
-  gap: 24px;
-}
-
-.radio-item {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  cursor: pointer;
-  font-size: $font-size-14;
-  color: $text-1;
-  font-family: $font-family;
-
-  input[type="radio"] {
-    width: 14px;
-    height: 14px;
-    accent-color: $primary;
-    cursor: pointer;
+    &:disabled {
+      color: $text-2;
+    }
   }
 }
 

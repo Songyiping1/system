@@ -19,6 +19,49 @@
   font-size: $font-size-14;
 }
 
+// ===== 左侧面板 =====
+.left-header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.add-dept-btn {
+  flex-shrink: 0;
+  width: 33px;
+  height: 33px;
+  border: 1px solid $border;
+  border-radius: $radius-md;
+  background: $white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+
+  &:hover {
+    background: $table-header-bg;
+  }
+}
+
+// ===== 筛选栏 =====
+.filter-resigned {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  font-size: $font-size-14;
+  color: $text-1;
+  cursor: pointer;
+  white-space: nowrap;
+
+  input[type="checkbox"] {
+    width: 14px;
+    height: 14px;
+    accent-color: $primary;
+    cursor: pointer;
+  }
+}
+
+// ===== 表格 =====
 .table-wrap {
   flex: 1;
   overflow: auto;
@@ -50,6 +93,27 @@ th {
   box-sizing: border-box;
 }
 
+th.sortable {
+  cursor: pointer;
+  user-select: none;
+
+  &:hover {
+    color: $text-1;
+  }
+}
+
+.sort-icon {
+  color: $text-2;
+  opacity: 0.4;
+  margin-left: 2px;
+  font-size: 12px;
+
+  &.active {
+    opacity: 1;
+    color: $primary;
+  }
+}
+
 td {
   padding: $table-cell-padding-y $table-cell-padding-x;
   font-size: $font-size-14;
@@ -66,6 +130,19 @@ tr:last-child td {
 
 tbody tr:hover {
   background: $sub-sidebar-bg;
+}
+
+.col-check {
+  width: 40px;
+  padding-left: 16px;
+  padding-right: 0;
+}
+
+.checkbox {
+  width: 16px;
+  height: 16px;
+  accent-color: $primary;
+  cursor: pointer;
 }
 
 .cell-user {
@@ -87,16 +164,22 @@ tbody tr:hover {
   color: $white;
 }
 
-.status-text {
-  font-size: $font-size-14;
+.status-cell {
+  display: flex;
+  align-items: center;
+  gap: 6px;
 }
 
-.status-joined {
-  color: $status-success;
-}
+.status-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: $text-2;
+  flex-shrink: 0;
 
-.status-not-joined {
-  color: $text-2;
+  &.success {
+    background: $status-success;
+  }
 }
 
 .table-footer {
@@ -104,4 +187,182 @@ tbody tr:hover {
   font-size: $font-size-12;
   color: $text-2;
   border-top: 1px solid $border;
+}
+
+// ===== 右键菜单 =====
+.context-menu {
+  position: fixed;
+  background: $white;
+  border: 1px solid $border;
+  border-radius: $radius-md;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  z-index: 3000;
+  min-width: 140px;
+  padding: 4px 0;
+}
+
+.context-menu-item {
+  padding: 8px 16px;
+  font-size: $font-size-14;
+  color: $text-1;
+  cursor: pointer;
+  white-space: nowrap;
+
+  &:hover {
+    background: $table-header-bg;
+  }
+
+  &.danger {
+    color: $danger;
+  }
+}
+
+// ===== 更多下拉菜单 =====
+.more-wrap {
+  position: relative;
+}
+
+.dropdown-menu {
+  position: absolute;
+  top: 100%;
+  right: 0;
+  margin-top: 4px;
+  background: $white;
+  border: 1px solid $border;
+  border-radius: $radius-md;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  z-index: 2000;
+  min-width: 140px;
+  padding: 4px 0;
+}
+
+.dropdown-item {
+  padding: 8px 16px;
+  font-size: $font-size-14;
+  color: $text-1;
+  cursor: pointer;
+  white-space: nowrap;
+
+  &:hover {
+    background: $table-header-bg;
+  }
+
+  &.primary {
+    color: $primary;
+  }
+
+  &.danger {
+    color: $danger;
+  }
+}
+
+// ===== 编辑列表弹窗 =====
+.column-editor-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.2);
+  z-index: 3000;
+  display: flex;
+  align-items: flex-start;
+  justify-content: flex-end;
+  padding: 80px 24px 0 0;
+}
+
+.column-editor {
+  background: $white;
+  border: 1px solid $border;
+  border-radius: $radius-md;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.12);
+  width: 260px;
+  max-height: 500px;
+  overflow-y: auto;
+  padding: 16px;
+}
+
+.column-editor-title {
+  font-size: $font-size-14;
+  color: $text-2;
+  margin-bottom: 12px;
+}
+
+.column-editor-list {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.column-editor-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 4px;
+  font-size: $font-size-14;
+  color: $text-1;
+  cursor: pointer;
+  border-radius: 4px;
+
+  &:hover {
+    background: $table-header-bg;
+  }
+
+  &.disabled {
+    color: $text-2;
+    cursor: default;
+  }
+
+  input[type="checkbox"] {
+    width: 16px;
+    height: 16px;
+    accent-color: $primary;
+    cursor: pointer;
+    flex-shrink: 0;
+  }
+}
+
+// ===== 变更部门弹窗 =====
+.transfer-form {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.transfer-hint {
+  font-size: $font-size-14;
+  color: $text-2;
+  margin: 0;
+}
+
+.transfer-tree {
+  max-height: 240px;
+  overflow-y: auto;
+  border: 1px solid $border;
+  border-radius: $radius-md;
+  padding: 8px;
+}
+
+// ===== 部门弹窗表单 =====
+.dept-form {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.dept-form-label {
+  font-size: $font-size-14;
+  color: $text-1;
+  font-weight: $font-weight-semibold;
+}
+
+.dept-form-input {
+  height: 36px;
+  padding: 0 12px;
+  border: 1px solid $border;
+  border-radius: $radius-md;
+  font-size: $font-size-14;
+  font-family: $font-family;
+  outline: none;
+
+  &:focus {
+    border-color: $primary;
+  }
 }

@@ -7,6 +7,9 @@ export interface TreeNode {
   children?: TreeNode[];
   count?: number;
   expanded?: boolean;
+  parentId?: string;
+  uri?: string;
+  parentUri?: string;
 }
 
 @Component({
@@ -20,9 +23,15 @@ export class TreeListComponent {
   items = input<TreeNode[]>([]);
   activeId = input('');
   select = output<TreeNode>();
+  contextMenu = output<{ node: TreeNode; event: MouseEvent }>();
 
   onSelect(node: TreeNode) {
     this.select.emit(node);
+  }
+
+  onContextMenu(node: TreeNode, event: MouseEvent) {
+    event.preventDefault();
+    this.contextMenu.emit({ node, event });
   }
 
   toggleExpand(node: TreeNode, event: Event) {

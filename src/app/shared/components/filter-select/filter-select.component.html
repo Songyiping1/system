@@ -1,6 +1,26 @@
-<select class="filter-select" (change)="change.emit($any($event.target).value)">
-  <option value="">{{ label() }}</option>
-  @for (opt of options(); track opt) {
-    <option [value]="opt">{{ opt }}</option>
+<div class="filter-select-wrap">
+  <button class="filter-trigger" [class.active]="open()" (click)="toggle($event)">
+    <span>{{ displayLabel() }}</span>
+    <svg class="arrow" [class.up]="open()" width="10" height="6" viewBox="0 0 10 6" fill="none">
+      <path d="M1 1L5 5L9 1" stroke="#999" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/>
+    </svg>
+  </button>
+  @if (open()) {
+    <div class="filter-dropdown" (click)="$event.stopPropagation()">
+      @for (opt of options(); track opt) {
+        <div
+          class="filter-option"
+          [class.selected]="selected() === opt || (!selected() && $first)"
+          (click)="select(opt)"
+        >
+          <span>{{ opt }}</span>
+          @if (selected() === opt || (!selected() && $first)) {
+            <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
+              <path d="M2.5 7L5.5 10L11.5 4" stroke="#4D7CFE" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+          }
+        </div>
+      }
+    </div>
   }
-</select>
+</div>
