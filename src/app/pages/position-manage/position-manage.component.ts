@@ -4,6 +4,7 @@ import { type PageState } from '../../shared/models/page-state';
 import { PositionApiService } from '../../api';
 import { type PositionVo } from '../../api/types/position.type';
 import { AuthService } from '../../services/auth.service';
+import { PositionAddDrawerComponent } from './position-add-drawer/position-add-drawer.component';
 
 interface PositionRow {
   id: string;
@@ -17,7 +18,7 @@ interface PositionRow {
 @Component({
   selector: 'app-position-manage',
   standalone: true,
-  imports: [PageHeaderComponent, SearchInputComponent, SplitLayoutComponent, TreeListComponent, ActionBarComponent, ButtonComponent, ModalComponent],
+  imports: [PageHeaderComponent, SearchInputComponent, SplitLayoutComponent, TreeListComponent, ActionBarComponent, ButtonComponent, ModalComponent, PositionAddDrawerComponent],
   templateUrl: './position-manage.component.html',
   styleUrl: './position-manage.component.scss',
 })
@@ -38,18 +39,20 @@ export class PositionManageComponent implements OnInit {
   contextMenuPos = signal<{ x: number; y: number } | null>(null);
   contextMenuNode = signal<TreeNode | null>(null);
 
-  // 岗位弹窗
-  showPositionModal = signal(false);
-  positionModalMode = signal<'create' | 'edit'>('create');
-  positionFormName = signal('');
+  // 岗位抽屉
+  showPositionDrawer = signal(false);
+  positionDrawerEditMode = signal(false);
   editingPositionId = signal<string | null>(null);
+  editingPositionName = signal('');
+  editingPositionDeptId = signal<string | null>(null);
+  editingPositionRoleIds = signal<string[]>([]);
 
   // 删除确认弹窗
   showDeleteModal = signal(false);
+  deletingNode = signal<TreeNode | null>(null);
 
   isLoading = computed(() => this.pageState() === 'loading');
   totalCount = computed(() => this.members().length);
-  positionModalTitle = computed(() => this.positionModalMode() === 'create' ? '新建岗位' : '编辑岗位');
 
   filteredMembers = computed(() => {
     const keyword = this.searchKeyword().trim().toLowerCase();
@@ -70,7 +73,7 @@ export class PositionManageComponent implements OnInit {
     const companyId = this.auth.currentUser()?.companyId ?? '';
     this.positionApi.listPosition({ companyId }).subscribe({
       next: (res) => {
-        const companyName = this.auth.currentUser()?.userName ?? '公司';
+        const companyName = this.auth.currentUser()?.companyName || this.auth.currentUser()?.userName || '公司';
         const items: TreeNode[] = [{
           id: 'root',
           label: companyName,
@@ -140,56 +143,47 @@ export class PositionManageComponent implements OnInit {
 
   // === 岗位 CRUD ===
   onAddPosition() {
-    this.positionModalMode.set('create');
-    this.positionFormName.set('');
+    this.positionDrawerEditMode.set(false);
     this.editingPositionId.set(null);
-    this.showPositionModal.set(true);
+    this.editingPositionName.set('');
+    this.editingPositionDeptId.set(null);
+    this.editingPositionRoleIds.set([]);
+    this.showPositionDrawer.set(true);
   }
 
   onEditPosition() {
     const node = this.contextMenuNode();
     if (!node) return;
     this.closeContextMenu();
-    this.positionModalMode.set('edit');
-    this.positionFormName.set(node.label);
+    this.positionDrawerEditMode.set(true);
     this.editingPositionId.set(node.id);
-    this.showPositionModal.set(true);
+    this.editingPositionName.set(node.label);
+    this.editingPositionDeptId.set(null);
+    this.editingPositionRoleIds.set([]);
+    this.showPositionDrawer.set(true);
+  }
+
+  onPositionDrawerSaved() {
+    this.showPositionDrawer.set(false);
+    this.loadPositionTree();
   }
 
   onDeletePosition() {
+    const node = this.contextMenuNode();
     this.closeContextMenu();
+    if (!node) return;
+    this.deletingNode.set(node);
     this.showDeleteModal.set(true);
   }
 
   onDeleteConfirmed() {
-    const node = this.contextMenuNode();
+    const node = this.deletingNode();
     if (!node) return;
     this.showDeleteModal.set(false);
+    this.deletingNode.set(null);
     const companyId = this.auth.currentUser()?.companyId ?? '';
     this.positionApi.removePosition({ id: node.id, companyId }).subscribe({
       next: () => this.loadPositionTree(),
     });
-  }
-
-  onPositionModalConfirm() {
-    const name = this.positionFormName().trim();
-    if (!name) return;
-    const companyId = this.auth.currentUser()?.companyId ?? '';
-
-    if (this.positionModalMode() === 'edit') {
-      this.positionApi.updatePosition({ id: this.editingPositionId()!, name, companyId }).subscribe({
-        next: () => {
-          this.showPositionModal.set(false);
-          this.loadPositionTree();
-        },
-      });
-    } else {
-      this.positionApi.createPosition({ name, companyId }).subscribe({
-        next: () => {
-          this.showPositionModal.set(false);
-          this.loadPositionTree();
-        },
-      });
-    }
   }
 }

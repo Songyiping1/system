@@ -68,25 +68,17 @@
   </div>
 }
 
-<!-- 新建/编辑岗位弹窗 -->
-<app-modal
-  [title]="positionModalTitle()"
-  size="sm"
-  [visible]="showPositionModal()"
-  (closed)="showPositionModal.set(false)"
-  (confirmed)="onPositionModalConfirm()"
->
-  <div class="modal-form">
-    <label class="modal-form-label">岗位名称</label>
-    <input
-      class="modal-form-input"
-      type="text"
-      placeholder="请输入岗位名称"
-      [value]="positionFormName()"
-      (input)="positionFormName.set($any($event.target).value)"
-    />
-  </div>
-</app-modal>
+<!-- 新建/编辑岗位抽屉 -->
+<app-position-add-drawer
+  [visible]="showPositionDrawer()"
+  [editMode]="positionDrawerEditMode()"
+  [editPositionId]="editingPositionId()"
+  [editName]="editingPositionName()"
+  [editDeptId]="editingPositionDeptId()"
+  [editRoleIds]="editingPositionRoleIds()"
+  (closed)="showPositionDrawer.set(false)"
+  (saved)="onPositionDrawerSaved()"
+/>
 
 <!-- 删除确认弹窗 -->
 <app-modal

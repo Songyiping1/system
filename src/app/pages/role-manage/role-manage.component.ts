@@ -1,5 +1,7 @@
 import { Component, inject, signal, computed, OnInit, HostListener } from '@angular/core';
 import { PageHeaderComponent, SearchInputComponent, SplitLayoutComponent, TreeListComponent, ModalComponent, type TreeNode } from '../../shared/components';
+import { MemberPickerModalComponent } from './member-picker-modal.component';
+import { RoleAddDrawerComponent } from './role-add-drawer/role-add-drawer.component';
 import { type PageState } from '../../shared/models/page-state';
 import { RoleApiService } from '../../api';
 import { type RoleVo } from '../../api/types';
@@ -17,7 +19,7 @@ interface RoleRow {
 @Component({
   selector: 'app-role-manage',
   standalone: true,
-  imports: [PageHeaderComponent, SearchInputComponent, SplitLayoutComponent, TreeListComponent, ModalComponent],
+  imports: [PageHeaderComponent, SearchInputComponent, SplitLayoutComponent, TreeListComponent, ModalComponent, MemberPickerModalComponent, RoleAddDrawerComponent],
   templateUrl: './role-manage.component.html',
   styleUrl: './role-manage.component.scss',
 })
@@ -32,6 +34,9 @@ export class RoleManageComponent implements OnInit {
   activeTreeId = signal('');
   activeRoleName = signal('');
   activeRoleDesc = signal('');
+  activeNodeType = signal<string>('role');
+  isActiveGroup = computed(() => this.activeNodeType() === 'group');
+  contextMenuLabel = computed(() => this.contextMenuNode()?.type === 'group' ? '分组' : '角色');
 
   members = signal<RoleRow[]>([]);
 
@@ -50,15 +55,32 @@ export class RoleManageComponent implements OnInit {
   // 新建角色弹窗
   showRoleModal = signal(false);
   roleModalMode = signal<'create' | 'edit'>('create');
+  roleFormType = signal<'group' | 'role'>('group');
   roleFormName = signal('');
   editingRoleId = signal<string | null>(null);
 
   // 删除确认弹窗
   showDeleteModal = signal(false);
+  deletingNode = signal<TreeNode | null>(null);
+
+  // 选择成员弹窗
+  showMemberPicker = signal(false);
+  pickerCompanyId = computed(() => this.auth.currentUser()?.companyId ?? '');
+
+  // 新增/编辑角色抽屉
+  showRoleDrawer = signal(false);
+  roleDrawerEditMode = signal(false);
+  roleDrawerEditId = signal<string | null>(null);
+  roleDrawerEditName = signal('');
+  roleDrawerEditDescription = signal('');
+  roleDrawerGroupId = signal<string | null>(null);
 
   isLoading = computed(() => this.pageState() === 'loading');
   totalCount = computed(() => this.members().length);
-  roleModalTitle = computed(() => this.roleModalMode() === 'create' ? '新建角色' : '编辑角色');
+  roleModalTitle = computed(() => {
+    const label = this.roleFormType() === 'group' ? '分组' : '角色';
+    return (this.roleModalMode() === 'create' ? '新建' : '编辑') + label;
+  });
 
   ngOnInit() {
     this.loadRoleTree();
@@ -75,7 +97,10 @@ export class RoleManageComponent implements OnInit {
         if (firstLeaf) {
           this.activeTreeId.set(firstLeaf.id);
           this.activeRoleName.set(firstLeaf.label);
-          this.loadRoleUsers(firstLeaf.id);
+          this.activeNodeType.set(firstLeaf.type ?? 'role');
+          if ((firstLeaf.type ?? 'role') !== 'group') {
+            this.loadRoleUsers(firstLeaf.id);
+          }
         }
         this.pageState.set(items.length > 0 ? 'normal' : 'empty');
       },
@@ -105,8 +130,15 @@ export class RoleManageComponent implements OnInit {
   }
 
   onTreeSelect(node: TreeNode) {
+    if (node.type === 'group') {
+      // 点击分组：仅切换展开/收起，不切换右侧内容，也不高亮
+      node.expanded = !node.expanded;
+      this.treeItems.set([...this.treeItems()]);
+      return;
+    }
     this.activeTreeId.set(node.id);
     this.activeRoleName.set(node.label);
+    this.activeNodeType.set(node.type ?? 'role');
     this.loadRoleUsers(node.id);
   }
 
@@ -132,6 +164,26 @@ export class RoleManageComponent implements OnInit {
     return this.selectedIds().has(id);
   }
 
+  onBatchRemove() {
+    const ids = Array.from(this.selectedIds());
+    if (ids.length === 0) return;
+    this.roleApi.unbindRoleUser({ roleId: this.activeTreeId(), userIds: ids }).subscribe({
+      next: () => this.loadRoleUsers(this.activeTreeId()),
+    });
+  }
+
+  onAddMember() {
+    this.showMemberPicker.set(true);
+  }
+
+  onMemberPickerConfirmed(users: { id: string; name: string }[]) {
+    this.showMemberPicker.set(false);
+    if (users.length === 0) return;
+    this.roleApi.bindRoleUser({ roleId: this.activeTreeId(), userIds: users.map(u => u.id) }).subscribe({
+      next: () => this.loadRoleUsers(this.activeTreeId()),
+    });
+  }
+
   // === 右键菜单 ===
   onTreeContextMenu(event: { node: TreeNode; event: MouseEvent }) {
     this.contextMenuNode.set(event.node);
@@ -151,32 +203,65 @@ export class RoleManageComponent implements OnInit {
   }
 
   // === 角色 CRUD ===
+  // 当前新建角色所属分组ID（仅 type='role' 时使用）
+  createRoleGroupId = signal<string | null>(null);
+
   onAddRole() {
     this.roleModalMode.set('create');
+    this.roleFormType.set('group');
     this.roleFormName.set('');
     this.editingRoleId.set(null);
+    this.createRoleGroupId.set(null);
     this.showRoleModal.set(true);
+  }
+
+  onAddRoleUnderGroup(group: TreeNode) {
+    this.roleDrawerEditMode.set(false);
+    this.roleDrawerEditId.set(null);
+    this.roleDrawerEditName.set('');
+    this.roleDrawerEditDescription.set('');
+    this.roleDrawerGroupId.set(group.id);
+    this.showRoleDrawer.set(true);
+  }
+
+  onRoleDrawerSaved() {
+    this.showRoleDrawer.set(false);
+    this.loadRoleTree();
   }
 
   onEditRole() {
     const node = this.contextMenuNode();
     if (!node) return;
     this.closeContextMenu();
-    this.roleModalMode.set('edit');
-    this.roleFormName.set(node.label);
-    this.editingRoleId.set(node.id);
-    this.showRoleModal.set(true);
+    if (node.type === 'group') {
+      this.roleModalMode.set('edit');
+      this.roleFormType.set('group');
+      this.roleFormName.set(node.label);
+      this.editingRoleId.set(node.id);
+      this.showRoleModal.set(true);
+    } else {
+      this.roleDrawerEditMode.set(true);
+      this.roleDrawerEditId.set(node.id);
+      this.roleDrawerEditName.set(node.label);
+      this.roleDrawerEditDescription.set('');
+      this.roleDrawerGroupId.set(null);
+      this.showRoleDrawer.set(true);
+    }
   }
 
   onDeleteRole() {
+    const node = this.contextMenuNode();
     this.closeContextMenu();
+    if (!node) return;
+    this.deletingNode.set(node);
     this.showDeleteModal.set(true);
   }
 
   onDeleteConfirmed() {
-    const node = this.contextMenuNode();
+    const node = this.deletingNode();
     if (!node) return;
     this.showDeleteModal.set(false);
+    this.deletingNode.set(null);
     const companyId = this.auth.currentUser()?.companyId ?? '';
     this.roleApi.removeRole({ id: node.id, companyId }).subscribe({
       next: () => this.loadRoleTree(),
@@ -188,15 +273,18 @@ export class RoleManageComponent implements OnInit {
     if (!name) return;
     const companyId = this.auth.currentUser()?.companyId ?? '';
 
+    const type = this.roleFormType();
+
     if (this.roleModalMode() === 'edit') {
-      this.roleApi.updateRole({ id: this.editingRoleId()!, name, companyId }).subscribe({
+      this.roleApi.updateRole({ id: this.editingRoleId()!, name, companyId, type }).subscribe({
         next: () => {
           this.showRoleModal.set(false);
           this.loadRoleTree();
         },
       });
     } else {
-      this.roleApi.createRole({ name, companyId }).subscribe({
+      const groupId = this.createRoleGroupId() ?? undefined;
+      this.roleApi.createRole({ name, companyId, type, groupId }).subscribe({
         next: () => {
           this.showRoleModal.set(false);
           this.loadRoleTree();
@@ -209,6 +297,7 @@ export class RoleManageComponent implements OnInit {
     return roles.map(r => ({
       id: r.id ?? '',
       label: r.name ?? '',
+      type: r.type,
       expanded: true,
       children: r.children?.length ? this.convertRoleTree(r.children) : undefined,
     }));

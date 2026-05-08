@@ -128,6 +128,14 @@ this.showDeleteModal.set(true);
 <app-button label="更多" (click)="toggleMenu()" />
 ```
 
+### stopPropagation 检查
+
+写 `stopPropagation` 前必须确认是否会破坏外层 `document:click` 监听 → 详见 `~/.claude/harness/stop-propagation-checklist.md`
+
+### SCSS Token 校验
+
+写 SCSS 引用 `$xxx` 变量前必须 grep `_tokens.scss` 确认存在 → 详见 `~/.claude/harness/scss-token-check.md`
+
 ### 接口方法校验
 
 - `openapi.json` 中标注的 HTTP method **可能与后端实际不一致**，以实际调用报错为准
@@ -142,3 +150,29 @@ this.showDeleteModal.set(true);
 2. 逐个截图确认交互状态
 3. 列出所有 TODO / 空方法，对照设计稿逐个实现
 4. **禁止**只看一个设计稿页面就开始写代码
+
+## 工作流元规则
+
+### 1. 任务超时复盘
+
+单个任务执行超过 30 分钟时，必须立即停下来复盘：
+
+- 列出本次任务最耗时的工作项（按时间倒序）
+- 分析哪些是重复性 / 机械性操作
+- 给出哪些工作项应该沉淀为 skill（说明 skill 名称和触发场景）
+- 复盘结果输出给用户确认后再继续
+
+### 2. 用户输入归档与跨项目错误防御
+
+- 每次收到用户输入，追加写入 `/workspace/rust/logs/{YYYY-MM-DD}.jsonl`，每行一条 JSON：`{"time": ISO8601, "cwd": 当前目录, "input": 原文}`
+- 每次**开始新任务时**，先读取该文件（含历史日期文件）检查是否出现过同类错误 / 同类纠正
+- 如果命中已有错误：立即发起 brainstorm，把结论写入 **harness 文档**（跨项目共享位置，如 `~/.claude/harness/*.md`），确保跨项目、跨目录不再重犯同一错误
+- harness 文档应可被任意项目的 CLAUDE.md 引用
+
+### 3. 每日早安复盘
+
+每天早上用户第一次说"你好"时，自动触发：
+
+- 读取昨天的 `/workspace/rust/logs/{昨天}.jsonl` 沟通记录
+- 复盘昨天的工作内容、卡点、重复纠正
+- 提出**具体可执行**的工作流程优化建议（不要泛泛而谈），例如：新增哪个 skill、修改哪条规范、调整哪个 hook

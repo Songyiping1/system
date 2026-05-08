@@ -1,5 +1,5 @@
 import { Component, inject, signal, computed, OnInit } from '@angular/core';
-import { PageHeaderComponent, SearchInputComponent, ActionBarComponent, ButtonComponent, ModalComponent } from '../../shared/components';
+import { PageHeaderComponent, SearchInputComponent, ButtonComponent, ModalComponent } from '../../shared/components';
 import { type PageState } from '../../shared/models/page-state';
 import { CompanyApiService, MenuApiService } from '../../api';
 import { type TreeNodeCompanyVo, type CompanyVo } from '../../api/types/company.type';
@@ -31,7 +31,7 @@ export interface AssignRow {
 @Component({
   selector: 'app-menu-assign',
   standalone: true,
-  imports: [PageHeaderComponent, SearchInputComponent, ActionBarComponent, ButtonComponent, ModalComponent],
+  imports: [PageHeaderComponent, SearchInputComponent, ButtonComponent, ModalComponent],
   templateUrl: './menu-assign.component.html',
   styleUrl: './menu-assign.component.scss',
 })

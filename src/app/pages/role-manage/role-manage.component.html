@@ -15,12 +15,21 @@
         [activeId]="activeTreeId()"
         (select)="onTreeSelect($event)"
         (contextMenu)="onTreeContextMenu($event)"
+        (addAction)="onAddRoleUnderGroup($event)"
       />
     </ng-container>
     <ng-container right>
+      @if (!isActiveGroup()) {
       <div class="panel-header">
         <span class="panel-title">{{ activeRoleName() }}</span>
         <span class="panel-note">该角色下的成员将自动获得对应的管理权限</span>
+      </div>
+      <div class="panel-actions">
+        <app-search-input placeholder="搜索" />
+        <div class="panel-actions-right">
+          <button class="btn-outline" type="button" [disabled]="selectedIds().size === 0" (click)="onBatchRemove()">批量删除</button>
+          <button class="btn-primary" type="button" (click)="onAddMember()">+ 添加人员</button>
+        </div>
       </div>
       @if (isLoading()) {
         <div class="state-loading">加载中...</div>
@@ -60,6 +69,7 @@
           <div class="table-footer">总人数 {{ totalCount() }}</div>
         </div>
       }
+      }
     </ng-container>
   </app-split-layout>
 </div>
@@ -67,8 +77,8 @@
 <!-- 右键菜单 -->
 @if (contextMenuPos()) {
   <div class="context-menu" [style.left.px]="contextMenuPos()!.x" [style.top.px]="contextMenuPos()!.y" (click)="$event.stopPropagation()">
-    <div class="context-menu-item" (click)="onEditRole()">编辑角色</div>
-    <div class="context-menu-item danger" (click)="onDeleteRole()">删除角色</div>
+    <div class="context-menu-item" (click)="onEditRole()">编辑{{ contextMenuLabel() }}</div>
+    <div class="context-menu-item danger" (click)="onDeleteRole()">删除{{ contextMenuLabel() }}</div>
   </div>
 }
 
@@ -81,16 +91,36 @@
   (confirmed)="onRoleModalConfirm()"
 >
   <div class="modal-form">
-    <label class="modal-form-label">角色名称</label>
+    <label class="modal-form-label">{{ roleFormType() === 'group' ? '分组名称' : '角色名称' }}</label>
     <input
       class="modal-form-input"
       type="text"
-      placeholder="请输入角色名称"
+      [placeholder]="roleFormType() === 'group' ? '请输入分组名称' : '请输入角色名称'"
       [value]="roleFormName()"
       (input)="roleFormName.set($any($event.target).value)"
     />
   </div>
 </app-modal>
+
+<!-- 新增/编辑角色抽屉 -->
+<app-role-add-drawer
+  [visible]="showRoleDrawer()"
+  [editMode]="roleDrawerEditMode()"
+  [editRoleId]="roleDrawerEditId()"
+  [editName]="roleDrawerEditName()"
+  [editDescription]="roleDrawerEditDescription()"
+  [groupId]="roleDrawerGroupId()"
+  (closed)="showRoleDrawer.set(false)"
+  (saved)="onRoleDrawerSaved()"
+/>
+
+<!-- 选择成员弹窗 -->
+<app-member-picker-modal
+  [visible]="showMemberPicker()"
+  [companyId]="pickerCompanyId()"
+  (closed)="showMemberPicker.set(false)"
+  (confirmed)="onMemberPickerConfirmed($event)"
+/>
 
 <!-- 删除确认弹窗 -->
 <app-modal

@@ -36,6 +36,57 @@
   color: $text-2;
 }
 
+.panel-actions {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-top: 16px;
+
+  app-search-input {
+    width: 258px;
+  }
+}
+
+.panel-actions-right {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.btn-outline,
+.btn-primary {
+  height: 36px;
+  padding: 0 16px;
+  border-radius: $radius-md;
+  font-size: $font-size-14;
+  font-family: $font-family;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.btn-outline {
+  background: $white;
+  border: 1px solid $border;
+  color: $text-1;
+
+  &:hover {
+    background: $table-header-bg;
+  }
+}
+
+.btn-primary {
+  background: $primary;
+  border: 1px solid $primary;
+  color: $white;
+
+  &:hover {
+    opacity: 0.9;
+  }
+}
+
 .table-wrap {
   flex: 1;
   overflow: auto;

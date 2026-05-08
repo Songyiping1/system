@@ -10,6 +10,7 @@ export interface TreeNode {
   parentId?: string;
   uri?: string;
   parentUri?: string;
+  type?: string;
 }
 
 @Component({
@@ -24,6 +25,12 @@ export class TreeListComponent {
   activeId = input('');
   select = output<TreeNode>();
   contextMenu = output<{ node: TreeNode; event: MouseEvent }>();
+  addAction = output<TreeNode>();
+
+  onAddAction(node: TreeNode, event: MouseEvent) {
+    event.stopPropagation();
+    this.addAction.emit(node);
+  }
 
   onSelect(node: TreeNode) {
     this.select.emit(node);

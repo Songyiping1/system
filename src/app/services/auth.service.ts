@@ -11,6 +11,7 @@ export interface User {
   name: string;
   role: Role;
   companyId: string;
+  companyName: string;
 }
 
 @Injectable({ providedIn: 'root' })
@@ -32,6 +33,7 @@ export class AuthService {
           name: res.name,
           role: res.roles?.includes('Root') ? 'admin' : 'user',
           companyId: res.companyId,
+          companyName: '',
         });
       }),
     );
@@ -41,6 +43,13 @@ export class AuthService {
     localStorage.removeItem('cookieId');
     this.currentUser.set(null);
     this.router.navigate(['/login']);
+  }
+
+  setCompanyName(name: string) {
+    const user = this.currentUser();
+    if (user && !user.companyName) {
+      this.currentUser.set({ ...user, companyName: name });
+    }
   }
 
   getHomePath(): string {

@@ -160,6 +160,9 @@ export class MemberManageComponent implements OnInit {
     const companyId = this.auth.currentUser()?.companyId ?? '';
     this.organizeApi.loadOrganize({ companyId }).subscribe({
       next: (res) => {
+        if (res.length > 0 && res[0].name) {
+          this.auth.setCompanyName(res[0].name);
+        }
         const items = this.convertOrgTree(res);
         this.treeItems.set(items);
         if (items.length > 0) {

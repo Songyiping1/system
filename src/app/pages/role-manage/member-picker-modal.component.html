@@ -1,0 +1,90 @@
+<app-modal
+  title="选择成员"
+  size="lg"
+  [radius]="16"
+  [visible]="visible()"
+  [showFooter]="false"
+  (closed)="onClose()"
+>
+  <div class="picker-body">
+    <!-- 左侧：通讯录 -->
+    <div class="picker-left">
+      <div class="search-box">
+        <svg width="12" height="12" viewBox="0 0 12 12" fill="none">
+          <circle cx="5" cy="5" r="3.5" stroke="#999" stroke-width="1"/>
+          <path d="M8 8L11 11" stroke="#999" stroke-width="1" stroke-linecap="round"/>
+        </svg>
+        <input
+          type="text"
+          placeholder="搜索联系人"
+          [value]="keyword()"
+          (input)="keyword.set($any($event.target).value)"
+        />
+      </div>
+
+      <!-- 面包屑 -->
+      <div class="crumbs">
+        <span class="crumb-item" [class.active]="crumbs().length === 0" (click)="goToCrumb(-1)">通讯录</span>
+        @for (c of crumbs(); track c.id; let i = $index) {
+          <span class="crumb-sep">›</span>
+          <span class="crumb-item" [class.active]="i === crumbs().length - 1" (click)="goToCrumb(i)">{{ c.name }}</span>
+        }
+      </div>
+
+      <div class="list">
+        @if (filteredMembers().length > 0) {
+          <label class="list-row">
+            <input type="checkbox" class="cb" [checked]="allChecked()" (change)="toggleAll()" />
+            <span class="list-name strong">全选</span>
+          </label>
+        }
+
+        <!-- 部门 -->
+        @for (d of filteredChildren(); track d.id) {
+          <div class="list-row" (click)="enterDept(d)">
+            <span class="dept-icon">
+              <svg width="12" height="12" viewBox="0 0 12 12" fill="none">
+                <rect x="1" y="2" width="10" height="8" rx="1" stroke="white" stroke-width="1"/>
+              </svg>
+            </span>
+            <span class="list-name strong">{{ d.name }}</span>
+            <span class="chevron">›</span>
+          </div>
+        }
+
+        <!-- 成员 -->
+        @for (u of filteredMembers(); track u.userId) {
+          <label class="list-row">
+            <input type="checkbox" class="cb" [checked]="isUserChecked(u)" (change)="toggleUser(u)" />
+            <span class="avatar">{{ initialOf(u.name ?? u.userName ?? '') }}</span>
+            <span class="list-name strong">{{ u.name ?? u.userName }}</span>
+          </label>
+        }
+
+        @if (filteredChildren().length === 0 && filteredMembers().length === 0) {
+          <div class="empty">暂无数据</div>
+        }
+      </div>
+    </div>
+
+    <!-- 右侧：已选 -->
+    <div class="picker-right">
+      <div class="picker-right-content">
+        <div class="selected-title">已选择（ {{ selectedCount() }} 人）</div>
+        <div class="chips">
+          @for (s of selectedList(); track s.id) {
+            <span class="chip">
+              <span class="chip-avatar">{{ initialOf(s.name) }}</span>
+              <span class="chip-name">{{ s.name }}</span>
+              <span class="chip-close" (click)="removeSelected(s.id)">×</span>
+            </span>
+          }
+        </div>
+      </div>
+      <div class="picker-footer">
+        <button class="btn-cancel" type="button" (click)="onClose()">取消</button>
+        <button class="btn-confirm" type="button" (click)="onConfirm()">确定</button>
+      </div>
+    </div>
+  </div>
+</app-modal>
