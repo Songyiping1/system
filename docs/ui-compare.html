@@ -1,0 +1,248 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>组件库风格对比 · Zard UI vs Taiga UI</title>
+<style>
+  /* ===== 你的设计 tokens ===== */
+  :root {
+    --primary: #4857e2;
+    --primary-bg: rgba(95, 111, 255, 0.08);
+    --danger: #e11212;
+    --text-1: #333; --text-2: #999; --text-3: #cfcfcf;
+    --border: #e6e6e6; --table-header-bg: #f8f8f8;
+    --badge-bg: #eaecff; --badge-text: #4857e2;
+    --ok: #22c55e; --warn: #f59e0b;
+    --radius-md: 8px; --radius-sm: 4px;
+    --font: 'PingFang SC', -apple-system, 'Segoe UI', sans-serif;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: var(--font); background: #eef1f6; color: var(--text-1); padding: 24px; }
+  h1.page-title { font-size: 20px; margin-bottom: 4px; }
+  p.page-sub { color: var(--text-2); font-size: 13px; margin-bottom: 20px; }
+
+  .compare { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; align-items: start; }
+  @media (max-width: 1100px) { .compare { grid-template-columns: 1fr; } }
+
+  .lib-card { background: #fff; border-radius: 14px; overflow: hidden; box-shadow: 0 4px 24px rgba(0,0,0,.06); }
+  .lib-head { padding: 14px 18px; display: flex; align-items: center; gap: 10px; border-bottom: 1px solid var(--border); }
+  .lib-dot { width: 10px; height: 10px; border-radius: 50%; }
+  .lib-name { font-weight: 600; font-size: 15px; }
+  .lib-tag { margin-left: auto; font-size: 11px; color: var(--text-2); }
+  .lib-body { padding: 18px; }
+
+  /* 共用：页面头部 */
+  .ph { display: flex; align-items: center; margin-bottom: 14px; }
+  .ph .t { font-size: 15px; font-weight: 600; }
+  .ph .d { font-size: 12px; color: var(--text-2); margin-top: 2px; }
+  .ph .spacer { flex: 1; }
+
+  /* 共用：搜索框 + 按钮（两种风格不同样式） */
+  .toolbar { display: flex; gap: 8px; margin-bottom: 14px; align-items: center; }
+  .toolbar .grow { flex: 1; }
+
+  /* 共用：表格 */
+  table { width: 100%; border-collapse: collapse; font-size: 13px; }
+  th { text-align: left; color: var(--text-2); font-weight: 400; font-size: 12px; }
+  td .name { font-weight: 600; }
+  td .sub { color: var(--text-2); font-size: 11px; }
+  .avatar { width: 30px; height: 30px; border-radius: 50%; display: inline-flex; align-items: center; justify-content: center; color: #fff; font-size: 12px; font-weight: 600; vertical-align: middle; margin-right: 8px; }
+  .cell-user { display: flex; align-items: center; }
+
+  /* 徽章 */
+  .badge { display: inline-flex; align-items: center; gap: 4px; font-size: 11px; padding: 2px 8px; }
+  .dot { width: 6px; height: 6px; border-radius: 50%; }
+
+  /* ============================================================= */
+  /* 风格 A：Zard UI（shadcn 风）—— 干净、低饱和、细边、克制圆角、subtle shadow */
+  /* ============================================================= */
+  .zard { --z-bg:#fff; --z-muted:#f4f4f5; --z-border:#e4e4e7; --z-ring: rgba(72,87,226,.35); }
+  .zard .ph .t { letter-spacing: -.2px; }
+  .zard .z-input {
+    height: 36px; border: 1px solid var(--z-border); border-radius: var(--radius-md);
+    padding: 0 12px 0 32px; font-size: 13px; width: 100%; outline: none; background: var(--z-bg);
+    transition: box-shadow .15s, border-color .15s;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='15' height='15' viewBox='0 0 24 24' fill='none' stroke='%23999' stroke-width='2'%3E%3Ccircle cx='11' cy='11' r='8'/%3E%3Cpath d='m21 21-4.3-4.3'/%3E%3C/svg%3E");
+    background-repeat: no-repeat; background-position: 11px center;
+  }
+  .zard .z-input:focus { border-color: var(--primary); box-shadow: 0 0 0 3px var(--z-ring); }
+  .zard .z-btn {
+    height: 36px; border-radius: var(--radius-md); padding: 0 14px; font-size: 13px; font-weight: 500;
+    border: 1px solid transparent; cursor: pointer; display: inline-flex; align-items: center; gap: 6px;
+    transition: transform .08s, background .15s, box-shadow .15s;
+  }
+  .zard .z-btn:active { transform: translateY(1px); }
+  .zard .z-btn.primary { background: var(--primary); color: #fff; box-shadow: 0 1px 2px rgba(72,87,226,.3); }
+  .zard .z-btn.primary:hover { background: #3a48c9; }
+  .zard .z-btn.outline { background: #fff; border-color: var(--z-border); color: var(--text-1); }
+  .zard .z-btn.outline:hover { background: var(--z-muted); }
+  .zard .z-btn.ghost { background: transparent; color: var(--text-2); padding: 0 8px; }
+  .zard .z-btn.ghost:hover { background: var(--z-muted); color: var(--text-1); }
+  .zard table th { padding: 10px 12px; border-bottom: 1px solid var(--z-border); }
+  .zard table td { padding: 12px; border-bottom: 1px solid var(--z-muted); }
+  .zard table tbody tr { transition: background .12s; }
+  .zard table tbody tr:hover { background: var(--z-muted); }
+  .zard .avatar { border-radius: var(--radius-md); } /* shadcn 偏方圆角头像 */
+  .zard .badge { border-radius: 6px; border: 1px solid transparent; font-weight: 500; }
+  .zard .badge.ok { background: rgba(34,197,94,.1); color: #16a34a; }
+  .zard .badge.warn { background: rgba(245,158,11,.12); color: #d97706; }
+  .zard .badge.muted { background: var(--z-muted); color: var(--text-2); }
+
+  /* ============================================================= */
+  /* 风格 B：Taiga UI —— 更饱满、大圆角、柔和阴影、轻盈、pill 形 */
+  /* ============================================================= */
+  .taiga { --t-bg:#fff; --t-soft:#f6f7fb; --t-border:#eceef5; }
+  .taiga .t-input {
+    height: 40px; border: 1px solid var(--t-border); border-radius: 14px;
+    padding: 0 14px 0 38px; font-size: 13px; width: 100%; outline: none; background: var(--t-soft);
+    transition: box-shadow .2s, background .2s;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%23999' stroke-width='2'%3E%3Ccircle cx='11' cy='11' r='8'/%3E%3Cpath d='m21 21-4.3-4.3'/%3E%3C/svg%3E");
+    background-repeat: no-repeat; background-position: 14px center;
+  }
+  .taiga .t-input:focus { background: #fff; box-shadow: 0 0 0 4px var(--primary-bg); }
+  .taiga .t-btn {
+    height: 40px; border-radius: 999px; padding: 0 20px; font-size: 13px; font-weight: 600;
+    border: none; cursor: pointer; display: inline-flex; align-items: center; gap: 6px;
+    transition: transform .12s cubic-bezier(.34,1.56,.64,1), box-shadow .2s, background .2s;
+  }
+  .taiga .t-btn:hover { transform: translateY(-1px); }
+  .taiga .t-btn:active { transform: translateY(0); }
+  .taiga .t-btn.primary { background: var(--primary); color: #fff; box-shadow: 0 6px 16px rgba(72,87,226,.3); }
+  .taiga .t-btn.primary:hover { box-shadow: 0 8px 22px rgba(72,87,226,.42); }
+  .taiga .t-btn.outline { background: var(--t-soft); color: var(--primary); }
+  .taiga .t-btn.outline:hover { background: #edf0fb; }
+  .taiga .t-btn.ghost { background: transparent; color: var(--text-2); padding: 0 12px; }
+  .taiga .t-btn.ghost:hover { background: var(--t-soft); color: var(--text-1); }
+  .taiga table { border-spacing: 0 6px; border-collapse: separate; }
+  .taiga table th { padding: 6px 14px; }
+  .taiga table tbody tr { background: var(--t-soft); transition: box-shadow .2s, transform .15s; }
+  .taiga table tbody tr:hover { box-shadow: 0 4px 16px rgba(0,0,0,.07); transform: translateY(-1px); }
+  .taiga table td { padding: 14px; }
+  .taiga table td:first-child { border-radius: 14px 0 0 14px; }
+  .taiga table td:last-child { border-radius: 0 14px 14px 0; }
+  .taiga .avatar { border-radius: 50%; }
+  .taiga .badge { border-radius: 999px; font-weight: 600; }
+  .taiga .badge.ok { background: rgba(34,197,94,.14); color: #15a34a; }
+  .taiga .badge.warn { background: rgba(245,158,11,.16); color: #c2740a; }
+  .taiga .badge.muted { background: #eceef5; color: var(--text-2); }
+
+  /* 卡片头标识色 */
+  .head-zard .lib-dot { background:#18181b; }
+  .head-taiga .lib-dot { background: var(--primary); }
+
+  .note { margin-top: 24px; font-size: 12px; color: var(--text-2); line-height: 1.8; background:#fff; border-radius:12px; padding:16px 18px; }
+  .note b { color: var(--text-1); }
+  kbd { background:#f4f4f5; border:1px solid #e4e4e7; border-radius:4px; padding:1px 5px; font-size:11px; }
+</style>
+</head>
+<body>
+  <h1 class="page-title">组件库风格对比</h1>
+  <p class="page-sub">同一个「成员管理」页面 · 左 Zard UI（shadcn 风）· 右 Taiga UI · 均使用你的设计 tokens（主色 #4857e2）。鼠标悬停看微交互。</p>
+
+  <div class="compare">
+
+    <!-- ============ Zard UI ============ -->
+    <div class="lib-card zard">
+      <div class="lib-head head-zard">
+        <span class="lib-dot"></span>
+        <span class="lib-name">Zard UI</span>
+        <span class="lib-tag">shadcn 风 · 克制 · 细边 · 方圆角</span>
+      </div>
+      <div class="lib-body">
+        <div class="ph">
+          <div>
+            <div class="t">成员管理</div>
+            <div class="d">管理公司成员、部门与岗位</div>
+          </div>
+          <div class="spacer"></div>
+        </div>
+        <div class="toolbar">
+          <div class="grow"><input class="z-input" placeholder="搜索成员姓名或手机号" /></div>
+          <button class="z-btn ghost">筛选</button>
+          <button class="z-btn outline">导入</button>
+          <button class="z-btn primary">+ 添加成员</button>
+        </div>
+        <table>
+          <thead><tr><th>成员</th><th>部门</th><th>岗位</th><th>状态</th><th></th></tr></thead>
+          <tbody>
+            <tr>
+              <td><div class="cell-user"><span class="avatar" style="background:#4857e2">张</span><div><div class="name">张伟</div><div class="sub">138****2048</div></div></div></td>
+              <td>研发部</td><td>后端工程师</td>
+              <td><span class="badge ok"><span class="dot" style="background:#16a34a"></span>在职</span></td>
+              <td><button class="z-btn ghost">⋯</button></td>
+            </tr>
+            <tr>
+              <td><div class="cell-user"><span class="avatar" style="background:#0ea5e9">李</span><div><div class="name">李娜</div><div class="sub">139****7712</div></div></div></td>
+              <td>市场部</td><td>市场经理</td>
+              <td><span class="badge warn"><span class="dot" style="background:#d97706"></span>待入职</span></td>
+              <td><button class="z-btn ghost">⋯</button></td>
+            </tr>
+            <tr>
+              <td><div class="cell-user"><span class="avatar" style="background:#94a3b8">王</span><div><div class="name">王强</div><div class="sub">137****3390</div></div></div></td>
+              <td>研发部</td><td>—</td>
+              <td><span class="badge muted">已离职</span></td>
+              <td><button class="z-btn ghost">⋯</button></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- ============ Taiga UI ============ -->
+    <div class="lib-card taiga">
+      <div class="lib-head head-taiga">
+        <span class="lib-dot"></span>
+        <span class="lib-name">Taiga UI</span>
+        <span class="lib-tag">轻盈 · 大圆角 · pill 按钮 · 悬浮卡片行</span>
+      </div>
+      <div class="lib-body">
+        <div class="ph">
+          <div>
+            <div class="t">成员管理</div>
+            <div class="d">管理公司成员、部门与岗位</div>
+          </div>
+          <div class="spacer"></div>
+        </div>
+        <div class="toolbar">
+          <div class="grow"><input class="t-input" placeholder="搜索成员姓名或手机号" /></div>
+          <button class="t-btn ghost">筛选</button>
+          <button class="t-btn outline">导入</button>
+          <button class="t-btn primary">+ 添加成员</button>
+        </div>
+        <table>
+          <thead><tr><th>成员</th><th>部门</th><th>岗位</th><th>状态</th><th></th></tr></thead>
+          <tbody>
+            <tr>
+              <td><div class="cell-user"><span class="avatar" style="background:#4857e2">张</span><div><div class="name">张伟</div><div class="sub">138****2048</div></div></div></td>
+              <td>研发部</td><td>后端工程师</td>
+              <td><span class="badge ok"><span class="dot" style="background:#15a34a"></span>在职</span></td>
+              <td><button class="t-btn ghost">⋯</button></td>
+            </tr>
+            <tr>
+              <td><div class="cell-user"><span class="avatar" style="background:#0ea5e9">李</span><div><div class="name">李娜</div><div class="sub">139****7712</div></div></div></td>
+              <td>市场部</td><td>市场经理</td>
+              <td><span class="badge warn"><span class="dot" style="background:#c2740a"></span>待入职</span></td>
+              <td><button class="t-btn ghost">⋯</button></td>
+            </tr>
+            <tr>
+              <td><div class="cell-user"><span class="avatar" style="background:#94a3b8">王</span><div><div class="name">王强</div><div class="sub">137****3390</div></div></div></td>
+              <td>研发部</td><td>—</td>
+              <td><span class="badge muted">已离职</span></td>
+              <td><button class="t-btn ghost">⋯</button></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+  </div>
+
+  <div class="note">
+    <b>怎么看：</b><br>
+    · <b>Zard UI（左）</b>—— shadcn 风格：细边框、克制的 8px 圆角、方圆角头像、subtle 阴影、hover 灰底高亮。偏「冷静、专业、信息密度高」，适合数据多的中后台。<br>
+    · <b>Taiga UI（右）</b>—— 轻盈风格：大圆角、pill 胶囊按钮、行卡片化（行间留白 + hover 上浮阴影）、弹性动画。偏「现代、活泼、呼吸感强」。<br><br>
+    <b>注意：</b>这是用纯 HTML/CSS 高保真还原两个库的<b>视觉语言</b>，方便你快速对比风格；真实接入时是 Angular 组件。两者都能对齐你的设计 tokens（主色、圆角、字体）。
+  </div>
+</body>
+</html>
