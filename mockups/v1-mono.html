@@ -1,0 +1,174 @@
+<!doctype html>
+<html lang="zh-CN"><head><meta charset="utf-8"/><meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>成员 · V1 冷工具</title>
+<style>
+/* V1 — 冷工具感(Linear/Stripe):近无彩、发丝边框代替阴影、小圆角、信息密 */
+:root{
+  --bg:#ffffff; --canvas:#fbfbfb; --panel:#fcfcfc;
+  --ink:#18181b; --ink2:#52525b; --ink3:#a1a1aa;
+  --line:#e8e8ea; --line2:#ededef;
+  --accent:#18181b;             /* 强调=墨黑,只用在主按钮/选中 */
+  --ok:#16a34a; --warn:#b45309; --off:#a1a1aa;
+  --r:6px; --font:'PingFang SC',-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:var(--font);color:var(--ink);background:var(--canvas);-webkit-font-smoothing:antialiased;font-size:13px}
+.app{display:grid;grid-template-columns:56px 220px 1fr;height:100vh;overflow:hidden}
+/* rail */
+.rail{display:flex;flex-direction:column;align-items:center;background:var(--bg);border-right:1px solid var(--line);padding:12px 0}
+.logo{width:30px;height:30px;border-radius:7px;background:var(--ink);color:#fff;display:grid;place-items:center;font-weight:700;font-size:15px}
+.rnav{display:flex;flex-direction:column;gap:2px;margin-top:14px}
+.ri{width:36px;height:36px;display:grid;place-items:center;border:none;background:transparent;border-radius:7px;color:var(--ink3);cursor:pointer}
+.ri:hover{background:#f4f4f5;color:var(--ink)}
+.ri.on{background:#f4f4f5;color:var(--ink)}
+.rsp{flex:1}
+.rme{width:30px;height:30px;border-radius:7px;background:#f0f0f1;color:var(--ink2);display:grid;place-items:center;font-weight:600;font-size:12px;border:1px solid var(--line)}
+/* nav */
+.nav{background:var(--panel);border-right:1px solid var(--line);display:flex;flex-direction:column;overflow-y:auto}
+.search{display:flex;align-items:center;gap:7px;margin:12px 12px 8px;padding:0 10px;height:32px;background:var(--bg);border:1px solid var(--line);border-radius:var(--r);color:var(--ink3)}
+.search input{flex:1;border:none;outline:none;background:transparent;font-size:12.5px;color:var(--ink);font-family:var(--font)}
+.cosw{margin:0 12px 6px;padding:8px 10px;display:flex;align-items:center;gap:9px;border:1px solid var(--line);border-radius:var(--r);background:var(--bg);cursor:pointer}
+.cosw:hover{border-color:#d4d4d8}
+.colg{width:26px;height:26px;border-radius:5px;background:var(--ink);color:#fff;display:grid;place-items:center;font-weight:700;font-size:12px;flex:none}
+.con{font-size:13px;font-weight:600}.cos{font-size:11px;color:var(--ink3)}
+.cosw .cv{margin-left:auto;color:var(--ink3)}
+.ng{padding:6px 12px}.ngt{font-size:11px;font-weight:600;letter-spacing:.3px;color:var(--ink3);padding:8px 8px 6px;text-transform:uppercase}
+.ni{display:flex;align-items:center;gap:9px;height:32px;padding:0 8px;border-radius:var(--r);color:var(--ink2);text-decoration:none;cursor:pointer}
+.ni:hover{background:#f1f1f2;color:var(--ink)}
+.ni.on{background:#ececee;color:var(--ink);font-weight:600}
+.ni .ic{width:15px;height:15px;color:var(--ink3)}.ni.on .ic{color:var(--ink)}
+.ni .ct{margin-left:auto;font-size:11px;color:var(--ink3)}
+/* main */
+.main{display:grid;grid-template-columns:1fr 340px;background:var(--canvas);min-width:0}
+.lp{display:flex;flex-direction:column;min-width:0;border-right:1px solid var(--line)}
+.tb{display:flex;align-items:center;justify-content:space-between;padding:16px 20px 0}
+.tb h1{font-size:17px;font-weight:700;letter-spacing:-.2px}
+.crumb{margin-top:4px;font-size:12px;color:var(--ink3)}
+.tba{display:flex;gap:8px}
+.ib{width:32px;height:32px;display:grid;place-items:center;border:1px solid var(--line);background:var(--bg);border-radius:var(--r);color:var(--ink2);cursor:pointer}
+.ib:hover{border-color:#d4d4d8;color:var(--ink)}
+.bp{height:32px;padding:0 13px;display:inline-flex;align-items:center;gap:6px;border:none;border-radius:var(--r);background:var(--ink);color:#fff;font-size:12.5px;font-weight:600;cursor:pointer;font-family:var(--font)}
+.bp:hover{background:#000}
+.tabs{display:flex;gap:2px;padding:14px 20px 0;border-bottom:1px solid var(--line)}
+.tab{position:relative;padding:7px 11px 12px;font-size:12.5px;color:var(--ink3);cursor:pointer}
+.tab.on{color:var(--ink);font-weight:600}
+.tab.on::after{content:'';position:absolute;left:11px;right:11px;bottom:-1px;height:2px;background:var(--ink)}
+.tab .b{margin-left:5px;font-size:11px;color:var(--ink3)}
+.tools{display:flex;align-items:center;gap:8px;padding:12px 20px}
+.sb{display:flex;align-items:center;gap:7px;height:30px;padding:0 10px;background:var(--bg);border:1px solid var(--line);border-radius:var(--r);color:var(--ink3);width:220px}
+.sb input{flex:1;border:none;outline:none;background:transparent;font-size:12.5px;color:var(--ink);font-family:var(--font)}
+.chip{height:30px;padding:0 11px;display:inline-flex;align-items:center;gap:6px;border:1px solid var(--line);background:var(--bg);border-radius:var(--r);font-size:12px;color:var(--ink2);cursor:pointer}
+.chip:hover{border-color:#d4d4d8}
+.tools .sp{flex:1}.tools .tt{font-size:12px;color:var(--ink3)}
+/* table-like rows */
+.rows{flex:1;overflow-y:auto}
+.rh{display:grid;grid-template-columns:30px 1fr 150px 130px 90px 32px;align-items:center;gap:12px;padding:8px 20px;font-size:11px;font-weight:600;letter-spacing:.3px;color:var(--ink3);text-transform:uppercase;border-bottom:1px solid var(--line);position:sticky;top:0;background:var(--canvas)}
+.row{display:grid;grid-template-columns:30px 1fr 150px 130px 90px 32px;align-items:center;gap:12px;padding:11px 20px;border-bottom:1px solid var(--line2);cursor:pointer}
+.row:hover{background:#f6f6f7}
+.row.on{background:#f1f1f2;box-shadow:inset 2px 0 0 var(--ink)}
+.av{width:30px;height:30px;border-radius:6px;display:grid;place-items:center;font-size:12px;font-weight:600;color:var(--ink2);background:#f0f0f1;border:1px solid var(--line);flex:none}
+.av.gh{color:var(--ink3);border-style:dashed;background:repeating-linear-gradient(45deg,#f6f6f7,#f6f6f7 4px,#efeff0 4px,#efeff0 8px)}
+.nm{display:flex;align-items:center;gap:8px;min-width:0}
+.nm .n{font-size:13px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.nm .ph{font-size:11.5px;color:var(--ink3)}
+.cell{font-size:12.5px;color:var(--ink2);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.muted{color:var(--ink3)}
+/* tag = 描边方框,无彩 */
+.tag{display:inline-block;font-size:11px;font-weight:500;padding:2px 7px;border:1px solid var(--line);border-radius:4px;color:var(--ink2);background:var(--bg);white-space:nowrap}
+.tag.solid{background:var(--ink);color:#fff;border-color:var(--ink)}
+/* 状态=点+字,无背景块 */
+.st{display:inline-flex;align-items:center;gap:6px;font-size:12px;color:var(--ink2)}
+.st .d{width:6px;height:6px;border-radius:50%}
+.st.ok .d{background:var(--ok)}.st.wn .d{background:var(--warn)}.st.of{color:var(--ink3)}.st.of .d{background:var(--off)}
+.ra{width:28px;height:28px;display:grid;place-items:center;border:none;background:transparent;border-radius:5px;color:var(--ink3);cursor:pointer}
+.ra:hover{background:#ececee;color:var(--ink)}
+/* detail */
+.dt{background:var(--bg);display:flex;flex-direction:column;overflow-y:auto}
+.dth{display:flex;align-items:center;justify-content:space-between;padding:14px 16px;border-bottom:1px solid var(--line)}
+.dth .t{font-size:12px;font-weight:600;color:var(--ink3);text-transform:uppercase;letter-spacing:.3px}
+.cl{width:28px;height:28px;display:grid;place-items:center;border:none;background:transparent;border-radius:5px;color:var(--ink3);cursor:pointer}.cl:hover{background:#f1f1f2}
+.hero{padding:18px 16px;border-bottom:1px solid var(--line);display:flex;gap:13px;align-items:center}
+.hero .av{width:48px;height:48px;font-size:18px;border-radius:8px}
+.hn{font-size:16px;font-weight:700}.hp{font-size:12.5px;color:var(--ink3);margin-top:2px}
+.htag{margin-top:7px;display:flex;gap:6px;flex-wrap:wrap}
+.sec{padding:14px 16px;border-bottom:1px solid var(--line)}
+.sect{font-size:11px;font-weight:600;color:var(--ink3);text-transform:uppercase;letter-spacing:.3px;margin-bottom:10px;display:flex;justify-content:space-between}
+.sect .lk{color:var(--ink);font-weight:500;text-transform:none;letter-spacing:0;cursor:pointer;border-bottom:1px solid var(--ink)}
+.kv{display:flex;justify-content:space-between;padding:6px 0;font-size:12.5px}
+.kv .k{color:var(--ink3)}.kv .v{font-weight:500}
+.kv .v.mono{font-family:ui-monospace,Menlo,monospace;font-size:11.5px;color:var(--ink2)}
+.pm{display:flex;gap:10px;padding:9px 0}.pm+.pm{border-top:1px solid var(--line2)}
+.pmi{width:26px;height:26px;border-radius:5px;border:1px solid var(--line);display:grid;place-items:center;color:var(--ink2);flex:none}
+.pmn{font-size:12.5px;font-weight:600}.pmc{font-size:11px;color:var(--ink3);font-family:ui-monospace,Menlo,monospace}
+.pmf{margin-top:3px;font-size:11px;color:var(--ink2)}.pmf b{font-weight:600}.pmf .ty{color:var(--ink3);font-family:ui-monospace,Menlo,monospace}
+.dtf{margin-top:auto;padding:14px 16px;display:flex;gap:8px}
+.bo{flex:1;height:34px;border:1px solid var(--line);background:var(--bg);border-radius:var(--r);font-size:12.5px;font-weight:600;color:var(--ink);cursor:pointer;font-family:var(--font)}
+.bo:hover{border-color:#d4d4d8}
+.bx{flex:1;height:34px;border:1px solid var(--line);background:var(--bg);border-radius:var(--r);font-size:12.5px;font-weight:600;color:#b91c1c;cursor:pointer;font-family:var(--font)}
+.bx:hover{background:#fef2f2;border-color:#fecaca}
+</style></head>
+<body><div class="app">
+<aside class="rail">
+  <div class="logo">C</div>
+  <nav class="rnav">
+    <button class="ri"><svg width="19" height="19" viewBox="0 0 24 24" fill="none"><path d="M3 12l9-9 9 9M5 10v10h14V10" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+    <button class="ri on"><svg width="19" height="19" viewBox="0 0 24 24" fill="none"><path d="M17 21v-2a4 4 0 0 0-4-4H7a4 4 0 0 0-4 4v2M10 11a4 4 0 1 0 0-8 4 4 0 0 0 0 8z" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+    <button class="ri"><svg width="19" height="19" viewBox="0 0 24 24" fill="none"><path d="M12 2l8 4v6c0 5-3.5 8-8 10-4.5-2-8-5-8-10V6l8-4z" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+    <button class="ri"><svg width="19" height="19" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="3" stroke="currentColor" stroke-width="1.7"/><path d="M19 12a7 7 0 0 0-.1-1l2-1.6-2-3.4-2.3 1a7 7 0 0 0-1.7-1l-.3-2.5h-4l-.3 2.5a7 7 0 0 0-1.7 1l-2.3-1-2 3.4L4 11a7 7 0 0 0 0 2l-2 1.6 2 3.4 2.3-1a7 7 0 0 0 1.7 1l.3 2.5h4l.3-2.5a7 7 0 0 0 1.7-1l2.3 1 2-3.4L19 13a7 7 0 0 0 0-1z" stroke="currentColor" stroke-width="1.4" stroke-linejoin="round"/></svg></button>
+  </nav>
+  <div class="rsp"></div>
+  <div class="rme">刘</div>
+</aside>
+<aside class="nav">
+  <div class="search"><svg width="14" height="14" viewBox="0 0 24 24" fill="none"><circle cx="11" cy="11" r="7" stroke="currentColor" stroke-width="2"/><path d="M21 21l-4.3-4.3" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg><input placeholder="搜索"/></div>
+  <div class="cosw"><span class="colg">A</span><span><div class="con">Acme 科技</div><div class="cos">当前公司</div></span><svg class="cv" width="13" height="13" viewBox="0 0 24 24" fill="none"><path d="M6 9l6 6 6-6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+  <div class="ng"><div class="ngt">组织管理</div>
+    <a class="ni"><svg class="ic" viewBox="0 0 24 24" fill="none"><rect x="4" y="3" width="16" height="18" rx="1.5" stroke="currentColor" stroke-width="1.7"/><path d="M9 8h6M9 12h6M9 16h3" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/></svg>公司</a>
+    <a class="ni"><svg class="ic" viewBox="0 0 24 24" fill="none"><path d="M3 21V7l9-4 9 4v14M3 21h18M9 21v-6h6v6" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round"/></svg>部门<span class="ct">8</span></a>
+    <a class="ni on"><svg class="ic" viewBox="0 0 24 24" fill="none"><path d="M17 21v-2a4 4 0 0 0-4-4H7a4 4 0 0 0-4 4v2M10 11a4 4 0 1 0 0-8 4 4 0 0 0 0 8z" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg>成员<span class="ct">42</span></a>
+    <a class="ni"><svg class="ic" viewBox="0 0 24 24" fill="none"><path d="M12 2l2 5 5 .4-4 3.3 1.3 5L12 18l-4.3 2.7L9 15l-4-3.3 5-.4 2-5z" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/></svg>角色<span class="ct">6</span></a>
+    <a class="ni"><svg class="ic" viewBox="0 0 24 24" fill="none"><rect x="5" y="11" width="14" height="9" rx="1.5" stroke="currentColor" stroke-width="1.7"/><path d="M8 11V8a4 4 0 0 1 8 0v3" stroke="currentColor" stroke-width="1.7"/></svg>权限</a>
+    <a class="ni"><svg class="ic" viewBox="0 0 24 24" fill="none"><rect x="3" y="6" width="18" height="13" rx="1.5" stroke="currentColor" stroke-width="1.7"/><path d="M8 6V4h8v2" stroke="currentColor" stroke-width="1.7"/></svg>职位<span class="ct">5</span></a>
+    <a class="ni"><svg class="ic" viewBox="0 0 24 24" fill="none"><path d="M4 4h16v12H7l-3 3V4z" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round"/></svg>邀请<span class="ct">3</span></a>
+  </div>
+</aside>
+<section class="main">
+  <div class="lp">
+    <div class="tb"><div><h1>成员</h1><div class="crumb">Acme 科技 · 共 42 名 · 在职 38</div></div>
+      <div class="tba"><button class="ib"><svg width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M12 3v12m0 0l-4-4m4 4l4-4M4 21h16" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+      <button class="bp"><svg width="14" height="14" viewBox="0 0 24 24" fill="none"><path d="M12 5v14M5 12h14" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>邀请成员</button></div></div>
+    <div class="tabs"><div class="tab on">在职<span class="b">38</span></div><div class="tab">待激活<span class="b">3</span></div><div class="tab">已离职<span class="b">1</span></div><div class="tab">全部</div></div>
+    <div class="tools"><div class="sb"><svg width="14" height="14" viewBox="0 0 24 24" fill="none"><circle cx="11" cy="11" r="7" stroke="currentColor" stroke-width="2"/><path d="M21 21l-4.3-4.3" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg><input placeholder="按姓名 / 手机号搜索"/></div>
+      <button class="chip">部门<svg width="11" height="11" viewBox="0 0 24 24" fill="none"><path d="M6 9l6 6 6-6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+      <button class="chip">角色<svg width="11" height="11" viewBox="0 0 24 24" fill="none"><path d="M6 9l6 6 6-6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+      <span class="sp"></span><span class="tt">1–6 / 38</span></div>
+    <div class="rows">
+      <div class="rh"><span></span><span>成员</span><span>部门</span><span>岗位</span><span>状态</span><span></span></div>
+      <div class="row on"><span class="av">刘</span><div class="nm"><span class="n">刘宇</span><span class="tag solid">负责人</span></div><span class="cell">技术中心</span><span class="cell">CTO</span><span class="st ok"><span class="d"></span>在职</span><button class="ra"><svg width="15" height="15" viewBox="0 0 24 24" fill="none"><circle cx="5" cy="12" r="1.5" fill="currentColor"/><circle cx="12" cy="12" r="1.5" fill="currentColor"/><circle cx="19" cy="12" r="1.5" fill="currentColor"/></svg></button></div>
+      <div class="row"><span class="av">何</span><div class="nm"><span class="n">何敏</span><span class="ph">· 138••••5521</span></div><span class="cell">产品部</span><span class="cell">产品经理</span><span class="st ok"><span class="d"></span>在职</span><button class="ra"><svg width="15" height="15" viewBox="0 0 24 24" fill="none"><circle cx="5" cy="12" r="1.5" fill="currentColor"/><circle cx="12" cy="12" r="1.5" fill="currentColor"/><circle cx="19" cy="12" r="1.5" fill="currentColor"/></svg></button></div>
+      <div class="row"><span class="av">张</span><div class="nm"><span class="n">张伟</span><span class="ph">· 139••••2046</span></div><span class="cell">研发一组</span><span class="cell">高级工程师</span><span class="st ok"><span class="d"></span>在职</span><button class="ra"><svg width="15" height="15" viewBox="0 0 24 24" fill="none"><circle cx="5" cy="12" r="1.5" fill="currentColor"/><circle cx="12" cy="12" r="1.5" fill="currentColor"/><circle cx="19" cy="12" r="1.5" fill="currentColor"/></svg></button></div>
+      <div class="row"><span class="av">林</span><div class="nm"><span class="n">林晓</span></div><span class="cell">市场部</span><span class="cell muted">未设岗位</span><span class="st ok"><span class="d"></span>在职</span><button class="ra"><svg width="15" height="15" viewBox="0 0 24 24" fill="none"><circle cx="5" cy="12" r="1.5" fill="currentColor"/><circle cx="12" cy="12" r="1.5" fill="currentColor"/><circle cx="19" cy="12" r="1.5" fill="currentColor"/></svg></button></div>
+      <div class="row"><span class="av gh">?</span><div class="nm"><span class="n">qa-runner@acme.io</span></div><span class="cell muted">—</span><span class="cell muted">邀请待接受</span><span class="st wn"><span class="d"></span>待激活</span><button class="ra"><svg width="15" height="15" viewBox="0 0 24 24" fill="none"><circle cx="5" cy="12" r="1.5" fill="currentColor"/><circle cx="12" cy="12" r="1.5" fill="currentColor"/><circle cx="19" cy="12" r="1.5" fill="currentColor"/></svg></button></div>
+      <div class="row"><span class="av" style="opacity:.55">王</span><div class="nm"><span class="n muted">王磊</span></div><span class="cell muted">原 销售部</span><span class="cell muted">离职 05-12</span><span class="st of"><span class="d"></span>已离职</span><button class="ra"><svg width="15" height="15" viewBox="0 0 24 24" fill="none"><circle cx="5" cy="12" r="1.5" fill="currentColor"/><circle cx="12" cy="12" r="1.5" fill="currentColor"/><circle cx="19" cy="12" r="1.5" fill="currentColor"/></svg></button></div>
+    </div>
+  </div>
+  <aside class="dt">
+    <div class="dth"><span class="t">成员详情</span><button class="cl"><svg width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M6 6l12 12M18 6L6 18" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg></button></div>
+    <div class="hero"><span class="av">刘</span><div><div class="hn">刘宇</div><div class="hp">138••••2046</div><div class="htag"><span class="tag solid">负责人</span><span class="tag">技术中心</span><span class="tag">CTO</span></div></div></div>
+    <div class="sec"><div class="sect">成员身份</div>
+      <div class="kv"><span class="k">状态</span><span class="v"><span class="st ok"><span class="d"></span>在职</span></span></div>
+      <div class="kv"><span class="k">部门</span><span class="v">技术中心</span></div>
+      <div class="kv"><span class="k">岗位</span><span class="v">CTO</span></div>
+      <div class="kv"><span class="k">加入</span><span class="v">2024-03-18</span></div>
+      <div class="kv"><span class="k">成员 ID</span><span class="v mono">mbr_8f3a…c21</span></div>
+    </div>
+    <div class="sec"><div class="sect">最终权限 · 来源溯源<span class="lk">全部 14</span></div>
+      <div class="pm"><span class="pmi"><svg width="14" height="14" viewBox="0 0 24 24" fill="none"><path d="M12 2l2.5 6.5L21 9l-5 4.5L17.5 21 12 17l-5.5 4L8 13.5 3 9l6.5-.5L12 2z" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/></svg></span><div><div class="pmn">管理全部 <span class="pmc">org.manage_all</span></div><div class="pmf">来自 <b>公司负责人</b> 身份 <span class="ty">owner</span></div></div></div>
+      <div class="pm"><span class="pmi"><svg width="14" height="14" viewBox="0 0 24 24" fill="none"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2M9 11a4 4 0 1 0 0-8 4 4 0 0 0 0 8z" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></span><div><div class="pmn">删除成员 <span class="pmc">org_members.delete</span></div><div class="pmf">直接角色 <b>管理员</b> <span class="ty">member_role</span></div></div></div>
+      <div class="pm"><span class="pmi"><svg width="14" height="14" viewBox="0 0 24 24" fill="none"><rect x="4" y="7" width="16" height="13" rx="1.5" stroke="currentColor" stroke-width="1.5"/><path d="M8 7V5a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2" stroke="currentColor" stroke-width="1.5"/></svg></span><div><div class="pmn">分配角色 <span class="pmc">org_access.role_assign</span></div><div class="pmf">岗位 <b>CTO</b> 继承角色 <b>权限主管</b> <span class="ty">position_role</span></div></div></div>
+    </div>
+    <div class="dtf"><button class="bo">转岗 / 调部门</button><button class="bx">办理离职</button></div>
+  </aside>
+</section>
+<!-- PH-MAIN -->
+</div></body></html>

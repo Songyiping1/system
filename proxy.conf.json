@@ -1,10 +1,12 @@
 {
-  "/api": {
-    "target": "http://196.168.1.168:3399",
+  "/authx": {
+    "target": "http://localhost:3399",
     "secure": false,
-    "changeOrigin": true,
-    "pathRewrite": {
-      "^/api": ""
-    }
+    "changeOrigin": true
+  },
+  "/org": {
+    "target": "http://localhost:3399",
+    "secure": false,
+    "changeOrigin": true
   }
 }

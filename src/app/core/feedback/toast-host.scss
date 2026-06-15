@@ -1,0 +1,101 @@
+@use '../../shared/styles/tokens' as *;
+
+.toast-stack {
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  z-index: 4000;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  pointer-events: none;
+}
+
+.toast {
+  pointer-events: auto;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-width: 240px;
+  max-width: 380px;
+  padding: 12px 12px 12px 14px;
+  border-radius: $radius-md;
+  background: $surface-card;
+  border: 1px solid $border;
+  box-shadow: $shadow-lg;
+  animation: toast-in 0.32s cubic-bezier(0.22, 1, 0.36, 1) both;
+
+  &.leaving {
+    animation: toast-out 0.22s ease-in both;
+  }
+}
+
+.ico {
+  width: 24px;
+  height: 24px;
+  flex: none;
+  display: grid;
+  place-items: center;
+  border-radius: 7px;
+  color: #fff;
+}
+
+.toast.success .ico {
+  background: $status-success;
+}
+.toast.error .ico {
+  background: $danger;
+}
+.toast.warning .ico {
+  background: $status-warning;
+}
+.toast.info .ico {
+  background: $primary;
+}
+
+.msg {
+  flex: 1;
+  font-size: 13.5px;
+  line-height: 1.5;
+  color: $text-1;
+}
+
+.close {
+  flex: none;
+  width: 22px;
+  height: 22px;
+  display: grid;
+  place-items: center;
+  border: none;
+  background: transparent;
+  border-radius: 6px;
+  color: $text-3;
+  cursor: pointer;
+  transition: background 0.15s ease, color 0.15s ease;
+
+  &:hover {
+    background: $surface-muted;
+    color: $text-1;
+  }
+}
+
+@keyframes toast-in {
+  from {
+    opacity: 0;
+    transform: translateX(24px) scale(0.98);
+  }
+}
+
+@keyframes toast-out {
+  to {
+    opacity: 0;
+    transform: translateX(24px) scale(0.98);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .toast,
+  .toast.leaving {
+    animation: none;
+  }
+}

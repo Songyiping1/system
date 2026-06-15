@@ -1,9 +1,0 @@
-@use '../../styles/tokens' as *;
-
-.checkbox {
-  width: $checkbox-size;
-  height: $checkbox-size;
-  cursor: pointer;
-  accent-color: $primary;
-  flex-shrink: 0;
-}
