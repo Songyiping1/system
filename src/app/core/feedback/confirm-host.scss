@@ -1,38 +1,36 @@
-@use '../../shared/styles/tokens' as *;
-
 .overlay {
   position: fixed;
   inset: 0;
-  z-index: 3500;
+  z-index: var(--z-modal);
   display: grid;
   place-items: center;
   padding: 24px;
   background: rgba(20, 24, 40, 0.42);
   backdrop-filter: blur(2px);
-  animation: overlay-in 0.2s ease both;
+  animation: overlay-in var(--motion-fast) var(--ease-out) both;
 }
 
 .dialog {
   width: 100%;
   max-width: 400px;
   padding: 24px;
-  background: $surface-card;
-  border-radius: $radius-lg;
-  box-shadow: $shadow-lg;
-  animation: dialog-in 0.34s cubic-bezier(0.34, 1.56, 0.64, 1) both;
+  background: var(--bg-surface);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-lg);
+  animation: dialog-in var(--motion-base) var(--ease-spring) both;
 }
 
 .title {
   font-size: 16px;
   font-weight: 700;
-  color: $text-1;
+  color: var(--text-strong);
 }
 
 .message {
   margin-top: 10px;
   font-size: 13.5px;
   line-height: 1.6;
-  color: $text-2;
+  color: var(--text-muted);
 }
 
 .actions {
@@ -45,11 +43,14 @@
 .btn {
   height: 36px;
   padding: 0 18px;
-  border-radius: $radius-md;
+  border-radius: var(--radius-md);
   font-size: 13px;
   font-weight: 600;
   cursor: pointer;
-  transition: background 0.15s ease, box-shadow 0.15s ease, transform 0.12s ease;
+  transition:
+    background var(--motion-fast) var(--ease-out),
+    box-shadow var(--motion-fast) var(--ease-out),
+    transform var(--motion-fast) var(--ease-spring);
 
   &:active {
     transform: translateY(1px);
@@ -57,29 +58,29 @@
 }
 
 .cancel {
-  border: 1px solid $border;
-  background: $surface-card;
-  color: $text-1;
+  border: 1px solid var(--border);
+  background: var(--bg-surface);
+  color: var(--text);
 
   &:hover {
-    box-shadow: $shadow-sm;
+    box-shadow: var(--shadow-sm);
   }
 }
 
 .ok {
   border: none;
-  background: $primary;
-  color: #fff;
+  background: var(--primary);
+  color: var(--on-primary);
 
   &:hover {
-    background: #3a48cf;
+    background: var(--primary-hover);
   }
 
   &.danger {
-    background: $danger;
+    background: var(--danger);
 
     &:hover {
-      background: #c10f0f;
+      background: var(--danger-hover);
     }
   }
 }

@@ -1,0 +1,149 @@
+.kit {
+  max-width: 960px;
+  margin: 0 auto;
+  padding: var(--space-12) var(--space-6) var(--space-16);
+
+  &__head {
+    margin-bottom: var(--space-10);
+  }
+  &__title {
+    margin: 0 0 var(--space-2);
+    font-size: var(--text-3xl);
+    font-weight: var(--font-bold);
+    color: var(--text-strong);
+    letter-spacing: -0.02em;
+  }
+  &__sub {
+    margin: 0;
+    color: var(--text-muted);
+    font-size: var(--text-md);
+  }
+
+  &__section {
+    margin-bottom: var(--space-12);
+    padding: var(--space-8);
+    background: var(--bg-surface);
+    border: 1px solid var(--border-subtle);
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-sm);
+  }
+
+  &__h2 {
+    margin: 0 0 var(--space-6);
+    font-size: var(--text-lg);
+    font-weight: var(--font-semibold);
+    color: var(--text-strong);
+  }
+
+  &__group {
+    margin-bottom: var(--space-6);
+    &:last-child {
+      margin-bottom: 0;
+    }
+  }
+
+  &__tag {
+    display: block;
+    margin-bottom: var(--space-3);
+    font-size: var(--text-xs);
+    font-weight: var(--font-medium);
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    color: var(--text-subtle);
+  }
+
+  &__row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-3);
+    &--baseline {
+      align-items: baseline;
+    }
+  }
+
+  &__form {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: var(--space-5);
+  }
+
+  &__echo {
+    margin: var(--space-5) 0 0;
+    font-size: var(--text-sm);
+    color: var(--text-muted);
+    code {
+      padding: 2px 6px;
+      background: var(--bg-subtle);
+      border-radius: var(--radius-xs);
+      font-family: var(--font-mono);
+      color: var(--primary);
+    }
+  }
+
+  &__swatches {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+    gap: var(--space-4);
+  }
+}
+
+.swatch {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+
+  &__chip {
+    height: 56px;
+    border-radius: var(--radius-md);
+    border: 1px solid var(--border);
+    transition: transform var(--motion-fast) var(--ease-spring);
+  }
+  &:hover &__chip {
+    transform: translateY(-2px) scale(1.02);
+  }
+  &__name {
+    font-size: var(--text-sm);
+    font-weight: var(--font-medium);
+    color: var(--text-strong);
+  }
+  &__var {
+    font-size: var(--text-xs);
+    font-family: var(--font-mono);
+    color: var(--text-subtle);
+  }
+}
+
+// —— 表单字段 ——
+.f {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+
+  &__label {
+    font-size: var(--text-sm);
+    font-weight: var(--font-medium);
+    color: var(--text);
+  }
+
+  &--inline {
+    flex-direction: row;
+    align-items: center;
+    gap: var(--space-2);
+    align-self: end;
+    padding-bottom: var(--space-2);
+    color: var(--text);
+  }
+
+  // PrimeNG 输入 / 下拉撑满栅格列
+  input,
+  p-select,
+  .p-select {
+    width: 100%;
+  }
+}
+
+@media (max-width: 640px) {
+  .kit__form {
+    grid-template-columns: 1fr;
+  }
+}

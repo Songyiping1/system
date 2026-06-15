@@ -1,6 +1,9 @@
 import { ApplicationConfig, provideBrowserGlobalErrorListeners, provideZoneChangeDetection } from '@angular/core';
 import { provideHttpClient, withInterceptors } from '@angular/common/http';
 import { provideRouter, withViewTransitions } from '@angular/router';
+import { provideAnimationsAsync } from '@angular/platform-browser/animations/async';
+import { providePrimeNG } from 'primeng/config';
+import { BrandPreset } from './theme/brand-preset';
 
 import { routes } from './app.routes';
 import { loadingInterceptor } from './core/http/loading.interceptor';
@@ -12,6 +15,18 @@ export const appConfig: ApplicationConfig = {
   providers: [
     provideBrowserGlobalErrorListeners(),
     provideZoneChangeDetection({ eventCoalescing: true }),
+    // PrimeNG:BrandPreset(基于 Aura,主色/表面已换成品牌 token,见
+    // theme/brand-preset.ts)。darkModeSelector 对齐我们 token 的
+    // [data-theme="dark"],切暗色时组件与自定义层一致。
+    provideAnimationsAsync(),
+    providePrimeNG({
+      theme: {
+        preset: BrandPreset,
+        options: {
+          darkModeSelector: '[data-theme="dark"]',
+        },
+      },
+    }),
     // withViewTransitions:路由切换走浏览器原生 View Transition,
     // 配合 styles.css 的 ::view-transition 规则,得到丝滑页面转场。
     provideRouter(routes, withViewTransitions()),

@@ -1,0 +1,230 @@
+/* ============================================================
+ * Design Tokens —— 动画驱动后台设计系统
+ * ------------------------------------------------------------
+ * 单一真相源:CSS 自定义属性。SCSS / TS 一律 var(--xxx) 引用。
+ *
+ * 两层结构:
+ *   1) primitive(--p-*):原始调色板 / 比例,**业务与组件禁止直接用**
+ *   2) semantic(--bg/-text/-primary…):语义角色,组件只用这一层
+ * 换肤 = 只改 semantic 层的映射(见底部 [data-theme="dark"] 预留)。
+ *
+ * 动效是一等公民:--motion-* / --ease-* 与 core/animation/motion.ts
+ * 的 DUR / EASE 数值严格对齐,CSS 与 JS 共用同一套动效词汇。
+ * ============================================================ */
+
+:root {
+  /* ===== primitive · 品牌 indigo(动画驱动主色:沉稳但有张力)===== */
+  --p-indigo-50: #eef0ff;
+  --p-indigo-100: #e0e3ff;
+  --p-indigo-200: #c4caff;
+  --p-indigo-300: #a0a8ff;
+  --p-indigo-400: #7b82fb;
+  --p-indigo-500: #5b61f2;
+  --p-indigo-600: #4a4ee3;
+  --p-indigo-700: #3b3fc4;
+  --p-indigo-800: #31349e;
+  --p-indigo-900: #2c2f7c;
+
+  /* ===== primitive · 中性冷灰(微偏蓝,屏显更干净)===== */
+  --p-gray-0: #ffffff;
+  --p-gray-25: #fbfcfd;
+  --p-gray-50: #f6f8fa;
+  --p-gray-100: #eef1f4;
+  --p-gray-200: #e1e6ec;
+  --p-gray-300: #cbd2db;
+  --p-gray-400: #9aa3b2;
+  --p-gray-500: #6c7585;
+  --p-gray-600: #4d5563;
+  --p-gray-700: #363d49;
+  --p-gray-800: #222831;
+  --p-gray-900: #12161d;
+
+  /* ===== primitive · 状态色 ===== */
+  --p-green-50: #e7f8ee;
+  --p-green-500: #15b364;
+  --p-green-600: #0a9251;
+  --p-amber-50: #fef3e2;
+  --p-amber-500: #f59e0b;
+  --p-amber-600: #d97e06;
+  --p-red-50: #fdeaea;
+  --p-red-500: #ef4343;
+  --p-red-600: #d92d2d;
+  --p-blue-50: #e8f1fe;
+  --p-blue-500: #3b82f6;
+  --p-blue-600: #2570eb;
+
+  /* ===== 间距(4px 基)===== */
+  --space-0: 0;
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 12px;
+  --space-4: 16px;
+  --space-5: 20px;
+  --space-6: 24px;
+  --space-8: 32px;
+  --space-10: 40px;
+  --space-12: 48px;
+  --space-16: 64px;
+
+  /* ===== 圆角 ===== */
+  --radius-xs: 4px;
+  --radius-sm: 6px;
+  --radius-md: 8px;
+  --radius-lg: 12px;
+  --radius-xl: 16px;
+  --radius-pill: 999px;
+
+  /* ===== 字体 ===== */
+  --font-sans: 'PingFang SC', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto,
+    'Helvetica Neue', Arial, sans-serif;
+  --font-mono: 'SF Mono', 'JetBrains Mono', ui-monospace, Menlo, Consolas, monospace;
+
+  --text-xs: 12px;
+  --text-sm: 13px;
+  --text-base: 14px;
+  --text-md: 16px;
+  --text-lg: 18px;
+  --text-xl: 20px;
+  --text-2xl: 24px;
+  --text-3xl: 30px;
+
+  --leading-tight: 1.25;
+  --leading-normal: 1.5;
+  --leading-relaxed: 1.7;
+
+  --font-regular: 400;
+  --font-medium: 500;
+  --font-semibold: 600;
+  --font-bold: 700;
+
+  /* ===== 阴影 / 高度(冷色调,贴近界面灰)===== */
+  --shadow-xs: 0 1px 2px rgba(18, 22, 29, 0.05);
+  --shadow-sm: 0 1px 3px rgba(18, 22, 29, 0.08), 0 1px 2px rgba(18, 22, 29, 0.04);
+  --shadow-md: 0 4px 12px rgba(18, 22, 29, 0.08), 0 2px 4px rgba(18, 22, 29, 0.04);
+  --shadow-lg: 0 12px 28px rgba(18, 22, 29, 0.12), 0 4px 8px rgba(18, 22, 29, 0.06);
+  --shadow-xl: 0 24px 48px rgba(18, 22, 29, 0.16);
+
+  /* ===== 动效 token(核心:与 motion.ts 数值对齐)===== */
+  --motion-instant: 0ms;
+  --motion-fast: 180ms; /* = DUR.fast 0.18s —— hover / press 微反馈 */
+  --motion-base: 320ms; /* = DUR.base 0.32s —— 入场 / 展开 */
+  --motion-slow: 500ms; /* = DUR.slow 0.5s  —— 大块转场 */
+
+  --ease-out: cubic-bezier(0.22, 1, 0.36, 1); /* = EASE_OUT,≈ gsap power3.out */
+  --ease-spring: cubic-bezier(0.34, 1.56, 0.64, 1); /* = EASE_SPRING,轻微过冲 */
+  --ease-standard: cubic-bezier(0.4, 0, 0.2, 1);
+  --ease-in: cubic-bezier(0.4, 0, 1, 1);
+  --ease-emphasized: var(--ease-out); /* 兼容 styles.css 旧别名 */
+
+  /* ===== z 层级 ===== */
+  --z-base: 0;
+  --z-dropdown: 1000;
+  --z-sticky: 1100;
+  --z-overlay: 1300;
+  --z-modal: 1400;
+  --z-popover: 1500;
+  --z-toast: 1600;
+  --z-tooltip: 1700;
+}
+
+/* ============================================================
+ * semantic 层 · 亮色(默认)
+ * 组件只引用这一层。加暗色时只需补一份 [data-theme="dark"] 映射。
+ * ============================================================ */
+:root,
+[data-theme='light'] {
+  color-scheme: light;
+
+  /* 背景 / 表面 */
+  --bg-canvas: var(--p-gray-50);
+  --bg-surface: var(--p-gray-0);
+  --bg-subtle: var(--p-gray-100);
+  --bg-muted: var(--p-gray-50);
+  --bg-hover: var(--p-gray-100);
+  --bg-active: var(--p-gray-200);
+  --bg-inverse: var(--p-gray-900);
+
+  /* 边框 */
+  --border-subtle: var(--p-gray-100);
+  --border: var(--p-gray-200);
+  --border-strong: var(--p-gray-300);
+
+  /* 文字 */
+  --text-strong: var(--p-gray-900);
+  --text: var(--p-gray-800);
+  --text-muted: var(--p-gray-500);
+  --text-subtle: var(--p-gray-400);
+  --text-disabled: var(--p-gray-300);
+  --text-inverse: var(--p-gray-0);
+
+  /* 主色 */
+  --primary: var(--p-indigo-500);
+  --primary-hover: var(--p-indigo-600);
+  --primary-active: var(--p-indigo-700);
+  --primary-subtle: var(--p-indigo-50);
+  --primary-subtle-hover: var(--p-indigo-100);
+  --on-primary: var(--p-gray-0);
+  --primary-ring: color-mix(in srgb, var(--primary) 38%, transparent);
+
+  /* 成功 / 警告 / 危险 / 信息 */
+  --success: var(--p-green-600);
+  --success-subtle: var(--p-green-50);
+  --on-success: var(--p-gray-0);
+  --warning: var(--p-amber-600);
+  --warning-subtle: var(--p-amber-50);
+  --on-warning: var(--p-gray-0);
+  --danger: var(--p-red-500);
+  --danger-hover: var(--p-red-600);
+  --danger-subtle: var(--p-red-50);
+  --on-danger: var(--p-gray-0);
+  --danger-ring: color-mix(in srgb, var(--danger) 38%, transparent);
+  --info: var(--p-blue-600);
+  --info-subtle: var(--p-blue-50);
+
+  /* 焦点环 */
+  --focus-ring: var(--primary-ring);
+}
+
+/* ============================================================
+ * semantic 层 · 暗色(结构预留 —— 已可用,默认不启用)
+ * 启用:在 <html> 上加 data-theme="dark"
+ * ============================================================ */
+[data-theme='dark'] {
+  color-scheme: dark;
+
+  --bg-canvas: var(--p-gray-900);
+  --bg-surface: var(--p-gray-800);
+  --bg-subtle: #1a1f27;
+  --bg-muted: #1a1f27;
+  --bg-hover: var(--p-gray-700);
+  --bg-active: var(--p-gray-600);
+  --bg-inverse: var(--p-gray-0);
+
+  --border-subtle: #20262f;
+  --border: var(--p-gray-700);
+  --border-strong: var(--p-gray-600);
+
+  --text-strong: var(--p-gray-0);
+  --text: var(--p-gray-100);
+  --text-muted: var(--p-gray-400);
+  --text-subtle: var(--p-gray-500);
+  --text-disabled: var(--p-gray-600);
+  --text-inverse: var(--p-gray-900);
+
+  --primary: var(--p-indigo-400);
+  --primary-hover: var(--p-indigo-300);
+  --primary-active: var(--p-indigo-200);
+  --primary-subtle: rgba(91, 97, 242, 0.16);
+  --primary-subtle-hover: rgba(91, 97, 242, 0.24);
+  --on-primary: var(--p-gray-900);
+
+  --success-subtle: rgba(21, 179, 100, 0.16);
+  --warning-subtle: rgba(245, 158, 11, 0.16);
+  --danger: var(--p-red-500);
+  --danger-subtle: rgba(239, 67, 67, 0.16);
+  --info-subtle: rgba(59, 130, 246, 0.16);
+
+  --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.4);
+  --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.45);
+  --shadow-lg: 0 12px 28px rgba(0, 0, 0, 0.5);
+}

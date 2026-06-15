@@ -1,10 +1,8 @@
-@use '../../shared/styles/tokens' as *;
-
 .toast-stack {
   position: fixed;
   top: 20px;
   right: 20px;
-  z-index: 4000;
+  z-index: var(--z-toast);
   display: flex;
   flex-direction: column;
   gap: 10px;
@@ -19,14 +17,14 @@
   min-width: 240px;
   max-width: 380px;
   padding: 12px 12px 12px 14px;
-  border-radius: $radius-md;
-  background: $surface-card;
-  border: 1px solid $border;
-  box-shadow: $shadow-lg;
-  animation: toast-in 0.32s cubic-bezier(0.22, 1, 0.36, 1) both;
+  border-radius: var(--radius-md);
+  background: var(--bg-surface);
+  border: 1px solid var(--border);
+  box-shadow: var(--shadow-lg);
+  animation: toast-in var(--motion-base) var(--ease-out) both;
 
   &.leaving {
-    animation: toast-out 0.22s ease-in both;
+    animation: toast-out var(--motion-fast) var(--ease-in) both;
   }
 }
 
@@ -37,27 +35,27 @@
   display: grid;
   place-items: center;
   border-radius: 7px;
-  color: #fff;
+  color: var(--on-primary);
 }
 
 .toast.success .ico {
-  background: $status-success;
+  background: var(--success);
 }
 .toast.error .ico {
-  background: $danger;
+  background: var(--danger);
 }
 .toast.warning .ico {
-  background: $status-warning;
+  background: var(--warning);
 }
 .toast.info .ico {
-  background: $primary;
+  background: var(--primary);
 }
 
 .msg {
   flex: 1;
   font-size: 13.5px;
   line-height: 1.5;
-  color: $text-1;
+  color: var(--text);
 }
 
 .close {
@@ -69,13 +67,15 @@
   border: none;
   background: transparent;
   border-radius: 6px;
-  color: $text-3;
+  color: var(--text-subtle);
   cursor: pointer;
-  transition: background 0.15s ease, color 0.15s ease;
+  transition:
+    background var(--motion-fast) var(--ease-out),
+    color var(--motion-fast) var(--ease-out);
 
   &:hover {
-    background: $surface-muted;
-    color: $text-1;
+    background: var(--bg-hover);
+    color: var(--text-strong);
   }
 }
 

@@ -69,35 +69,6 @@ export function fadeUp(el: Element, opts: RevealOptions = {}): AnimateControls |
   );
 }
 
-/** 缩放淡入 —— 卡片/弹层出现 */
-export function scaleIn(el: Element, opts: RevealOptions = {}): AnimateControls | void {
-  if (prefersReducedMotion()) {
-    settle(el);
-    return;
-  }
-  const { delay = 0, duration = DUR.base } = opts;
-  return animate(
-    el,
-    { opacity: [0, 1], transform: ['scale(0.96)', 'scale(1)'] },
-    { duration, delay, ease: EASE_OUT },
-  );
-}
-
-/** 自右滑入 —— 抽屉/侧栏内容 */
-export function slideInRight(el: Element, opts: RevealOptions = {}): AnimateControls | void {
-  if (prefersReducedMotion()) {
-    settle(el);
-    return;
-  }
-  const { y = 0, delay = 0, duration = DUR.base } = opts;
-  const xFrom = 24;
-  return animate(
-    el,
-    { opacity: [0, 1], transform: [`translate(${xFrom}px, ${y}px)`, 'translate(0px, 0px)'] },
-    { duration, delay, ease: EASE_OUT },
-  );
-}
-
 /** 错峰入场参数 */
 export interface StaggerOptions extends RevealOptions {
   /** 每项间隔(秒),默认 0.06 */
