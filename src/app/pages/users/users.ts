@@ -17,10 +17,6 @@ import {
   USER_STATE_OPTIONS,
 } from '../../features/system/system.model';
 import { PageResult, emptyPage } from '../../shared/models/page-result';
-import {
-  RevealDirective,
-  RevealStaggerDirective,
-} from '../../shared/directives/reveal.directive';
 
 @Component({
   selector: 'app-users-page',
@@ -34,12 +30,10 @@ import {
     SkeletonModule,
     TagModule,
     TooltipModule,
-    RevealDirective,
-    RevealStaggerDirective,
   ],
   styleUrl: './users.scss',
   template: `
-    <section class="page" appReveal [appRevealY]="0">
+    <section class="page">
       <div class="toolbar">
         <label class="search">
           <i class="pi pi-search"></i>
@@ -64,7 +58,7 @@ import {
         <p-button icon="pi pi-refresh" label="刷新" [text]="true" (onClick)="load()" />
       </div>
 
-      <section class="data-panel" appReveal [appRevealDelay]="0.08" [appRevealY]="0">
+      <section class="data-panel">
         <div class="data-panel__head">
           <div>
             <strong>用户列表</strong>
@@ -105,7 +99,7 @@ import {
                   <th class="actions-col">操作</th>
                 </tr>
               </thead>
-              <tbody appRevealStagger [appRevealStaggerGap]="0.025">
+              <tbody>
                 @for (user of result().items; track user.id) {
                   <tr>
                     <td>

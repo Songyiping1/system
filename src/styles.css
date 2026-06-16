@@ -1,3 +1,5 @@
+/* Geist 可变字体(Vercel,product-grade,比系统字更有调性) */
+@import '@fontsource-variable/geist';
 /* 设计 token —— 全站单一真相源(见 styles/tokens.css) */
 @import './styles/tokens.css';
 
@@ -19,12 +21,22 @@ body {
   line-height: var(--leading-normal);
   color: var(--text);
   background: var(--bg-canvas);
+  font-variant-numeric: tabular-nums; /* 数据等宽对齐,后台质感 */
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
 }
 
 body {
   overflow-x: hidden;
+}
+
+/* 标题收紧字距 —— 紧致、有骨架,脱离"默认系统字" */
+h1,
+h2,
+h3,
+h4 {
+  letter-spacing: -0.015em;
 }
 
 a {
@@ -42,24 +54,10 @@ select {
 /* ============================================================
  * 路由级 View Transition(配合 app.config.ts 的 withViewTransitions)
  * ============================================================ */
-@keyframes vt-fade-in {
-  from {
-    opacity: 0;
-  }
-}
-
-@keyframes vt-fade-out {
-  to {
-    opacity: 0;
-  }
-}
-
-::view-transition-old(root) {
-  animation: vt-fade-out var(--motion-fast) var(--ease-out) both;
-}
-
+/* 路由切换即时,不做转场动画(避免位移与露底闪烁) */
+::view-transition-old(root),
 ::view-transition-new(root) {
-  animation: vt-fade-in var(--motion-base) var(--ease-out) both;
+  animation: none;
 }
 
 /* ============================================================

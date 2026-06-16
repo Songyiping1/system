@@ -17,10 +17,6 @@ import {
   CompanyApply,
 } from '../../features/system/system.model';
 import { PageResult, emptyPage } from '../../shared/models/page-result';
-import {
-  RevealDirective,
-  RevealStaggerDirective,
-} from '../../shared/directives/reveal.directive';
 
 type ReviewAction = 'approve' | 'reject';
 
@@ -37,12 +33,10 @@ type ReviewAction = 'approve' | 'reject';
     TagModule,
     TextareaModule,
     TooltipModule,
-    RevealDirective,
-    RevealStaggerDirective,
   ],
   styleUrl: './onboarding-review.scss',
   template: `
-    <section class="page" appReveal [appRevealY]="0">
+    <section class="page">
       <div class="toolbar">
         <p-select
           [options]="stateOptions"
@@ -56,7 +50,7 @@ type ReviewAction = 'approve' | 'reject';
         <p-button icon="pi pi-refresh" label="刷新" [text]="true" (onClick)="load()" />
       </div>
 
-      <section class="review-grid" appReveal [appRevealDelay]="0.08" [appRevealY]="0">
+      <section class="review-grid">
         <aside class="queue-panel">
           <div class="queue-panel__head">
             <div>
@@ -86,7 +80,7 @@ type ReviewAction = 'approve' | 'reject';
               <p>当前筛选条件下没有入驻申请。</p>
             </div>
           } @else {
-            <div class="apply-list" appRevealStagger [appRevealStaggerGap]="0.03">
+            <div class="apply-list">
               @for (item of result().items; track item.id) {
                 <button
                   class="apply-card"

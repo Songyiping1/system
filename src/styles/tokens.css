@@ -4,7 +4,7 @@
  * 单一真相源:CSS 自定义属性。SCSS / TS 一律 var(--xxx) 引用。
  *
  * 两层结构:
- *   1) primitive(--p-*):原始调色板 / 比例,**业务与组件禁止直接用**
+ *   1) primitive(--c-*):原始调色板 / 比例(用 --c- 前缀避开 PrimeNG 的 --p-)
  *   2) semantic(--bg/-text/-primary…):语义角色,组件只用这一层
  * 换肤 = 只改 semantic 层的映射(见底部 [data-theme="dark"] 预留)。
  *
@@ -14,44 +14,45 @@
 
 :root {
   /* ===== primitive · 品牌 indigo(动画驱动主色:沉稳但有张力)===== */
-  --p-indigo-50: #eef0ff;
-  --p-indigo-100: #e0e3ff;
-  --p-indigo-200: #c4caff;
-  --p-indigo-300: #a0a8ff;
-  --p-indigo-400: #7b82fb;
-  --p-indigo-500: #5b61f2;
-  --p-indigo-600: #4a4ee3;
-  --p-indigo-700: #3b3fc4;
-  --p-indigo-800: #31349e;
-  --p-indigo-900: #2c2f7c;
+  --c-indigo-50: #edeefb;
+  --c-indigo-100: #dcdef7;
+  --c-indigo-200: #bcc1f0;
+  --c-indigo-300: #949ce6;
+  --c-indigo-400: #6c75db;
+  --c-indigo-500: #4857e2;
+  --c-indigo-600: #3845c9;
+  --c-indigo-700: #2e39a3;
+  --c-indigo-800: #293282;
+  --c-indigo-900: #262e67;
 
-  /* ===== primitive · 中性冷灰(微偏蓝,屏显更干净)===== */
-  --p-gray-0: #ffffff;
-  --p-gray-25: #fbfcfd;
-  --p-gray-50: #f6f8fa;
-  --p-gray-100: #eef1f4;
-  --p-gray-200: #e1e6ec;
-  --p-gray-300: #cbd2db;
-  --p-gray-400: #9aa3b2;
-  --p-gray-500: #6c7585;
-  --p-gray-600: #4d5563;
-  --p-gray-700: #363d49;
-  --p-gray-800: #222831;
-  --p-gray-900: #12161d;
+  /* ===== primitive · 中性灰(zinc,真中性不偏蓝 —— shadcn 同款)===== */
+  --c-gray-0: #ffffff;
+  --c-gray-25: #fcfcfc;
+  --c-gray-50: #fafafa;
+  --c-gray-100: #f4f4f5;
+  --c-gray-200: #e4e4e7;
+  --c-gray-300: #d4d4d8;
+  --c-gray-400: #a1a1aa;
+  --c-gray-500: #71717a;
+  --c-gray-600: #52525b;
+  --c-gray-700: #3f3f46;
+  --c-gray-800: #27272a;
+  --c-gray-900: #18181b;
+  --c-gray-950: #09090b;
 
   /* ===== primitive · 状态色 ===== */
-  --p-green-50: #e7f8ee;
-  --p-green-500: #15b364;
-  --p-green-600: #0a9251;
-  --p-amber-50: #fef3e2;
-  --p-amber-500: #f59e0b;
-  --p-amber-600: #d97e06;
-  --p-red-50: #fdeaea;
-  --p-red-500: #ef4343;
-  --p-red-600: #d92d2d;
-  --p-blue-50: #e8f1fe;
-  --p-blue-500: #3b82f6;
-  --p-blue-600: #2570eb;
+  --c-green-50: #e7f8ee;
+  --c-green-500: #15b364;
+  --c-green-600: #0a9251;
+  --c-amber-50: #fef3e2;
+  --c-amber-500: #f59e0b;
+  --c-amber-600: #d97e06;
+  --c-red-50: #fdeaea;
+  --c-red-500: #ef4343;
+  --c-red-600: #d92d2d;
+  --c-blue-50: #e8f1fe;
+  --c-blue-500: #3b82f6;
+  --c-blue-600: #2570eb;
 
   /* ===== 间距(4px 基)===== */
   --space-0: 0;
@@ -75,8 +76,8 @@
   --radius-pill: 999px;
 
   /* ===== 字体 ===== */
-  --font-sans: 'PingFang SC', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto,
-    'Helvetica Neue', Arial, sans-serif;
+  --font-sans: 'Geist Variable', 'PingFang SC', -apple-system, BlinkMacSystemFont,
+    'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
   --font-mono: 'SF Mono', 'JetBrains Mono', ui-monospace, Menlo, Consolas, monospace;
 
   --text-xs: 12px;
@@ -135,51 +136,51 @@
 [data-theme='light'] {
   color-scheme: light;
 
-  /* 背景 / 表面 */
-  --bg-canvas: var(--p-gray-50);
-  --bg-surface: var(--p-gray-0);
-  --bg-subtle: var(--p-gray-100);
-  --bg-muted: var(--p-gray-50);
-  --bg-hover: var(--p-gray-100);
-  --bg-active: var(--p-gray-200);
-  --bg-inverse: var(--p-gray-900);
+  /* 背景 / 表面:画布带一点点灰,内容卡纯白 → 卡片更跳、不再一片白 */
+  --bg-canvas: var(--c-gray-100);
+  --bg-surface: var(--c-gray-0);
+  --bg-subtle: var(--c-gray-100);
+  --bg-muted: var(--c-gray-50);
+  --bg-hover: var(--c-gray-200);
+  --bg-active: var(--c-gray-300);
+  --bg-inverse: var(--c-gray-900);
 
   /* 边框 */
-  --border-subtle: var(--p-gray-100);
-  --border: var(--p-gray-200);
-  --border-strong: var(--p-gray-300);
+  --border-subtle: var(--c-gray-100);
+  --border: var(--c-gray-200);
+  --border-strong: var(--c-gray-300);
 
   /* 文字 */
-  --text-strong: var(--p-gray-900);
-  --text: var(--p-gray-800);
-  --text-muted: var(--p-gray-500);
-  --text-subtle: var(--p-gray-400);
-  --text-disabled: var(--p-gray-300);
-  --text-inverse: var(--p-gray-0);
+  --text-strong: var(--c-gray-900);
+  --text: var(--c-gray-800);
+  --text-muted: var(--c-gray-500);
+  --text-subtle: var(--c-gray-400);
+  --text-disabled: var(--c-gray-300);
+  --text-inverse: var(--c-gray-0);
 
   /* 主色 */
-  --primary: var(--p-indigo-500);
-  --primary-hover: var(--p-indigo-600);
-  --primary-active: var(--p-indigo-700);
-  --primary-subtle: var(--p-indigo-50);
-  --primary-subtle-hover: var(--p-indigo-100);
-  --on-primary: var(--p-gray-0);
+  --primary: var(--c-indigo-500);
+  --primary-hover: var(--c-indigo-600);
+  --primary-active: var(--c-indigo-700);
+  --primary-subtle: var(--c-indigo-50);
+  --primary-subtle-hover: var(--c-indigo-100);
+  --on-primary: var(--c-gray-0);
   --primary-ring: color-mix(in srgb, var(--primary) 38%, transparent);
 
   /* 成功 / 警告 / 危险 / 信息 */
-  --success: var(--p-green-600);
-  --success-subtle: var(--p-green-50);
-  --on-success: var(--p-gray-0);
-  --warning: var(--p-amber-600);
-  --warning-subtle: var(--p-amber-50);
-  --on-warning: var(--p-gray-0);
-  --danger: var(--p-red-500);
-  --danger-hover: var(--p-red-600);
-  --danger-subtle: var(--p-red-50);
-  --on-danger: var(--p-gray-0);
+  --success: var(--c-green-600);
+  --success-subtle: var(--c-green-50);
+  --on-success: var(--c-gray-0);
+  --warning: var(--c-amber-600);
+  --warning-subtle: var(--c-amber-50);
+  --on-warning: var(--c-gray-0);
+  --danger: var(--c-red-500);
+  --danger-hover: var(--c-red-600);
+  --danger-subtle: var(--c-red-50);
+  --on-danger: var(--c-gray-0);
   --danger-ring: color-mix(in srgb, var(--danger) 38%, transparent);
-  --info: var(--p-blue-600);
-  --info-subtle: var(--p-blue-50);
+  --info: var(--c-blue-600);
+  --info-subtle: var(--c-blue-50);
 
   /* 焦点环 */
   --focus-ring: var(--primary-ring);
@@ -192,35 +193,36 @@
 [data-theme='dark'] {
   color-scheme: dark;
 
-  --bg-canvas: var(--p-gray-900);
-  --bg-surface: var(--p-gray-800);
-  --bg-subtle: #1a1f27;
-  --bg-muted: #1a1f27;
-  --bg-hover: var(--p-gray-700);
-  --bg-active: var(--p-gray-600);
-  --bg-inverse: var(--p-gray-0);
+  /* 黑色系(zinc dark —— shadcn 同款)*/
+  --bg-canvas: #09090b;
+  --bg-surface: #18181b;
+  --bg-subtle: #18181b;
+  --bg-muted: #1c1c1f;
+  --bg-hover: #27272a;
+  --bg-active: #3f3f46;
+  --bg-inverse: #fafafa;
 
-  --border-subtle: #20262f;
-  --border: var(--p-gray-700);
-  --border-strong: var(--p-gray-600);
+  --border-subtle: #202023;
+  --border: #27272a;
+  --border-strong: #3f3f46;
 
-  --text-strong: var(--p-gray-0);
-  --text: var(--p-gray-100);
-  --text-muted: var(--p-gray-400);
-  --text-subtle: var(--p-gray-500);
-  --text-disabled: var(--p-gray-600);
-  --text-inverse: var(--p-gray-900);
+  --text-strong: #fafafa;
+  --text: #e4e4e7;
+  --text-muted: #a1a1aa;
+  --text-subtle: #71717a;
+  --text-disabled: #52525b;
+  --text-inverse: #18181b;
 
-  --primary: var(--p-indigo-400);
-  --primary-hover: var(--p-indigo-300);
-  --primary-active: var(--p-indigo-200);
-  --primary-subtle: rgba(91, 97, 242, 0.16);
-  --primary-subtle-hover: rgba(91, 97, 242, 0.24);
-  --on-primary: var(--p-gray-900);
+  --primary: var(--c-indigo-400);
+  --primary-hover: var(--c-indigo-300);
+  --primary-active: var(--c-indigo-200);
+  --primary-subtle: color-mix(in srgb, var(--primary) 18%, transparent);
+  --primary-subtle-hover: color-mix(in srgb, var(--primary) 26%, transparent);
+  --on-primary: var(--c-gray-900);
 
   --success-subtle: rgba(21, 179, 100, 0.16);
   --warning-subtle: rgba(245, 158, 11, 0.16);
-  --danger: var(--p-red-500);
+  --danger: var(--c-red-500);
   --danger-subtle: rgba(239, 67, 67, 0.16);
   --info-subtle: rgba(59, 130, 246, 0.16);
 
