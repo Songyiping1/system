@@ -9,39 +9,24 @@ import { Router } from '@angular/router';
 import {
   Observable,
   catchError,
-  finalize,
-  map,
-  of,
-  shareReplay,
-  switchMap,
-  tap,
   throwError,
 } from 'rxjs';
 import { TokenStorage } from '../auth/token.storage';
 import { SKIP_AUTH } from './http-context';
 import { ApiError } from './api-response.model';
-import { AuthService } from '../../features/auth/auth.service';
 
 /**
- * 认证 interceptor —— 注入 token + 401 自动刷新重试。
+ * 平台管理员认证 interceptor —— 注入 token + 401 清理登录态。
  *
  * 流程:
- *   1. 非匿名请求盖上 Authorization: Bearer <accessToken>
- *   2. 命中 401 时,用 refreshToken 静默换新 token,然后重放原请求
- *   3. 刷新失败 → 清 token + 跳登录(把原错误继续上抛给 errorInterceptor)
- *
- * 多个并发 401 只触发一次刷新(单飞),其余共享同一刷新结果。
+ *   1. 非匿名请求盖上 Authorization: Bearer <platformAccessToken>
+ *   2. 命中 401 时清本地平台管理员登录态并跳回登录页
  */
-
-/** 单飞:进行中的刷新流(成功 true / 失败 false) */
-let refresh$: Observable<boolean> | null = null;
-
 export function authInterceptor(
   req: HttpRequest<unknown>,
   next: HttpHandlerFn,
 ): Observable<HttpEvent<unknown>> {
   const tokenStorage = inject(TokenStorage);
-  const auth = inject(AuthService);
   const router = inject(Router);
 
   const skipAuth = req.context.get(SKIP_AUTH);
@@ -54,17 +39,8 @@ export function authInterceptor(
       if (skipAuth || !isUnauthorized(err)) {
         return throwError(() => err);
       }
-
-      return runRefresh(auth, tokenStorage).pipe(
-        switchMap((ok) => {
-          if (!ok) {
-            forceLogout(tokenStorage, router);
-            return throwError(() => err);
-          }
-          // 用新 token 重放原请求
-          return next(withToken(req, tokenStorage.accessToken));
-        }),
-      );
+      forceLogout(tokenStorage, router);
+      return throwError(() => err);
     }),
   );
 }
@@ -86,29 +62,7 @@ function isUnauthorized(err: unknown): boolean {
   return false;
 }
 
-/** 单飞刷新:首个 401 发起刷新,并发者共享同一结果 */
-function runRefresh(
-  auth: AuthService,
-  tokenStorage: TokenStorage,
-): Observable<boolean> {
-  const refreshToken = tokenStorage.refreshToken;
-  if (!refreshToken) return of(false);
-
-  if (!refresh$) {
-    refresh$ = auth.refreshToken(refreshToken).pipe(
-      tap((res) => tokenStorage.setTokens(res.accessToken, res.refreshToken)),
-      map(() => true),
-      catchError(() => of(false)),
-      finalize(() => {
-        refresh$ = null;
-      }),
-      shareReplay(1),
-    );
-  }
-  return refresh$;
-}
-
-/** 刷新失败:清 token + 跳登录(带 returnUrl) */
+/** 平台 token 失效:清 token + 跳登录(带 returnUrl) */
 function forceLogout(tokenStorage: TokenStorage, router: Router): void {
   tokenStorage.clear();
   const returnUrl = router.url;

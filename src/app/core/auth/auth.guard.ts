@@ -1,6 +1,5 @@
 import { inject } from '@angular/core';
 import { CanActivateFn, Router, UrlTree } from '@angular/router';
-import { Observable, map } from 'rxjs';
 import { AuthStore } from './auth.store';
 import { TokenStorage } from './token.storage';
 
@@ -15,14 +14,13 @@ function toLogin(router: Router, returnUrl: string): UrlTree {
  * authGuard —— 主应用区路由守卫。
  *
  * - 无 token:直接跳 /login(带 returnUrl)。
- * - 有 token 但未水合:调一次 store.hydrate() 拉登录环境,
- *   成功放行;失败跳 /login(401 已由 auth.interceptor 兜底)。
- * - 已水合:放行。
+ * - 有 token:从本地恢复平台管理员 profile,成功放行。
+ * - 平台管理员后端当前没有 /me 或 refresh 接口,401 由 auth.interceptor 兜底清理。
  */
 export const authGuard: CanActivateFn = (
   _route,
   state,
-): boolean | UrlTree | Observable<boolean | UrlTree> => {
+): boolean | UrlTree => {
   const store = inject(AuthStore);
   const tokenStorage = inject(TokenStorage);
   const router = inject(Router);
@@ -31,11 +29,9 @@ export const authGuard: CanActivateFn = (
     return toLogin(router, state.url);
   }
 
-  if (store.hydrated()) {
+  if (store.isLoggedIn() || store.restoreFromStorage()) {
     return true;
   }
 
-  return store
-    .hydrate()
-    .pipe(map((ok) => (ok ? true : toLogin(router, state.url))));
+  return toLogin(router, state.url);
 };

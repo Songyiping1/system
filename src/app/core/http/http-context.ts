@@ -17,12 +17,12 @@ export const SKIP_AUTH = new HttpContextToken<boolean>(() => false);
 
 /**
  * 标记:置 true 时,errorInterceptor 不弹全局 Toast。
- * 用于由调用方自行处理错误展示的接口(如登录页内联报错、token 刷新)。
+ * 用于由调用方自行处理错误展示的接口(如登录页内联报错)。
  */
 export const SKIP_ERROR_TOAST = new HttpContextToken<boolean>(() => false);
 
 /**
  * 标记:置 true 时,不计入全局加载进度条。
- * 用于轮询/SSE/后台静默请求(如 token 刷新)。
+ * 用于轮询/SSE/后台静默请求。
  */
 export const SKIP_LOADING = new HttpContextToken<boolean>(() => false);

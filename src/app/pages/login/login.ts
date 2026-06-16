@@ -8,7 +8,7 @@ import {
 } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
-import { finalize, switchMap, tap } from 'rxjs';
+import { finalize, tap } from 'rxjs';
 import { ButtonModule } from 'primeng/button';
 import { InputTextModule } from 'primeng/inputtext';
 import { PasswordModule } from 'primeng/password';
@@ -21,10 +21,10 @@ import {
 } from '../../shared/directives/reveal.directive';
 import { AuthService } from '../../features/auth/auth.service';
 
-type LoginPhase = 'idle' | 'validating' | 'authenticating' | 'hydrating' | 'complete';
+type LoginPhase = 'idle' | 'validating' | 'authenticating' | 'complete';
 
 interface FieldErrors {
-  mobile?: string;
+  account?: string;
   password?: string;
 }
 
@@ -73,8 +73,8 @@ interface FieldErrors {
       <section class="login-workbench" appReveal [appRevealDelay]="0.08" [appRevealY]="0">
         <header class="workbench-head">
           <div>
-            <span class="eyebrow">账号登录</span>
-            <h2>进入 PassAuth Console</h2>
+            <span class="eyebrow">平台管理员</span>
+            <h2>进入管理后台</h2>
           </div>
           <span class="phase-badge" [class.phase-badge--active]="submitting()">
             {{ phaseLabel() }}
@@ -92,21 +92,20 @@ interface FieldErrors {
         }
 
         <form class="login-form" (ngSubmit)="submit()" appRevealStagger>
-          <label class="field" [class.field--invalid]="fieldErrors().mobile">
-            <span class="field__label">手机号</span>
+          <label class="field" [class.field--invalid]="fieldErrors().account">
+            <span class="field__label">账号</span>
             <input
               pInputText
-              name="mobile"
-              inputmode="numeric"
+              name="account"
               autocomplete="username"
-              placeholder="请输入手机号"
+              placeholder="请输入用户名或手机号"
               [disabled]="submitting()"
-              [class.is-invalid]="fieldErrors().mobile"
-              [ngModel]="mobile()"
-              (ngModelChange)="setMobile($event)"
+              [class.is-invalid]="fieldErrors().account"
+              [ngModel]="account()"
+              (ngModelChange)="setAccount($event)"
             />
-            @if (fieldErrors().mobile) {
-              <small class="field__error">{{ fieldErrors().mobile }}</small>
+            @if (fieldErrors().account) {
+              <small class="field__error">{{ fieldErrors().account }}</small>
             }
           </label>
 
@@ -131,7 +130,7 @@ interface FieldErrors {
 
           <div class="trust-row" aria-label="登录说明">
             <span><i class="pi pi-shield"></i>安全连接</span>
-            <span><i class="pi pi-building"></i>进入工作区</span>
+            <span><i class="pi pi-key"></i>独立平台账号</span>
           </div>
 
           <p-button
@@ -149,7 +148,7 @@ interface FieldErrors {
   `,
 })
 export class LoginPage implements OnInit {
-  protected readonly mobile = signal('');
+  protected readonly account = signal('');
   protected readonly password = signal('');
   protected readonly submitting = signal(false);
   protected readonly error = signal('');
@@ -160,7 +159,7 @@ export class LoginPage implements OnInit {
   protected readonly canSubmit = computed(
     () =>
       !this.submitting() &&
-      this.mobile().trim().length > 0 &&
+      this.account().trim().length > 0 &&
       this.password().length > 0,
   );
 
@@ -170,8 +169,6 @@ export class LoginPage implements OnInit {
         return '正在检查';
       case 'authenticating':
         return '正在验证';
-      case 'hydrating':
-        return '正在准备';
       case 'complete':
         return '登录完成';
       default:
@@ -183,8 +180,6 @@ export class LoginPage implements OnInit {
     switch (this.phase()) {
       case 'authenticating':
         return '验证中';
-      case 'hydrating':
-        return '准备中';
       case 'complete':
         return '进入中';
       default:
@@ -201,23 +196,15 @@ export class LoginPage implements OnInit {
   ngOnInit(): void {
     if (!this.tokenStorage.accessToken) return;
 
-    this.phase.set('hydrating');
-    this.store.hydrate().subscribe({
-      next: (ok) => {
-        if (ok) {
-          this.phase.set('complete');
-          this.router.navigateByUrl(this.returnUrl());
-          return;
-        }
-        this.phase.set('idle');
-      },
-      error: () => this.phase.set('idle'),
-    });
+    if (this.store.restoreFromStorage()) {
+      this.phase.set('complete');
+      this.router.navigateByUrl(this.returnUrl());
+    }
   }
 
-  setMobile(value: string): void {
-    this.mobile.set(value);
-    this.fieldErrors.update((errors) => ({ ...errors, mobile: undefined }));
+  setAccount(value: string): void {
+    this.account.set(value);
+    this.fieldErrors.update((errors) => ({ ...errors, account: undefined }));
     this.error.set('');
   }
 
@@ -228,11 +215,11 @@ export class LoginPage implements OnInit {
   }
 
   submit(): void {
-    const mobile = this.mobile().trim();
+    const account = this.account().trim();
     const password = this.password();
 
     this.phase.set('validating');
-    if (!this.validate(mobile, password)) {
+    if (!this.validate(account, password)) {
       this.phase.set('idle');
       return;
     }
@@ -242,26 +229,16 @@ export class LoginPage implements OnInit {
     this.phase.set('authenticating');
 
     this.auth
-      .passwordLogin(mobile, password)
+      .platformAdminLogin(account, password)
       .pipe(
         tap((result) => {
-          if (result.flowStage && result.flowStage !== 'authenticated') {
-            throw new Error('当前账号需要完成额外验证，请按提示继续');
-          }
-          this.tokenStorage.setTokens(result.accessToken, result.refreshToken);
-          this.phase.set('hydrating');
+          this.store.signIn(result);
+          this.phase.set('complete');
         }),
-        switchMap(() => this.store.hydrate()),
         finalize(() => this.submitting.set(false)),
       )
       .subscribe({
-        next: (ok) => {
-          if (!ok) {
-            this.phase.set('idle');
-            this.showError('进入工作区失败', '登录成功，但进入工作区失败，请稍后重试');
-            return;
-          }
-          this.phase.set('complete');
+        next: () => {
           window.setTimeout(() => this.router.navigateByUrl(this.returnUrl()), 220);
         },
         error: (err: unknown) => {
@@ -273,15 +250,15 @@ export class LoginPage implements OnInit {
 
   private returnUrl(): string {
     const url = this.route.snapshot.queryParamMap.get('returnUrl');
-    return url && url !== '/login' ? url : '/session';
+    return url && url !== '/login' ? url : '/users';
   }
 
-  private validate(mobile: string, password: string): boolean {
+  private validate(account: string, password: string): boolean {
     const errors: FieldErrors = {};
-    if (!mobile) {
-      errors.mobile = '请输入手机号';
-    } else if (!/^\d{6,20}$/.test(mobile)) {
-      errors.mobile = '手机号只能包含 6-20 位数字';
+    if (!account) {
+      errors.account = '请输入平台账号';
+    } else if (account.length > 64) {
+      errors.account = '账号不能超过 64 个字符';
     }
 
     if (!password) {

@@ -9,14 +9,31 @@ export const routes: Routes = [
   },
   {
     path: '',
-    pathMatch: 'full',
-    redirectTo: 'session',
-  },
-  {
-    path: 'session',
     canActivate: [authGuard],
-    loadComponent: () => import('./pages/session/session').then((m) => m.SessionPage),
-    title: '会话 · PassAuth Console',
+    loadComponent: () => import('./shell/admin/admin-shell').then((m) => m.AdminShell),
+    children: [
+      {
+        path: '',
+        pathMatch: 'full',
+        redirectTo: 'users',
+      },
+      {
+        path: 'users',
+        loadComponent: () => import('./pages/users/users').then((m) => m.UsersPage),
+        title: '用户管理 · PassAuth Console',
+      },
+      {
+        path: 'onboarding',
+        loadComponent: () =>
+          import('./pages/onboarding-review/onboarding-review').then((m) => m.OnboardingReviewPage),
+        title: '入驻审核 · PassAuth Console',
+      },
+      {
+        path: 'session',
+        pathMatch: 'full',
+        redirectTo: 'users',
+      },
+    ],
   },
   {
     path: 'ui-kit',

@@ -9,7 +9,7 @@ import { ToastService } from '../feedback/toast.service';
  * 错误 Toast interceptor —— 统一把失败弹成全局提示,业务里不必每处手写。
  *
  * 注册在 auth 之外、response 之外:
- *   - 只在 auth 的「刷新 token + 重试」彻底失败后才会收到错误(刷新成功则无错冒上来)
+ *   - auth 负责 401 清理登录态,其他错误继续向外冒泡
  *   - response 已把 HTTP/业务错误归一成 ApiError,这里直接读 message
  * SKIP_ERROR_TOAST 的接口自行处理报错,不弹。
  */

@@ -32,8 +32,8 @@ export const appConfig: ApplicationConfig = {
     provideRouter(routes, withViewTransitions()),
     // interceptor 顺序(外→内)很重要:
     //   loading  —— 最外层,统计所有在途请求驱动顶部进度条
-    //   error    —— 在 auth 之外:仅当刷新重试彻底失败才弹 Toast
-    //   auth     —— 盖 Bearer token;401 自动刷新 + 重放原请求
+    //   error    —— 在 auth 之外,统一弹业务错误 Toast
+    //   auth     —— 盖平台管理员 Bearer token;401 清本地登录态
     //   response —— 最内层,拆壳(成功透传 data / 失败归一成 ApiError)
     provideHttpClient(
       withInterceptors([
