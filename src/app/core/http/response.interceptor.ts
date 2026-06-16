@@ -42,8 +42,12 @@ export function responseInterceptor(
 
       const shell = body as ApiResponse;
 
+      const success =
+        shell.isSuccess === true ||
+        (shell.isSuccess === undefined && shell.code === 200);
+
       // 业务失败 → 抛 ApiError
-      if (!shell.isSuccess) {
+      if (!success) {
         throw new ApiError(shell.code, shell.message || '请求失败', event.status);
       }
 

@@ -12,7 +12,7 @@
  */
 export interface ApiResponse<T = unknown> {
   /** 业务是否成功。拆壳依据。 */
-  isSuccess: boolean;
+  isSuccess?: boolean;
   /** 业务码。200 成功;其余为各业务错误码。 */
   code: number;
   /** 提示文案。失败时用于错误展示。 */
@@ -43,10 +43,16 @@ export class ApiError extends Error {
 
 /** 判断一个响应体是否符合 pass-authx 返回壳形状。 */
 export function isApiResponse(body: unknown): body is ApiResponse {
-  return (
-    typeof body === 'object' &&
-    body !== null &&
-    'isSuccess' in body &&
-    typeof (body as ApiResponse).isSuccess === 'boolean'
-  );
+  if (typeof body !== 'object' || body === null) return false;
+
+  const candidate = body as ApiResponse;
+  const hasWrappedFlag =
+    'isSuccess' in candidate && typeof candidate.isSuccess === 'boolean';
+  const hasAuthxShell =
+    'code' in candidate &&
+    typeof candidate.code === 'number' &&
+    'message' in candidate &&
+    typeof candidate.message === 'string';
+
+  return hasWrappedFlag || hasAuthxShell;
 }
