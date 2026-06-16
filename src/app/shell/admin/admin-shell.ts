@@ -30,14 +30,29 @@ interface NavItem {
     <div class="admin-shell">
       <aside class="sidebar" [class.sidebar--open]="navOpen()" aria-label="平台后台导航">
         <div class="brand">
-          <span class="brand__mark">PA</span>
-          <div>
+          <span class="brand__mark" aria-hidden="true">
+            <svg viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path
+                d="M16 2.6 26.4 6.6 V14.8 C26.4 21.6 22 26.4 16 29.4 C10 26.4 5.6 21.6 5.6 14.8 V6.6 Z"
+                fill="var(--primary)"
+              />
+              <path
+                d="M11.2 16 14.6 19.4 20.9 12.6"
+                stroke="var(--on-primary)"
+                stroke-width="2.6"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+              />
+            </svg>
+          </span>
+          <div class="brand__copy">
             <strong>PassAuth</strong>
             <span>System Console</span>
           </div>
         </div>
 
         <nav class="nav">
+          <p class="nav-label">管理</p>
           @for (item of navItems; track item.path) {
             <a
               class="nav-item"
@@ -47,18 +62,17 @@ interface NavItem {
               (click)="closeNav()"
             >
               <i [class]="item.icon"></i>
-              <span>
-                <strong>{{ item.label }}</strong>
-                <small>{{ item.description }}</small>
-              </span>
+              <span class="nav-item__label">{{ item.label }}</span>
             </a>
           }
         </nav>
 
         <div class="sidebar-foot">
-          <span>当前身份</span>
-          <strong>{{ displayName() }}</strong>
-          <small>{{ accountLine() }}</small>
+          <span class="sidebar-foot__avatar">{{ avatarLabel() }}</span>
+          <div class="sidebar-foot__meta">
+            <strong>{{ displayName() }}</strong>
+            <small>{{ accountLine() }}</small>
+          </div>
         </div>
       </aside>
 
@@ -161,10 +175,10 @@ export class AdminShell {
 
   async logout(): Promise<void> {
     const ok = await this.confirm.ask({
-      title: '退出平台后台',
-      message: '当前平台管理员 token 会从本机清除。',
+      title: '退出登录',
+      message: '确定要退出当前账号吗？',
       confirmText: '退出',
-      cancelText: '继续使用',
+      cancelText: '取消',
       danger: true,
     });
     if (!ok) return;

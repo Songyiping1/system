@@ -42,17 +42,8 @@ type ReviewAction = 'approve' | 'reject';
   ],
   styleUrl: './onboarding-review.scss',
   template: `
-    <section class="page" appReveal>
-      <header class="page-head">
-        <div>
-          <span class="eyebrow">Onboarding Review</span>
-          <h2>入驻审核</h2>
-          <p>处理用户提交的公司入驻申请，审核通过后后端会创建公司和成员身份。</p>
-        </div>
-        <p-button icon="pi pi-refresh" label="刷新" [outlined]="true" (onClick)="load()" />
-      </header>
-
-      <section class="toolbar" appReveal [appRevealDelay]="0.04">
+    <section class="page" appReveal [appRevealY]="0">
+      <div class="toolbar">
         <p-select
           [options]="stateOptions"
           optionLabel="label"
@@ -61,13 +52,11 @@ type ReviewAction = 'approve' | 'reject';
           (ngModelChange)="setState($event)"
           styleClass="state-select"
         />
-        <div class="queue-summary">
-          <span>当前筛选</span>
-          <strong>{{ stateLabel(state()) }}</strong>
-        </div>
-      </section>
+        <span class="toolbar__spacer"></span>
+        <p-button icon="pi pi-refresh" label="刷新" [text]="true" (onClick)="load()" />
+      </div>
 
-      <section class="review-grid" appReveal [appRevealDelay]="0.08">
+      <section class="review-grid" appReveal [appRevealDelay]="0.08" [appRevealY]="0">
         <aside class="queue-panel">
           <div class="queue-panel__head">
             <div>

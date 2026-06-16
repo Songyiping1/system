@@ -1,6 +1,6 @@
 import { HttpErrorResponse, HttpEvent, HttpHandlerFn, HttpRequest, HttpResponse } from '@angular/common/http';
 import { Observable, map, throwError, catchError } from 'rxjs';
-import { ApiError, ApiResponse, isApiResponse } from './api-response.model';
+import { ApiError, ApiResponse, httpStatusMessage, isApiResponse } from './api-response.model';
 import { RAW_RESPONSE } from './http-context';
 
 /**
@@ -69,11 +69,9 @@ export function responseInterceptor(
             () => new ApiError(errBody.code, errBody.message || err.message, err.status),
           );
         }
-        const message =
-          err.status === 0
-            ? '网络连接失败,请检查网络'
-            : err.message || `请求失败(${err.status})`;
-        return throwError(() => new ApiError(err.status, message, err.status));
+        return throwError(
+          () => new ApiError(err.status, httpStatusMessage(err.status), err.status),
+        );
       }
 
       // 其余未知错误

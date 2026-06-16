@@ -1,26 +1,16 @@
-.page {
+:host {
+  flex: 1;
+  min-height: 0;
   display: flex;
   flex-direction: column;
-  gap: var(--space-5);
 }
 
-.page-head {
+.page {
+  flex: 1;
+  min-height: 0;
   display: flex;
-  align-items: flex-end;
-  justify-content: space-between;
-  gap: var(--space-5);
-
-  h2 {
-    margin: var(--space-1) 0;
-    color: var(--text-strong);
-    font-size: var(--text-2xl);
-    line-height: var(--leading-tight);
-  }
-
-  p {
-    margin: 0;
-    color: var(--text-muted);
-  }
+  flex-direction: column;
+  gap: var(--space-4);
 }
 
 .eyebrow {
@@ -30,79 +20,78 @@
   letter-spacing: 0;
 }
 
-.toolbar,
+// 扁平工具栏 —— 不再是卡片
+.toolbar {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+
+  &__spacer {
+    flex: 1;
+  }
+}
+
 .queue-panel,
 .preview-panel {
   border: 1px solid var(--border-subtle);
   border-radius: var(--radius-lg);
   background: var(--bg-surface);
-  box-shadow: var(--shadow-sm);
-}
-
-.toolbar {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: var(--space-4);
-  padding: var(--space-4);
 }
 
 :host ::ng-deep .state-select {
-  width: 220px;
-}
-
-.queue-summary {
-  display: flex;
-  align-items: center;
-  gap: var(--space-2);
-  color: var(--text-muted);
-  font-size: var(--text-sm);
-
-  strong {
-    color: var(--text-strong);
-  }
+  width: 200px;
 }
 
 .review-grid {
+  flex: 1;
+  min-height: 0;
   display: grid;
-  grid-template-columns: minmax(360px, 0.92fr) minmax(360px, 1fr);
-  gap: var(--space-5);
-  align-items: start;
+  grid-template-columns: minmax(340px, 0.9fr) minmax(360px, 1fr);
+  gap: var(--space-4);
+  align-items: stretch;
 }
 
 .queue-panel {
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
   overflow: hidden;
 
   &__head {
-    min-height: 64px;
     display: flex;
     align-items: center;
     justify-content: space-between;
     gap: var(--space-4);
-    padding: var(--space-4) var(--space-5);
+    padding: var(--space-3) var(--space-4);
     border-bottom: 1px solid var(--border-subtle);
-
-    strong,
-    span {
-      display: block;
-    }
 
     strong {
       color: var(--text-strong);
+      font-size: var(--text-sm);
     }
 
     span {
-      color: var(--text-muted);
-      font-size: var(--text-sm);
+      color: var(--text-subtle);
+      font-size: var(--text-xs);
+    }
+
+    > div {
+      display: flex;
+      align-items: baseline;
+      gap: var(--space-2);
     }
   }
 }
 
 .skeleton-list,
 .apply-list {
+  flex: 1;
+  min-height: 0;
+  overflow: auto;
   display: grid;
-  gap: var(--space-3);
-  padding: var(--space-4);
+  align-content: start;
+  gap: var(--space-2);
+  padding: var(--space-3);
 }
 
 .apply-card {
@@ -171,33 +160,35 @@
 }
 
 .state-block {
-  min-height: 320px;
+  flex: 1;
+  min-height: 0;
   display: grid;
   place-items: center;
   align-content: center;
-  gap: var(--space-3);
-  padding: var(--space-8);
+  gap: var(--space-2);
+  padding: var(--space-6);
   color: var(--text-muted);
   text-align: center;
 
   i {
-    width: 48px;
-    height: 48px;
+    width: 40px;
+    height: 40px;
     display: grid;
     place-items: center;
     border-radius: var(--radius-md);
     color: var(--primary);
     background: var(--primary-subtle);
-    font-size: var(--text-xl);
+    font-size: var(--text-lg);
   }
 
   strong {
     color: var(--text-strong);
-    font-size: var(--text-lg);
+    font-size: var(--text-base);
   }
 
   p {
     margin: 0;
+    font-size: var(--text-sm);
   }
 
   &--error i {
@@ -221,7 +212,7 @@
 }
 
 .preview-panel {
-  min-height: 520px;
+  min-height: 0;
   display: grid;
   padding: var(--space-5);
 }
@@ -406,14 +397,8 @@
 }
 
 @media (max-width: 680px) {
-  .page-head,
-  .toolbar {
-    align-items: flex-start;
-    flex-direction: column;
-  }
-
   :host ::ng-deep .state-select {
-    width: 100%;
+    flex: 1;
   }
 
   .apply-card {

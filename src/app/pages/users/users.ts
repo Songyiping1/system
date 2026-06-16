@@ -39,17 +39,8 @@ import {
   ],
   styleUrl: './users.scss',
   template: `
-    <section class="page" appReveal>
-      <header class="page-head">
-        <div>
-          <span class="eyebrow">User Operations</span>
-          <h2>用户管理</h2>
-          <p>查询平台用户、查看所属公司与登录会话，并处理账号状态。</p>
-        </div>
-        <p-button icon="pi pi-refresh" label="刷新" [outlined]="true" (onClick)="load()" />
-      </header>
-
-      <section class="toolbar" appReveal [appRevealDelay]="0.04">
+    <section class="page" appReveal [appRevealY]="0">
+      <div class="toolbar">
         <label class="search">
           <i class="pi pi-search"></i>
           <input
@@ -69,9 +60,11 @@ import {
           styleClass="state-select"
         />
         <p-button label="查询" icon="pi pi-filter" (onClick)="search()" />
-      </section>
+        <span class="toolbar__spacer"></span>
+        <p-button icon="pi pi-refresh" label="刷新" [text]="true" (onClick)="load()" />
+      </div>
 
-      <section class="data-panel" appReveal [appRevealDelay]="0.08">
+      <section class="data-panel" appReveal [appRevealDelay]="0.08" [appRevealY]="0">
         <div class="data-panel__head">
           <div>
             <strong>用户列表</strong>

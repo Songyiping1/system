@@ -41,6 +41,46 @@ export class ApiError extends Error {
   }
 }
 
+/**
+ * HTTP 状态码 → 用户可读兜底文案。
+ * 仅用于「非业务壳」的传输层错误(网络断 / 网关 / 404 / 500 等),
+ * 业务失败优先用后端返回壳里的 message。
+ */
+export function httpStatusMessage(status: number): string {
+  switch (status) {
+    case 0:
+      return '网络连接失败,请检查网络后重试';
+    case 400:
+      return '请求参数有误';
+    case 401:
+      return '登录已过期,请重新登录';
+    case 403:
+      return '没有权限访问该资源';
+    case 404:
+      return '请求的资源不存在';
+    case 408:
+      return '请求超时,请稍后重试';
+    case 409:
+      return '操作冲突,请刷新后重试';
+    case 422:
+      return '提交的数据未通过校验';
+    case 429:
+      return '操作过于频繁,请稍后再试';
+    case 500:
+      return '服务器开小差了,请稍后重试';
+    case 502:
+      return '网关错误,请稍后重试';
+    case 503:
+      return '服务暂不可用,请稍后重试';
+    case 504:
+      return '网关超时,请稍后重试';
+    default:
+      if (status >= 500) return '服务异常,请稍后重试';
+      if (status >= 400) return '请求失败,请稍后重试';
+      return '请求失败,请稍后重试';
+  }
+}
+
 /** 判断一个响应体是否符合 pass-authx 返回壳形状。 */
 export function isApiResponse(body: unknown): body is ApiResponse {
   if (typeof body !== 'object' || body === null) return false;

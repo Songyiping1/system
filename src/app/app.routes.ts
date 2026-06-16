@@ -9,7 +9,6 @@ export const routes: Routes = [
   },
   {
     path: '',
-    canActivate: [authGuard],
     loadComponent: () => import('./shell/admin/admin-shell').then((m) => m.AdminShell),
     children: [
       {

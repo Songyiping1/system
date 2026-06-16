@@ -128,12 +128,7 @@ interface FieldErrors {
             }
           </label>
 
-          <div class="trust-row" aria-label="登录说明">
-            <span><i class="pi pi-shield"></i>安全连接</span>
-            <span><i class="pi pi-key"></i>独立平台账号</span>
-          </div>
-
-          <p-button
+<p-button
             type="submit"
             [label]="submitLabel()"
             icon="pi pi-arrow-right"

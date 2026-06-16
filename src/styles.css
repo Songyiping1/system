@@ -45,23 +45,21 @@ select {
 @keyframes vt-fade-in {
   from {
     opacity: 0;
-    transform: translateY(8px);
   }
 }
 
 @keyframes vt-fade-out {
   to {
     opacity: 0;
-    transform: translateY(-6px);
   }
 }
 
 ::view-transition-old(root) {
-  animation: vt-fade-out var(--motion-base) var(--ease-out) both;
+  animation: vt-fade-out var(--motion-fast) var(--ease-out) both;
 }
 
 ::view-transition-new(root) {
-  animation: vt-fade-in var(--motion-slow) var(--ease-out) both;
+  animation: vt-fade-in var(--motion-base) var(--ease-out) both;
 }
 
 /* ============================================================
