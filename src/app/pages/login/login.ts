@@ -42,80 +42,35 @@ interface FieldErrors {
   styleUrl: './login.scss',
   template: `
     <main class="login-shell">
-      <section class="login-hero" appReveal>
+      <section class="login-hero" appReveal [appRevealY]="0">
         <header class="brand">
-          <span class="brand__mark">PA</span>
+          <span class="brand__mark" aria-hidden="true">
+            <svg viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path
+                d="M16 2.6 26.4 6.6 V14.8 C26.4 21.6 22 26.4 16 29.4 C10 26.4 5.6 21.6 5.6 14.8 V6.6 Z"
+                fill="var(--primary)"
+              />
+              <path
+                d="M11.2 16 14.6 19.4 20.9 12.6"
+                stroke="var(--on-primary)"
+                stroke-width="2.6"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+              />
+            </svg>
+          </span>
           <div class="brand__copy">
             <strong>PassAuth Console</strong>
-            <span>统一登录入口</span>
+            <span>身份与访问管理</span>
           </div>
         </header>
 
         <figure class="login-visual" aria-hidden="true">
-          <div class="console-panel">
-            <div class="console-panel__bar">
-              <span></span>
-              <span></span>
-              <span></span>
-              <strong>PassAuth 控制台</strong>
-            </div>
-
-            <div class="console-grid">
-              <div class="console-auth">
-                <span class="console-auth__shield">
-                  <i class="pi pi-shield"></i>
-                </span>
-                <div class="console-auth__copy">
-                  <strong>身份验证</strong>
-                  <span>账号、设备、会话</span>
-                </div>
-              </div>
-
-              <div class="console-status">
-                <div>
-                  <span>公司</span>
-                  <strong>已匹配</strong>
-                </div>
-                <div>
-                  <span>角色</span>
-                  <strong>已确认</strong>
-                </div>
-                <div>
-                  <span>菜单</span>
-                  <strong>可访问</strong>
-                </div>
-              </div>
-
-              <div class="console-matrix">
-                <span class="matrix-cell matrix-cell--active"></span>
-                <span></span>
-                <span class="matrix-cell matrix-cell--active"></span>
-                <span></span>
-                <span class="matrix-cell matrix-cell--active"></span>
-                <span class="matrix-cell matrix-cell--active"></span>
-                <span></span>
-                <span class="matrix-cell matrix-cell--active"></span>
-                <span></span>
-                <span></span>
-                <span class="matrix-cell matrix-cell--active"></span>
-                <span></span>
-              </div>
-            </div>
-
-            <div class="console-flow">
-              <span>身份</span>
-              <i class="pi pi-arrow-right"></i>
-              <span>公司</span>
-              <i class="pi pi-arrow-right"></i>
-              <span>角色</span>
-              <i class="pi pi-arrow-right"></i>
-              <span>菜单</span>
-            </div>
-          </div>
+          <img class="login-visual__art" src="illustrations/login.svg" alt="" />
         </figure>
       </section>
 
-      <section class="login-workbench" appReveal [appRevealDelay]="0.08">
+      <section class="login-workbench" appReveal [appRevealDelay]="0.08" [appRevealY]="0">
         <header class="workbench-head">
           <div>
             <span class="eyebrow">账号登录</span>
