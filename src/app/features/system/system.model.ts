@@ -8,6 +8,16 @@ export interface SystemUserQuery extends PageRequest {
   state?: string;
 }
 
+export interface SystemUserListSummary {
+  total: number;
+  active: number;
+  disabled: number;
+  archived: number;
+  deleted: number;
+  withCompany: number;
+  withoutCompany: number;
+}
+
 export interface SystemUser {
   id: string;
   username?: string;
@@ -54,6 +64,16 @@ export interface SystemUserDetail {
 export interface SystemUserStateUpdate {
   state: 'active' | 'disabled' | 'archived';
 }
+
+export const EMPTY_USER_LIST_SUMMARY: SystemUserListSummary = {
+  total: 0,
+  active: 0,
+  disabled: 0,
+  archived: 0,
+  deleted: 0,
+  withCompany: 0,
+  withoutCompany: 0,
+};
 
 export interface CompanyApplyQuery extends PageRequest {
   state?: string;

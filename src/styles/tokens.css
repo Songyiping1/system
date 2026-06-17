@@ -137,9 +137,9 @@
   color-scheme: light;
 
   /* 背景 / 表面:画布带一点点灰,内容卡纯白 → 卡片更跳、不再一片白 */
-  --bg-canvas: var(--c-gray-100);
+  --bg-canvas: #f2f2f6;
   --bg-surface: var(--c-gray-0);
-  --bg-subtle: var(--c-gray-100);
+  --bg-subtle: #f2f2f6;
   --bg-muted: var(--c-gray-50);
   --bg-hover: var(--c-gray-200);
   --bg-active: var(--c-gray-300);

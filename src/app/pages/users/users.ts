@@ -12,6 +12,7 @@ import { ConfirmService } from '../../core/feedback/confirm.service';
 import { ToastService } from '../../core/feedback/toast.service';
 import { SystemService } from '../../features/system/system.service';
 import {
+  EMPTY_USER_LIST_SUMMARY,
   SystemUser,
   SystemUserDetail,
   USER_STATE_OPTIONS,
@@ -34,31 +35,61 @@ import { PageResult, emptyPage } from '../../shared/models/page-result';
   styleUrl: './users.scss',
   template: `
     <section class="page">
-      <div class="toolbar">
-        <label class="search">
-          <i class="pi pi-search"></i>
-          <input
-            pInputText
-            placeholder="用户名 / 手机号 / 真实姓名"
-            [ngModel]="keyword()"
-            (ngModelChange)="keyword.set($event)"
-            (keyup.enter)="search()"
-          />
-        </label>
-        <p-select
-          [options]="stateOptions"
-          optionLabel="label"
-          optionValue="value"
-          [ngModel]="state()"
-          (ngModelChange)="setState($event)"
-          styleClass="state-select"
-        />
-        <p-button label="查询" icon="pi pi-filter" (onClick)="search()" />
-        <span class="toolbar__spacer"></span>
-        <p-button icon="pi pi-refresh" label="刷新" [text]="true" (onClick)="load()" />
-      </div>
-
       <section class="data-panel">
+        <div class="data-panel__tools">
+          <label class="search">
+            <i class="pi pi-search"></i>
+            <input
+              pInputText
+              placeholder="用户名 / 手机号 / 真实姓名"
+              [ngModel]="keyword()"
+              (ngModelChange)="keyword.set($event)"
+              (keyup.enter)="search()"
+            />
+          </label>
+          <p-select
+            [options]="stateOptions"
+            optionLabel="label"
+            optionValue="value"
+            [ngModel]="state()"
+            (ngModelChange)="setState($event)"
+            styleClass="state-select"
+          />
+          <p-button label="查询" icon="pi pi-filter" (onClick)="search()" />
+          <span class="data-panel__tools-spacer"></span>
+          <p-button icon="pi pi-refresh" label="刷新" [text]="true" (onClick)="load()" />
+        </div>
+
+        <div class="summary-strip" [class.is-loading]="summaryLoading()">
+          <div class="summary-strip__group" aria-label="用户状态统计">
+            @for (item of stateSummaryItems(); track item.value) {
+              <button
+                class="summary-chip"
+                type="button"
+                [class.is-active]="state() === item.value"
+                [attr.aria-pressed]="state() === item.value"
+                (click)="selectSummaryState(item.value)"
+              >
+                <i [class]="item.icon"></i>
+                <span>{{ item.label }}</span>
+                <strong>{{ item.count }}</strong>
+              </button>
+            }
+          </div>
+          <div class="summary-strip__group summary-strip__group--company" aria-label="公司归属统计">
+            @for (item of companySummaryItems(); track item.label) {
+              <span class="summary-chip summary-chip--readonly">
+                <i [class]="item.icon"></i>
+                <span>{{ item.label }}</span>
+                <strong>{{ item.count }}</strong>
+              </span>
+            }
+          </div>
+          @if (summaryError()) {
+            <span class="summary-strip__error">{{ summaryError() }}</span>
+          }
+        </div>
+
         <div class="data-panel__head">
           <div>
             <strong>用户列表</strong>
@@ -70,7 +101,7 @@ import { PageResult, emptyPage } from '../../shared/models/page-result';
         @if (loading()) {
           <div class="skeleton-list">
             @for (row of skeletonRows; track row) {
-              <p-skeleton height="54px" borderRadius="8px" />
+              <p-skeleton height="42px" borderRadius="6px" />
             }
           </div>
         } @else if (error()) {
@@ -104,8 +135,15 @@ import { PageResult, emptyPage } from '../../shared/models/page-result';
                   <tr>
                     <td>
                       <button class="user-cell" type="button" (click)="openDetail(user)">
-                        <span class="avatar">{{ avatarOf(user) }}</span>
-                        <span>
+                        <span
+                          class="user-state-dot"
+                          [class.is-active]="user.state === 'active'"
+                          [class.is-disabled]="user.state === 'disabled'"
+                          [class.is-archived]="user.state === 'archived'"
+                          [class.is-deleted]="user.state === 'deleted'"
+                          aria-hidden="true"
+                        ></span>
+                        <span class="user-cell__text">
                           <strong>{{ user.username || user.realName || '-' }}</strong>
                           <small>{{ user.id }}</small>
                         </span>
@@ -118,22 +156,24 @@ import { PageResult, emptyPage } from '../../shared/models/page-result';
                     </td>
                     <td>{{ formatTime(user.createdAt) }}</td>
                     <td class="row-actions">
-                      <p-button
-                        icon="pi pi-eye"
-                        [text]="true"
-                        pTooltip="查看详情"
-                        ariaLabel="查看详情"
-                        (onClick)="openDetail(user)"
-                      />
-                      <p-button
-                        icon="pi pi-ban"
-                        [text]="true"
-                        severity="danger"
-                        pTooltip="禁用账号"
-                        ariaLabel="禁用账号"
-                        [disabled]="user.state === 'disabled'"
-                        (onClick)="changeState(user, 'disabled')"
-                      />
+                      <span class="row-actions__inner">
+                        <p-button
+                          icon="pi pi-eye"
+                          [text]="true"
+                          pTooltip="查看详情"
+                          ariaLabel="查看详情"
+                          (onClick)="openDetail(user)"
+                        />
+                        <p-button
+                          icon="pi pi-ban"
+                          [text]="true"
+                          severity="danger"
+                          pTooltip="禁用账号"
+                          ariaLabel="禁用账号"
+                          [disabled]="user.state === 'disabled'"
+                          (onClick)="changeState(user, 'disabled')"
+                        />
+                      </span>
                     </td>
                   </tr>
                 }
@@ -299,8 +339,11 @@ export class UsersPage implements OnInit {
   protected readonly page = signal(1);
   protected readonly size = signal(20);
   protected readonly result = signal<PageResult<SystemUser>>(emptyPage<SystemUser>());
+  protected readonly summary = signal(EMPTY_USER_LIST_SUMMARY);
   protected readonly loading = signal(false);
+  protected readonly summaryLoading = signal(false);
   protected readonly error = signal('');
+  protected readonly summaryError = signal('');
   protected readonly selectedUser = signal<SystemUser | null>(null);
   protected readonly detail = signal<SystemUserDetail | null>(null);
   protected readonly detailVisible = signal(false);
@@ -312,6 +355,23 @@ export class UsersPage implements OnInit {
   protected readonly totalPages = computed(() =>
     Math.max(1, Math.ceil(this.result().total / this.result().size)),
   );
+  protected readonly stateSummaryItems = computed(() => {
+    const summary = this.summary();
+    return [
+      { label: '全部', value: '', count: summary.total, icon: 'pi pi-users' },
+      { label: '正常', value: 'active', count: summary.active, icon: 'pi pi-check-circle' },
+      { label: '禁用', value: 'disabled', count: summary.disabled, icon: 'pi pi-ban' },
+      { label: '注销', value: 'archived', count: summary.archived, icon: 'pi pi-user-minus' },
+      { label: '删除', value: 'deleted', count: summary.deleted, icon: 'pi pi-trash' },
+    ];
+  });
+  protected readonly companySummaryItems = computed(() => {
+    const summary = this.summary();
+    return [
+      { label: '有公司', count: summary.withCompany, icon: 'pi pi-building' },
+      { label: '无公司', count: summary.withoutCompany, icon: 'pi pi-minus-circle' },
+    ];
+  });
 
   private readonly api = inject(SystemService);
   private readonly confirm = inject(ConfirmService);
@@ -331,12 +391,20 @@ export class UsersPage implements OnInit {
     this.search();
   }
 
+  selectSummaryState(value: string): void {
+    if (this.state() === value) {
+      return;
+    }
+    this.setState(value);
+  }
+
   gotoPage(nextPage: number): void {
     this.page.set(Math.min(Math.max(1, nextPage), this.totalPages()));
     this.load();
   }
 
   load(): void {
+    this.loadSummary();
     this.loading.set(true);
     this.error.set('');
     this.api
@@ -350,6 +418,21 @@ export class UsersPage implements OnInit {
       .subscribe({
         next: (page) => this.result.set(page ?? emptyPage<SystemUser>()),
         error: (err: unknown) => this.error.set(this.messageOf(err)),
+      });
+  }
+
+  private loadSummary(): void {
+    this.summaryLoading.set(true);
+    this.summaryError.set('');
+    this.api
+      .userListSummary({
+        keyword: this.keyword().trim(),
+        state: this.state(),
+      })
+      .pipe(finalize(() => this.summaryLoading.set(false)))
+      .subscribe({
+        next: (summary) => this.summary.set(summary ?? EMPTY_USER_LIST_SUMMARY),
+        error: (err: unknown) => this.summaryError.set(this.messageOf(err)),
       });
   }
 
@@ -389,6 +472,7 @@ export class UsersPage implements OnInit {
         next: (updated) => {
           this.toast.success('用户状态已更新');
           this.patchUser(updated);
+          this.loadSummary();
           if (this.detail()?.user.id === updated.id) {
             this.detail.update((detail) => detail ? { ...detail, user: updated } : detail);
           }

@@ -8,6 +8,7 @@ import {
   CompanyApplyReviewRequest,
   SystemUser,
   SystemUserDetail,
+  SystemUserListSummary,
   SystemUserQuery,
   SystemUserStateUpdate,
 } from './system.model';
@@ -22,6 +23,13 @@ export class SystemService {
       state: query.state ?? '',
       page: query.page,
       size: query.size,
+    });
+  }
+
+  userListSummary(query: Pick<SystemUserQuery, 'keyword' | 'state'>): Observable<SystemUserListSummary> {
+    return this.http.post<SystemUserListSummary>('/system/users/list/summary', {
+      keyword: query.keyword ?? '',
+      state: query.state ?? '',
     });
   }
 
