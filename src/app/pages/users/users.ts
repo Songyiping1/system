@@ -211,33 +211,33 @@ import { PageResult, emptyPage } from '../../shared/models/page-result';
       [blockScroll]="true"
     >
       <ng-template #header>
-        <div class="drawer-title">
-          <span class="eyebrow">User Detail</span>
-          <strong>{{ detail()?.user?.username || selectedUser()?.username || '用户详情' }}</strong>
+        <div class="drawer-head">
+          <span class="drawer-head__avatar">{{ avatarOf(detail()?.user ?? selectedUser()) }}</span>
+          <div class="drawer-head__meta">
+            <strong>{{ detail()?.user?.username || selectedUser()?.username || '用户详情' }}</strong>
+            <span>{{ detail()?.user?.id || selectedUser()?.id || '—' }}</span>
+          </div>
+          @if (detail()?.user?.state || selectedUser()?.state; as st) {
+            <span class="drawer-head__state">
+              <p-tag [value]="stateLabel(st)" [severity]="stateSeverity(st)" />
+            </span>
+          }
         </div>
       </ng-template>
 
       @if (detailLoading()) {
-        <div class="drawer-stack">
-          <p-skeleton height="92px" borderRadius="8px" />
-          <p-skeleton height="180px" borderRadius="8px" />
-          <p-skeleton height="180px" borderRadius="8px" />
+        <div class="drawer-body drawer-body--loading">
+          <p-skeleton height="132px" borderRadius="6px" />
+          <p-skeleton height="108px" borderRadius="6px" />
+          <p-skeleton height="108px" borderRadius="6px" />
         </div>
       } @else if (detail(); as item) {
-        <div class="drawer-stack">
-          <section class="detail-card detail-card--identity">
-            <div class="identity-mark">{{ avatarOf(item.user) }}</div>
-            <div>
-              <h3>{{ item.user.username || '-' }}</h3>
-              <p>{{ item.user.realName || '未填写真实姓名' }} · {{ item.user.mobile || '无手机号' }}</p>
-              <p-tag [value]="stateLabel(item.user.state)" [severity]="stateSeverity(item.user.state)" />
-            </div>
-          </section>
-
-          <section class="detail-card">
-            <h4>账号资料</h4>
+        <div class="drawer-body">
+          <section class="field-group">
+            <h4 class="field-group__title">账号资料</h4>
             <div class="kv">
-              <span>用户 ID</span><strong>{{ item.user.id }}</strong>
+              <span>真实姓名</span><strong>{{ item.user.realName || '-' }}</strong>
+              <span>手机号</span><strong>{{ item.user.mobile || '-' }}</strong>
               <span>邮箱</span><strong>{{ item.user.email || '-' }}</strong>
               <span>账号类型</span><strong>{{ item.user.accountType || '-' }}</strong>
               <span>默认公司</span><strong>{{ item.user.defaultCompanyId || '-' }}</strong>
@@ -246,49 +246,43 @@ import { PageResult, emptyPage } from '../../shared/models/page-result';
             </div>
           </section>
 
-          <section class="detail-card">
-            <div class="section-line">
-              <h4>所属公司</h4>
-              <span>{{ item.companies.length }} 个</span>
-            </div>
+          <section class="field-group">
+            <h4 class="field-group__title">所属公司 <span>{{ item.companies.length }}</span></h4>
             @if (item.companies.length === 0) {
               <p class="muted">暂无在职公司。</p>
             } @else {
-              <div class="mini-list">
+              <ul class="record-list">
                 @for (company of item.companies; track company.memberId || company.companyId) {
-                  <div class="mini-item">
+                  <li class="record-list__item">
                     <strong>{{ company.companyName || company.companyId }}</strong>
                     <span>{{ company.memberDisplayName || '-' }} · {{ company.memberState || '-' }}</span>
                     <small>{{ formatTime(company.joinedAt) }}</small>
-                  </div>
+                  </li>
                 }
-              </div>
+              </ul>
             }
           </section>
 
-          <section class="detail-card">
-            <div class="section-line">
-              <h4>有效会话</h4>
-              <span>{{ item.sessions.length }} 个</span>
-            </div>
+          <section class="field-group">
+            <h4 class="field-group__title">有效会话 <span>{{ item.sessions.length }}</span></h4>
             @if (item.sessions.length === 0) {
               <p class="muted">暂无有效登录会话。</p>
             } @else {
-              <div class="mini-list">
+              <ul class="record-list">
                 @for (session of item.sessions; track session.sessionId) {
-                  <div class="mini-item">
+                  <li class="record-list__item">
                     <strong>{{ session.deviceType || 'Unknown Device' }}</strong>
                     <span>{{ session.loginMethod || '-' }} · {{ session.ipAddress || '-' }}</span>
                     <small>最近活跃 {{ formatTime(session.lastSeenAt) }}</small>
-                  </div>
+                  </li>
                 }
-              </div>
+              </ul>
             }
           </section>
 
-          <section class="danger-zone">
-            <h4>高危操作</h4>
-            <div class="danger-actions">
+          <section class="field-group">
+            <h4 class="field-group__title">账号操作</h4>
+            <div class="action-row">
               <p-button
                 label="恢复正常"
                 icon="pi pi-check"
